@@ -3,12 +3,12 @@ export interface UserProps {
   name: string;
   email: string;
   password: string;
-  orchards_id?: string[];  
-  count_orchards?: number; 
-  experience_level?: number; 
-  profile_image?: string;  
-  createdAt?: Date;   
-  historyTimeUse_ids?: string[]; 
+  orchards_id?: string[];
+  count_orchards?: number;
+  experience_level?: 1 | 2 | 3;
+  profile_image?: string;
+  createdAt?: Date;
+  historyTimeUse_ids?: Date[];
 
 }
 
@@ -17,10 +17,12 @@ export class User {
   private _name: string;
   private _email: string;
   private _password: string;
-  private _experience_level: number;
-  private _profile_image?: string;
+  private _orchards_id: string[];
+  private _count_orchards: number;
+  private _experience_level: 1 | 2 | 3;
+  private _profile_image: string;
   private _createdAt: Date;
-  private _historyTimeUse_ids: string[];
+  private _historyTimeUse_ids: Date[];
 
 
   constructor(props: UserProps) {
@@ -28,8 +30,10 @@ export class User {
     this._name = props.name;
     this._email = props.email;
     this._password = props.password;
-    this._experience_level = props.experience_level || 1; 
-    this._profile_image = props.profile_image;
+    this._orchards_id = props.orchards_id || [];
+    this._count_orchards = props.count_orchards || 0;
+    this._experience_level = props.experience_level || 1;
+    this._profile_image = props.profile_image || 'https://imgs.search.brave.com/4UEc9qL-ya5yCbrX6t3vwBJRKoFVHndy9k0d9DuWMJY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9oaXBz/LmhlYXJzdGFwcHMu/Y29tL2htZy1wcm9k/L2ltYWdlcy9zd2Vl/dC1wb3RhdG8tcGxh/bnQtcm95YWx0eS1m/cmVlLWltYWdlLTE3/NDI0MjMxMDIucGpw/ZWc_Y3JvcD0wLjY2/OHh3OjEuMDB4aDsw/LjAyMDR4dyww';
     this._createdAt = props.createdAt || new Date();
     this._historyTimeUse_ids = props.historyTimeUse_ids || [];
   }
@@ -50,6 +54,14 @@ export class User {
     return this._password;
   }
 
+  get orchards_id(): string[] | undefined {
+    return this._orchards_id ? [...this._orchards_id] : undefined;
+  }
+
+  get count_orchards(): number | undefined {
+    return this._count_orchards;
+  }
+
   get experience_level(): number {
     return this._experience_level;
   }
@@ -62,8 +74,8 @@ export class User {
     return this._createdAt;
   }
 
-  get historyTimeUse_ids(): string[] {
-    return [...this._historyTimeUse_ids]; 
+  get historyTimeUse_ids(): Date[] {
+    return [...this._historyTimeUse_ids];
   }
 
   private generateId(): string {
@@ -75,7 +87,9 @@ export class User {
       id: this._id,
       name: this._name,
       email: this._email,
-      experience_level : this._experience_level,
+      orchards_id: this._orchards_id,
+      count_orchards: this._count_orchards,
+      experience_level: this._experience_level,
       profile_image: this._profile_image,
       createdAt: this._createdAt,
       historyTimeUse_ids: this._historyTimeUse_ids

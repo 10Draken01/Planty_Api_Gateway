@@ -158,12 +158,7 @@ export class UserController {
       const user = await this.getUserByEmailUseCase.execute({ email });
 
       // Respuesta exitosa - INCLUYE la contraseña para validación de autenticación
-      res.status(200).json({
-        id: user.id,
-        email: user.email,
-        password: user.password, // Necesario para validar credenciales
-        name: user.name
-      });
+      res.status(200).json(user);
 
     } catch (error: any) {
       // Manejo de errores específicos
