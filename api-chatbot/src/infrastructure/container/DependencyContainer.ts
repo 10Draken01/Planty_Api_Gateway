@@ -90,7 +90,6 @@ export class DependencyContainer {
 
     // 4. Inicializar Use Cases - Chat
     this.sendMessageUseCase = new SendMessageUseCase(
-      this.chatRepository,
       this.vectorRepository,
       this.chatService,
       this.embeddingService

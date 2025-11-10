@@ -18,7 +18,7 @@ export class ChatController {
    */
   async sendMessage(req: Request, res: Response): Promise<void> {
     try {
-      const { sessionId, message, includeContext = true, maxContextChunks = 5 } = req.body;
+      const { message, includeContext = true, maxContextChunks = 5 } = req.body;
 
       // Validaciones
       if (!message || typeof message !== 'string' || message.trim().length === 0) {
@@ -29,17 +29,17 @@ export class ChatController {
         return;
       }
 
-      // Ejecutar use case
-      const result = await this.sendMessageUseCase.execute({
-        sessionId,
+      // Ejecutar use case - retorna solo el mensaje de respuesta
+      const response = await this.sendMessageUseCase.execute({
         message: message.trim(),
         includeContext,
         maxContextChunks
       });
 
+      // Retornar solo la respuesta generada
       res.status(200).json({
         success: true,
-        data: result
+        response: response
       });
     } catch (error) {
       console.error('Error en sendMessage:', error);

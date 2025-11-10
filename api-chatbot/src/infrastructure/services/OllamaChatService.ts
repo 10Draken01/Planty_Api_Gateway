@@ -18,8 +18,7 @@ export class OllamaChatService implements IChatService {
 
   async generateResponse(
     query: string,
-    context: string,
-    conversationHistory?: Array<{ role: string; content: string }>
+    context: string
   ): Promise<string> {
     try {
       // Construir el prompt con contexto RAG
@@ -27,26 +26,16 @@ export class OllamaChatService implements IChatService {
       const userPrompt = this.buildUserPrompt(query, context);
 
       // Preparar mensajes para Ollama
-      const messages: Array<{ role: string; content: string }> = [];
-
-      // Agregar mensaje de sistema
-      messages.push({
-        role: 'system',
-        content: systemPrompt
-      });
-
-      // Agregar historial de conversación (si existe)
-      if (conversationHistory && conversationHistory.length > 0) {
-        // Solo los últimos 4 mensajes para no saturar el contexto
-        const recentHistory = conversationHistory.slice(-4);
-        messages.push(...recentHistory);
-      }
-
-      // Agregar pregunta actual con contexto
-      messages.push({
-        role: 'user',
-        content: userPrompt
-      });
+      const messages: Array<{ role: string; content: string }> = [
+        {
+          role: 'system',
+          content: systemPrompt
+        },
+        {
+          role: 'user',
+          content: userPrompt
+        }
+      ];
 
       // Generar respuesta
       const response = await this.ollama.chat({
@@ -54,7 +43,7 @@ export class OllamaChatService implements IChatService {
         messages: messages,
         stream: false,
         options: {
-          temperature: 0.7,
+          temperature: 0.8,
           top_p: 0.9,
           top_k: 40
         }
@@ -74,33 +63,41 @@ export class OllamaChatService implements IChatService {
   }
 
   private buildSystemPrompt(): string {
-    return `Eres un asistente experto en plantas de Suchiapa, Chiapas, México.
-Tu objetivo es ayudar a los usuarios a obtener información precisa sobre las plantas de esta región.
+    return `Eres Planty 🌿, un asistente virtual super amigable y divertido especializado en plantas de Suchiapa, Chiapas, México.
+
+TU PERSONALIDAD:
+- Eres alegre, entusiasta y te ENCANTAN las plantas 🌱
+- Usas emojis relevantes en tus respuestas para hacerlas más amenas 😊🌺🌸🍃
+- Tienes un tono conversacional, cercano y divertido
+- Te emociona compartir conocimientos sobre plantas
+- Eres como ese amigo que siempre tiene datos curiosos sobre la naturaleza
 
 INSTRUCCIONES:
-- Responde siempre en español de manera clara y concisa
-- Basa tus respuestas en el contexto proporcionado
-- Si el contexto no contiene información suficiente para responder, indícalo claramente
-- Sé específico y preciso con los nombres de las plantas
-- Proporciona información útil sobre usos, características, cuidados, etc.
-- Si no estás seguro de algo, admítelo en lugar de inventar información
-- Mantén un tono amigable y educativo`;
+- Responde SIEMPRE en español de manera clara, amigable y con entusiasmo
+- Usa emojis de plantas, naturaleza y emociones para hacer tus respuestas más expresivas
+- Basa tus respuestas en el contexto proporcionado de la base de datos
+- Si el contexto no tiene suficiente información, dilo de forma amigable y ofrece ayuda general
+- Sé específico con los nombres de las plantas, pero explícalo de forma divertida
+- Comparte datos curiosos cuando sea relevante
+- Si no estás seguro de algo, admítelo con humor en lugar de inventar información
+- Mantén las respuestas relativamente cortas pero informativas (2-4 párrafos máximo)
+- Añade personalidad: usa expresiones como "¡Qué emoción!", "¡Me encanta esa planta!", etc.`;
   }
 
   private buildUserPrompt(query: string, context: string): string {
     if (context && context.trim().length > 0) {
-      return `CONTEXTO RELEVANTE:
+      return `📚 INFORMACIÓN DE LA BASE DE DATOS:
 ${context}
 
-PREGUNTA DEL USUARIO:
+💬 PREGUNTA DEL USUARIO:
 ${query}
 
-Por favor, responde la pregunta basándote en el contexto proporcionado. Si el contexto no es suficiente para responder completamente, indícalo.`;
+Genera una respuesta divertida, amigable y útil basándote en la información de la base de datos. Usa emojis relevantes y mantén un tono entusiasta. Si la información es limitada, dilo de forma simpática y ofrece lo que sí sabes.`;
     } else {
-      return `PREGUNTA DEL USUARIO:
+      return `💬 PREGUNTA DEL USUARIO:
 ${query}
 
-Nota: No se encontró contexto específico en la base de conocimientos. Proporciona una respuesta general si es posible, o indica que necesitas más información.`;
+⚠️ No encontré información específica en mi base de datos sobre esto. Genera una respuesta amigable indicando que no tienes información específica sobre esa planta en tu base de datos de Suchiapa, pero mantén un tono positivo y ofrece ayuda de forma general si es posible. Usa emojis para mantener la conversación amena.`;
     }
   }
 
