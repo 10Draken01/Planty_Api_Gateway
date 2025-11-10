@@ -63,40 +63,87 @@ export class ProcessDocumentUseCase {
         throw new Error('No se pudo extraer texto del PDF');
       }
 
-      // 4. Dividir en chunks
+      // 4. Dividir en chunks (procesar por bloques para PDFs grandes)
       console.log(`Dividiendo texto en chunks (size: ${chunkSize}, overlap: ${chunkOverlap})`);
-      const textChunks = this.textSplitter.splitText(text, chunkSize, chunkOverlap);
+      console.log(`Tamaño del texto: ${text.length} caracteres`);
+
+      const textChunks: string[] = [];
+      const BLOCK_SIZE = 1000000; // Procesar 1MB de texto a la vez
+
+      // Si el texto es muy grande, procesarlo por bloques
+      if (text.length > BLOCK_SIZE) {
+        console.log(`Texto muy grande, procesando por bloques de ${BLOCK_SIZE} caracteres`);
+
+        for (let i = 0; i < text.length; i += BLOCK_SIZE) {
+          const blockEnd = Math.min(i + BLOCK_SIZE + chunkSize, text.length);
+          const block = text.substring(i, blockEnd);
+          const blockChunks = this.textSplitter.splitText(block, chunkSize, chunkOverlap);
+          textChunks.push(...blockChunks);
+
+          console.log(`Bloque ${Math.floor(i / BLOCK_SIZE) + 1}: ${blockChunks.length} chunks generados`);
+        }
+      } else {
+        const chunks = this.textSplitter.splitText(text, chunkSize, chunkOverlap);
+        textChunks.push(...chunks);
+      }
 
       if (textChunks.length === 0) {
         throw new Error('No se generaron chunks de texto');
       }
 
-      console.log(`Se generaron ${textChunks.length} chunks`);
+      console.log(`Total: ${textChunks.length} chunks generados`);
 
-      // 5. Crear entidades TextChunk y generar embeddings
+      // 5. Crear entidades TextChunk y generar embeddings en paralelo por lotes
       const chunks: TextChunk[] = [];
+      const BATCH_SIZE = 50; // Procesar 50 chunks en paralelo
+      const CHROMA_BATCH_SIZE = 500; // Insertar en ChromaDB cada 500 chunks (evitar timeout)
+      let totalProcessed = 0; // Contador de chunks procesados
 
-      for (let i = 0; i < textChunks.length; i++) {
-        const chunkText = textChunks[i];
+      console.log(`\n🚀 Iniciando procesamiento paralelo de ${textChunks.length} chunks`);
+      console.log(`   📦 Tamaño de lote para embeddings: ${BATCH_SIZE}`);
+      console.log(`   💾 Tamaño de lote para ChromaDB: ${CHROMA_BATCH_SIZE}\n`);
 
-        console.log(`Generando embedding para chunk ${i + 1}/${textChunks.length}`);
-        const embedding = await this.embeddingService.generateEmbedding(chunkText);
+      for (let i = 0; i < textChunks.length; i += BATCH_SIZE) {
+        const batchEnd = Math.min(i + BATCH_SIZE, textChunks.length);
+        const batch = textChunks.slice(i, batchEnd);
 
-        const chunk = TextChunk.create(document.id, chunkText, i, {
-          chunkSize,
-          chunkOverlap
+        // Generar embeddings en paralelo para este lote
+        const embeddingPromises = batch.map(async (chunkText, batchIndex) => {
+          const globalIndex = i + batchIndex;
+          const embedding = await this.embeddingService.generateEmbedding(chunkText);
+
+          const chunk = TextChunk.create(document.id, chunkText, globalIndex, {
+            chunkSize,
+            chunkOverlap
+          });
+
+          chunk.setEmbedding(embedding);
+          return chunk;
         });
 
-        chunk.setEmbedding(embedding);
-        chunks.push(chunk);
+        const batchChunks = await Promise.all(embeddingPromises);
+        chunks.push(...batchChunks);
+
+        // Mostrar progreso cada 100 chunks
+        if ((i + BATCH_SIZE) % 100 === 0 || batchEnd === textChunks.length) {
+          const progress = ((batchEnd / textChunks.length) * 100).toFixed(2);
+          console.log(`   ⏳ Progreso: ${batchEnd}/${textChunks.length} (${progress}%) - ${chunks.length} chunks listos`);
+        }
+
+        // Insertar en ChromaDB cada CHROMA_BATCH_SIZE chunks para evitar memoria
+        if (chunks.length >= CHROMA_BATCH_SIZE || batchEnd === textChunks.length) {
+          console.log(`   💾 Insertando ${chunks.length} chunks en ChromaDB...`);
+          await this.vectorRepository.addChunks(chunks);
+          totalProcessed += chunks.length;
+          chunks.length = 0; // Limpiar array para liberar memoria
+        }
       }
 
-      // 6. Almacenar en ChromaDB
-      console.log(`Almacenando ${chunks.length} chunks en ChromaDB`);
-      await this.vectorRepository.addChunks(chunks);
+      // 6. Confirmar almacenamiento completo
+      console.log(`\n✅ Procesamiento completado: ${totalProcessed} chunks almacenados en ChromaDB`);
 
       // 7. Marcar documento como procesado
-      document.markAsProcessed(chunks.length);
+      document.markAsProcessed(totalProcessed);
       document.updateMetadata({
         textLength: text.length,
         chunkSize,

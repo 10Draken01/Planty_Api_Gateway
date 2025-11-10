@@ -23,7 +23,7 @@ export class ChromaVectorRepository implements VectorRepository {
 
   async initialize(): Promise<void> {
     try {
-      console.log(`Inicializando ChromaDB en ${this.client.path}`);
+     
 
       // Verificar heartbeat
       const heartbeat = await this.client.heartbeat();
@@ -224,7 +224,7 @@ export class ChromaVectorRepository implements VectorRepository {
   async collectionExists(): Promise<boolean> {
     try {
       const collections = await this.client.listCollections();
-      return collections.some((col) => col.name === this.collectionName);
+      return collections.some((col:any) => col.name === this.collectionName);
     } catch (error) {
       console.error('Error verificando existencia de colección:', error);
       return false;

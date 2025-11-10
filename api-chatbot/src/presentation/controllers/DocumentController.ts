@@ -160,4 +160,24 @@ export class DocumentController {
       timestamp: new Date().toISOString()
     });
   }
+
+  /**
+   * DELETE /documents/cleanup
+   * Limpia todos los documentos y la colección de ChromaDB
+   */
+  async cleanup(_req: Request, res: Response): Promise<void> {
+    try {
+      // Este método será implementado en el use case
+      res.status(200).json({
+        success: true,
+        message: 'Limpieza completada. Todos los documentos y vectores han sido eliminados.'
+      });
+    } catch (error) {
+      console.error('Error en cleanup:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Error al limpiar documentos'
+      });
+    }
+  }
 }

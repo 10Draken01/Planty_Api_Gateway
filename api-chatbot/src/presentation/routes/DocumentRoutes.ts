@@ -61,6 +61,9 @@ export class DocumentRoutes {
     // GET /documents/health - Health check
     router.get('/health', (req, res) => documentController.health(req, res));
 
+    // DELETE /documents/cleanup - Limpiar todos los documentos y vectores
+    router.delete('/cleanup', (req, res) => documentController.cleanup(req, res));
+
     return router;
   }
 }

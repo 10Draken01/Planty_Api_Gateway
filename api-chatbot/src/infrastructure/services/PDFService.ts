@@ -27,11 +27,14 @@ export class PDFService implements IPDFService {
       // Extraer y limpiar el texto
       let text = data.text;
 
-      // Normalizar espacios en blanco
-      text = text.replace(/\s+/g, ' ');
-
-      // Eliminar caracteres especiales problemáticos
+      // Eliminar caracteres especiales problemáticos (pero mantener saltos de línea)
       text = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+
+      // Normalizar múltiples saltos de línea a máximo 2
+      text = text.replace(/\n{3,}/g, '\n\n');
+
+      // Normalizar espacios horizontales múltiples
+      text = text.replace(/[^\S\n]+/g, ' ');
 
       // Trim
       text = text.trim();

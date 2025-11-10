@@ -26,31 +26,27 @@ export class TextSplitterService implements ITextSplitter {
     }
 
     const chunks: string[] = [];
-    let startIndex = 0;
+    let position = 0;
+    const textLength = text.length;
 
-    while (startIndex < text.length) {
+    while (position < textLength) {
       // Calcular el final del chunk
-      let endIndex = Math.min(startIndex + chunkSize, text.length);
-
-      // Si no es el último chunk, intentar cortar en un límite natural
-      if (endIndex < text.length) {
-        endIndex = this.findNaturalBreakpoint(text, startIndex, endIndex);
-      }
+      const end = Math.min(position + chunkSize, textLength);
 
       // Extraer el chunk
-      const chunk = text.substring(startIndex, endIndex).trim();
+      const chunk = text.slice(position, end).trim();
 
       // Solo agregar si el chunk no está vacío
       if (chunk.length > 0) {
         chunks.push(chunk);
       }
 
-      // Mover el índice con overlap
-      startIndex = endIndex - overlap;
+      // Avanzar con overlap, pero siempre avanzar al menos (chunkSize - overlap)
+      position += chunkSize - overlap;
 
-      // Asegurar que avanzamos al menos 1 carácter
-      if (startIndex <= chunks.length && startIndex + chunkSize >= text.length) {
-        break;
+      // Seguridad: si no estamos avanzando, forzar avance
+      if (position <= chunks.length * (chunkSize - overlap)) {
+        position = chunks.length * (chunkSize - overlap);
       }
     }
 
