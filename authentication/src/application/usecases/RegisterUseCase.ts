@@ -19,19 +19,18 @@ export class RegisterUseCase {
 
     const hashedPassword = await this.hashService.hash(password);
 
-    const user = await this.userService.create(name, email, hashedPassword);
+    const res = await this.userService.create(name, email, hashedPassword);
 
     const token = this.tokenService.generate({
-      userId: user.id,
-      email: user.email
+      userId: res.data.id,
+      email: res.data.email
     });
 
     return {
       token,
       user: {
-        id: user.id,
-        email: user.email,
-        name: user.name
+        ...res.data,
+        password: undefined
       }
     };
   }

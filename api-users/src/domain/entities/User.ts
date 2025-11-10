@@ -87,6 +87,7 @@ export class User {
       id: this._id,
       name: this._name,
       email: this._email,
+      password: this._password,
       orchards_id: this._orchards_id,
       count_orchards: this._count_orchards,
       experience_level: this._experience_level,
