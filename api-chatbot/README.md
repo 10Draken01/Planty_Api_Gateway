@@ -107,6 +107,25 @@ CHAT_RATE_LIMIT_MAX=20
 
 ## 🎯 Uso
 
+### Inicialización Automática (Recomendado)
+
+El proyecto incluye un script de inicialización que automáticamente sube y procesa el PDF educativo:
+
+```bash
+# Asegúrate de que el servicio esté corriendo
+npm run dev
+
+# En otra terminal, ejecuta el script de inicialización
+npm run init-pdf
+```
+
+Este script:
+1. Espera a que el servicio esté disponible
+2. Verifica si el PDF ya fue procesado
+3. Sube el PDF automáticamente desde `pdf/Planty_Educative.pdf`
+4. Procesa el PDF y lo fragmenta en ChromaDB
+5. Muestra el progreso y confirma la finalización
+
 ### Desarrollo
 
 ```bash
@@ -327,6 +346,25 @@ GET /api/chat/history/:sessionId
 
 ## 🔄 Flujo de Trabajo Completo
 
+### Opción A: Automático (Recomendado)
+
+```bash
+# 1. Iniciar servicio
+npm run dev
+
+# 2. En otra terminal, ejecutar script de inicialización
+npm run init-pdf
+
+# 3. Hacer preguntas
+curl -X POST http://localhost:3003/api/chat/message \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "¿Qué plantas medicinales hay en Suchiapa?"
+  }'
+```
+
+### Opción B: Manual
+
 1. **Subir PDF**: `POST /api/documents/upload`
 2. **Procesar PDF**: `POST /api/documents/:id/process`
 3. **Hacer preguntas**: `POST /api/chat/message`
@@ -401,6 +439,42 @@ API Gateway (3000) → /api/chatbot/* → Chatbot Service (3003)
 └─────────┘    └──────────┘      └─────────────┘
 ```
 
+## 📄 Procesamiento de PDFs
+
+El sistema fragmenta los PDFs de forma optimizada para búsquedas semánticas:
+
+### Proceso de Fragmentación
+
+1. **Extracción de Texto**: Se extrae todo el texto del PDF usando pdf-parse
+2. **División en Bloques**: Para PDFs grandes, se divide en bloques de 1MB
+3. **Fragmentación**: El texto se divide en chunks con:
+   - **Tamaño**: 1000 caracteres por chunk (configurable)
+   - **Solapamiento**: 200 caracteres entre chunks (configurable)
+   - **Ventaja del solapamiento**: Evita perder contexto entre fragmentos
+4. **Generación de Embeddings**: Cada chunk se convierte en un vector usando `nomic-embed-text`
+   - Procesamiento paralelo: 50 chunks a la vez
+5. **Almacenamiento**: Los vectores se guardan en ChromaDB
+   - Inserción por lotes: 500 chunks por batch
+   - Incluye metadata: chunkIndex, timestamp, filename
+
+### Ejemplo de Chunk
+
+```
+Chunk 1 (0-1000 caracteres):
+"Las plantas medicinales de Suchiapa incluyen..."
+
+Chunk 2 (800-1800 caracteres, con 200 de solapamiento):
+"...de Suchiapa incluyen el epazote, la hierbabuena..."
+```
+
+### Búsqueda Semántica
+
+Cuando el usuario hace una pregunta:
+1. La pregunta se convierte en un embedding
+2. ChromaDB encuentra los 5 chunks más similares (cosine similarity)
+3. Los chunks se concatenan como contexto
+4. El LLM genera una respuesta basada en ese contexto
+
 ## 🛠️ Stack Tecnológico
 
 - **Runtime**: Node.js 20+
@@ -413,6 +487,14 @@ API Gateway (3000) → /api/chatbot/* → Chatbot Service (3003)
 
 ## 📝 Notas de Desarrollo
 
+### Scripts Disponibles
+
+- **`npm run dev`**: Inicia el servidor en modo desarrollo con hot-reload
+- **`npm run build`**: Compila TypeScript a JavaScript
+- **`npm start`**: Ejecuta el servidor compilado en producción
+- **`npm run init-pdf`**: Script automatizado para subir y procesar el PDF educativo
+- **`npm test`**: Ejecuta las pruebas unitarias
+
 ### Chunk Size y Overlap
 
 - **CHUNK_SIZE**: Tamaño máximo de cada fragmento de texto (default: 1000)
@@ -421,6 +503,15 @@ API Gateway (3000) → /api/chatbot/* → Chatbot Service (3003)
 Ajusta estos valores según el tipo de contenido:
 - Textos técnicos: chunks más pequeños (500-800)
 - Textos narrativos: chunks más grandes (1000-1500)
+
+### Mejoras en Prompt Engineering
+
+El sistema utiliza un prompt mejorado que incluye:
+- Instrucciones claras sobre cómo usar el contexto
+- Tono amigable y energético
+- Enfoque en coherencia y claridad
+- Referencia a las fuentes de información
+- Manejo elegante cuando no hay información disponible
 
 ### Modelos de Ollama
 
