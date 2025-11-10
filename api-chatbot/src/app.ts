@@ -70,7 +70,7 @@ class ChatbotApp {
       legacyHeaders: false
     });
 
-    this.app.use('/api', generalLimiter);
+    this.app.use('/', generalLimiter);
 
     // Rate limiting específico para chat (más restrictivo)
     const chatLimiter = rateLimit({
@@ -81,7 +81,7 @@ class ChatbotApp {
       legacyHeaders: false
     });
 
-    this.app.use('/api/chat/message', chatLimiter);
+    this.app.use('/chat/message', chatLimiter);
 
     // Logger de peticiones
     this.app.use((req, _res, next) => {
@@ -95,7 +95,7 @@ class ChatbotApp {
    */
   private setupRoutes(): void {
     // Health check general
-    this.app.get('/health', (_req: Request, res: Response) => {
+    this.app.get('/chat/health', (_req: Request, res: Response) => {
       res.json({
         success: true,
         service: 'chatbot-api',
@@ -106,7 +106,7 @@ class ChatbotApp {
     });
 
     // System info
-    this.app.get('/api/info', async (_req: Request, res: Response) => {
+    this.app.get('/chat/info', async (_req: Request, res: Response) => {
       try {
         const systemInfo = this.container.getSystemInfo();
         const services = await this.container.checkServices();
@@ -127,10 +127,10 @@ class ChatbotApp {
     });
 
     // Rutas de documentos
-    this.app.use('/api/documents', this.container.getDocumentRoutes());
+    this.app.use('/chat/documents', this.container.getDocumentRoutes());
 
     // Rutas de chat
-    this.app.use('/api/chat', this.container.getChatRoutes());
+    this.app.use('/chat', this.container.getChatRoutes());
 
     // Ruta 404
     this.app.use((_req: Request, res: Response) => {
@@ -210,13 +210,13 @@ class ChatbotApp {
       console.log(`\n✓ Servidor corriendo en puerto ${config.port}`);
       console.log(`✓ Entorno: ${config.nodeEnv}`);
       console.log(`\n📚 Endpoints disponibles:`);
-      console.log(`   GET  http://localhost:${config.port}/health`);
-      console.log(`   GET  http://localhost:${config.port}/api/info`);
-      console.log(`   POST http://localhost:${config.port}/api/documents/upload`);
-      console.log(`   POST http://localhost:${config.port}/api/documents/:id/process`);
-      console.log(`   GET  http://localhost:${config.port}/api/documents`);
-      console.log(`   POST http://localhost:${config.port}/api/chat/message`);
-      console.log(`   GET  http://localhost:${config.port}/api/chat/history/:sessionId`);
+      console.log(`   GET  http://localhost:${config.port}/chat/health`);
+      console.log(`   GET  http://localhost:${config.port}/chat/info`);
+      console.log(`   POST http://localhost:${config.port}/chat/documents/upload`);
+      console.log(`   POST http://localhost:${config.port}/chat/documents/:id/process`);
+      console.log(`   GET  http://localhost:${config.port}/chat/documents`);
+      console.log(`   POST http://localhost:${config.port}/chat/message`);
+      console.log(`   GET  http://localhost:${config.port}/chat/history/:sessionId`);
       console.log(`\n💡 Presiona Ctrl+C para detener el servidor\n`);
     });
   }

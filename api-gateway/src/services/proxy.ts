@@ -22,13 +22,24 @@ export const authServiceProxy = createProxyMiddleware({
   },
 });
 
-export const chatbotServiceProxy = createProxyMiddleware({
+/**
+ * Proxy para rutas protegidas del chatbot
+ * Se usa para /chatbot/chat/message que requiere autenticación
+ */
+export const protectedChatbotProxy = createProxyMiddleware({
   target: 'http://localhost:3003',
   changeOrigin: true,
-  pathRewrite: { '^/chatbot': '/api' },
+  pathRewrite: { '^/api/chat/message': '/chat/message' },
   logLevel: 'debug',
 
   onProxyReq: (proxyReq, req) => {
+    // Pasar información del usuario autenticado al microservicio
+    const user = (req as any).user;
+    if (user) {
+      proxyReq.setHeader('X-User-Id', user.userId);
+      proxyReq.setHeader('X-User-Email', user.email);
+    }
+
     if (req.body && Object.keys(req.body).length) {
       const bodyData = JSON.stringify(req.body);
       proxyReq.setHeader('Content-Type', 'application/json');

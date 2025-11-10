@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  # ChromaDB - Base de datos vectorial para embeddings
+  chromadb:
+    image: ghcr.io/chroma-core/chroma:latest
+    container_name: chatbot-chromadb
+    ports:
+      - "8000:8000"
+    volumes:
+      - chromadb-data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
+    networks:
+      - chatbot-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  chromadb-data:
+    driver: local
+
+networks:
+  chatbot-network:
+    driver: bridge

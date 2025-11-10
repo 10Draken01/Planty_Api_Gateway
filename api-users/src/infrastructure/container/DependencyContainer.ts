@@ -26,12 +26,14 @@ export class DependencyContainer {
 
   constructor(
     mongoRootUser: string,
-    mongoRootPassword: string
+    mongoRootPassword: string,
+    mongoDbName: string
   ) {
     // Repositories
     this.initDatabaseConnection(
       mongoRootUser, 
-      mongoRootPassword
+      mongoRootPassword,
+      mongoDbName
     );
 
     this.userRepository = new MongoUserRepository();
@@ -60,9 +62,10 @@ export class DependencyContainer {
   }
   private async initDatabaseConnection(
     mongoRootUser: string,
-    mongoRootPassword: string
+    mongoRootPassword: string,
+    mongoDbName: string
   ): Promise<void> {
-    await DatabaseConnection.connect(mongoRootUser, mongoRootPassword); 
+    await DatabaseConnection.connect(mongoRootUser, mongoRootPassword, mongoDbName); 
   }
   
   createUserRoutes(): UserRoutes {

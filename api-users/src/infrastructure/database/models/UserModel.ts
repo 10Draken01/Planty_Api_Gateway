@@ -5,9 +5,11 @@ export interface UserDocument extends Document {
   name: string;
   email: string;
   password: string;
-  experience_level: number;
-  profile_image?: string;
-  historyTimeUse_ids: string[];
+  orchards_id: string[];
+  count_orchards: number;
+  experience_level: 1 | 2 | 3;
+  profile_image: string;
+  historyTimeUse_ids: Date[];
   createdAt: Date;
   updatedAt: Date;
 }

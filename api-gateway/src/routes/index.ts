@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { userServiceProxy, authServiceProxy, chatbotServiceProxy } from '../services/proxy';
+import { userServiceProxy, authServiceProxy, protectedChatbotProxy } from '../services/proxy';
+import { validateTokenWithAuthService } from '../middleware/validateTokenWithAuthService';
 
 const router = Router();
 
@@ -13,6 +14,9 @@ router.get('/health', (req, res) => {
 
 router.use('/auth', authServiceProxy);
 router.use('/users', userServiceProxy);
-router.use('/chatbot', chatbotServiceProxy);
+
+// Ruta protegida específica para /chatbot/chat/message
+// Esta debe ir ANTES de la ruta general del chatbot para que tome prioridad
+router.use('/chat/message', validateTokenWithAuthService, protectedChatbotProxy);
 
 export default router;

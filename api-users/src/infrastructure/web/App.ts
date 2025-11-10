@@ -15,9 +15,11 @@ export class App {
     this.port = parseInt(process.env.PORT || '3001', 10);
     const mongoRootUser = process.env.MONGO_ROOT_USER || 'admin';
     const mongoRootPassword = process.env.MONGO_ROOT_PASSWORD || 'password123';
+    const mongoDbName = process.env.MONGO_DB_NAME || 'users_db';
     this.dependencyContainer = new DependencyContainer(
       mongoRootUser,
-      mongoRootPassword
+      mongoRootPassword,
+      mongoDbName
     );
     
     this.initializeMiddlewares();
