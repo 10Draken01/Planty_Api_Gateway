@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { userServiceProxy, authServiceProxy } from '../services/proxy';
+import { userServiceProxy, authServiceProxy, chatbotServiceProxy } from '../services/proxy';
 
 const router = Router();
 
@@ -13,5 +13,6 @@ router.get('/health', (req, res) => {
 
 router.use('/auth', authServiceProxy);
 router.use('/users', userServiceProxy);
+router.use('/chatbot', chatbotServiceProxy);
 
 export default router;

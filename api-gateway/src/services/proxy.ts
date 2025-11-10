@@ -21,3 +21,19 @@ export const authServiceProxy = createProxyMiddleware({
     }
   },
 });
+
+export const chatbotServiceProxy = createProxyMiddleware({
+  target: 'http://localhost:3003',
+  changeOrigin: true,
+  pathRewrite: { '^/chatbot': '/api' },
+  logLevel: 'debug',
+
+  onProxyReq: (proxyReq, req) => {
+    if (req.body && Object.keys(req.body).length) {
+      const bodyData = JSON.stringify(req.body);
+      proxyReq.setHeader('Content-Type', 'application/json');
+      proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+      proxyReq.write(bodyData);
+    }
+  },
+});
