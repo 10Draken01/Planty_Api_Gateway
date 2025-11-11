@@ -1,0 +1,184 @@
+version: '3.8'
+
+services:
+  # MongoDB - Base de datos de usuarios
+  mongodb:
+    image: mongo:7.0
+    container_name: planty-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB_NAME:-users_db}
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - planty-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # ChromaDB - Base de datos vectorial para RAG
+  chromadb:
+    image: ghcr.io/chroma-core/chroma:latest
+    container_name: planty-chromadb
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - chromadb-data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
+    networks:
+      - planty-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # Users Service
+  api-users:
+    image: draken101/planty-api-users:latest
+    container_name: planty-api-users
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - MONGO_URI=mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-password123}@mongodb:27017/${MONGO_DB_NAME:-users_db}?authSource=admin
+      - JWT_SECRET=${JWT_SECRET:-planty-super-secret-jwt-key-2024-change-in-production}
+      - JWT_EXPIRATION=${JWT_EXPIRATION:-24h}
+      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - planty-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Authentication Service
+  authentication:
+    image: draken101/planty-authentication:latest
+    container_name: planty-authentication
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+      - JWT_SECRET=${JWT_SECRET:-planty-super-secret-jwt-key-2024-change-in-production}
+      - JWT_EXPIRATION=${JWT_EXPIRATION:-24h}
+      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+      - USERS_SERVICE_URL=http://api-users:3001/api
+    depends_on:
+      api-users:
+        condition: service_healthy
+    networks:
+      - planty-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3002/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Chatbot Service
+  api-chatbot:
+    image: draken101/planty-api-chatbot:latest
+    container_name: planty-api-chatbot
+    restart: unless-stopped
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=production
+      - PORT=3003
+      - NODE_OPTIONS=--max-old-space-size=8192
+      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      - OLLAMA_EMBEDDING_MODEL=${OLLAMA_EMBEDDING_MODEL:-nomic-embed-text}
+      - OLLAMA_CHAT_MODEL=${OLLAMA_CHAT_MODEL:-llama3.2}
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+      - CHROMA_COLLECTION_NAME=${CHROMA_COLLECTION_NAME:-plantas_suchiapa}
+      - CHUNK_SIZE=${CHUNK_SIZE:-1000}
+      - CHUNK_OVERLAP=${CHUNK_OVERLAP:-200}
+      - MAX_FILE_SIZE_MB=${MAX_FILE_SIZE_MB:-50}
+      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-15}
+      - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS:-100}
+      - CHAT_RATE_LIMIT_MAX=${CHAT_RATE_LIMIT_MAX:-20}
+    depends_on:
+      chromadb:
+        condition: service_healthy
+    networks:
+      - planty-network
+    volumes:
+      - chatbot-uploads:/app/uploads
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3003/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # API Gateway
+  api-gateway:
+    image: draken101/planty-api-gateway:latest
+    container_name: planty-api-gateway
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - JWT_SECRET=${JWT_SECRET:-planty-super-secret-jwt-key-2024-change-in-production}
+      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-15}
+      - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS:-100}
+      - AUTH_RATE_LIMIT_MAX=${AUTH_RATE_LIMIT_MAX:-5}
+      - CREATE_RATE_LIMIT_MAX=${CREATE_RATE_LIMIT_MAX:-3}
+      - USERS_SERVICE_URL=http://api-users:3001
+      - AUTH_SERVICE_URL=http://authentication:3002
+      - CHATBOT_SERVICE_URL=http://api-chatbot:3003
+    depends_on:
+      api-users:
+        condition: service_healthy
+      authentication:
+        condition: service_healthy
+      api-chatbot:
+        condition: service_healthy
+    networks:
+      - planty-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  mongodb-data:
+    driver: local
+  chromadb-data:
+    driver: local
+  chatbot-uploads:
+    driver: local
+
+networks:
+  planty-network:
+    driver: bridge
