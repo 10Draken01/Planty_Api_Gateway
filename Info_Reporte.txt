@@ -1,0 +1,26 @@
+Alumnos
+Leonardo Favio Najera Morales
+Armando Rodriguez Villarreal
+Edgar Fabricio Jimenez Urbina
+Ángel Gabriel Guzmán Pérez
+
+matriculas
+231230
+231184
+231221
+223270
+
+Profesor
+Jose Alonso Macias Montoya
+
+Empresa
+Vega Script
+
+Materia 
+Seguridad de la Información
+
+Grupo
+A
+
+Cuatrimestre
+9

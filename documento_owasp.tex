@@ -1,0 +1,809 @@
+\documentclass[12pt, a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage[table]{xcolor}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{enumitem}
+
+\addto{\captionsspanish}{\renewcommand{\lstlistingname}{Listado}}
+\addto{\captionsspanish}{\renewcommand{\lstlistlistingname}{Listado de Códigos}}
+
+\definecolor{GrisClaro}{rgb}{0.95, 0.95, 0.95}
+\definecolor{VerdeOWASP}{rgb}{0.2, 0.6, 0.2}
+
+\lstset{
+    backgroundcolor=\color{GrisClaro},
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    showstringspaces=false,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    frame=single,
+    framesep=5pt,
+    rulesepcolor=\color{black},
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{green!60!black}\itshape,
+    stringstyle=\color{orange},
+}
+
+\geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=25mm,
+ right=25mm,
+ top=30mm,
+ bottom=30mm,
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\rfoot{\thepage}
+\lfoot{Seguridad de la Información / Vega Script}
+
+\newcommand{\nombreuniversidad}{Universidad Politécnica de Chiapas}
+\newcommand{\nombrecarrera}{Ingeniería en Software}
+\newcommand{\nombremateria}{Seguridad de la Información}
+\newcommand{\nombreprofesor}{MC. José Alonso Macías Montoya}
+\newcommand{\nombreempresa}{Vega Script}
+\newcommand{\grupo}{9-A}
+\newcommand{\actividad}{Implementación de Controles OWASP Mobile Security}
+\newcommand{\alumnos}{Leonardo Favio Najera Morales (231230) \\ Armando Rodriguez Villarreal (231184) \\ Edgar Fabricio Jimenez Urbina (231221) \\ Ángel Gabriel Guzmán Pérez (223270)}
+\newcommand{\fechaentrega}{\today}
+\newcommand{\ciudad}{Suchiapa, Chiapas}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{0.5cm}
+
+    % --- LOGO DE LA EMPRESA ---
+    \includegraphics[width=0.3\textwidth]{Logo_VS.png}
+
+    \vspace{0.5cm}
+
+    {\Huge\bfseries \nombreuniversidad \par}
+    \vspace{0.3cm}
+    {\Large \nombrecarrera \par}
+
+    \vspace{0.5cm}
+    {\large \textit{Empresa: \nombreempresa} \par}
+
+    \vspace{2cm}
+    \rule{\textwidth}{1.5pt}
+    \vspace{0.4cm}
+    {\Large\bfseries \actividad \par}
+    \vspace{0.4cm}
+    \rule{\textwidth}{1.5pt}
+
+    \vspace{2.5cm}
+
+    % --- INFORMACIÓN DEL CURSO ---
+    \begin{flushleft}
+        \centering
+        \textbf{Materia:} \nombremateria \\
+        \textbf{Profesor:} \nombreprofesor
+    \end{flushleft}
+
+    \vspace{1cm}
+
+    % --- INFORMACIÓN DE LOS ESTUDIANTES ---
+    \begin{flushleft}
+        \centering
+        \textbf{Estudiantes:}
+    \end{flushleft}
+
+    \vspace{0.3cm}
+
+    \begin{center}
+        \begin{tabular}{|l|l|}
+            \hline
+            \textbf{Nombre} & \textbf{Matrícula} \\
+            \hline
+            Leonardo Favio Najera Morales & 231230 \\
+            \hline
+            Armando Rodriguez Villarreal & 231184 \\
+            \hline
+            Edgar Fabricio Jimenez Urbina & 231221 \\
+            \hline
+            Ángel Gabriel Guzmán Pérez & 223270 \\
+            \hline
+        \end{tabular}
+    \end{center}
+
+    \vfill
+
+    \vspace{1cm}
+    \textbf{\ciudad, a \fechaentrega}
+
+\end{titlepage}
+
+\clearpage
+
+\tableofcontents
+\clearpage
+
+\section{Introducción}
+\label{sec:introduccion}
+
+Este documento presenta la implementación de controles de seguridad para aplicaciones móviles basados en el estándar OWASP Mobile Application Security Verification Standard (MASVS). El proyecto \textbf{Planty} es un sistema de gestión de huertos inteligentes que consta de una aplicación móvil desarrollada en Flutter y un backend de microservicios implementado en Node.js con TypeScript.
+
+\subsection{Objetivo del Documento}
+
+Documentar la implementación de los controles de seguridad prioritarios (marcados en VERDE en el checklist OWASP) aplicados al proyecto Planty, con un avance mínimo del 30\% en esta primera entrega.
+
+\subsection{Alcance}
+
+Este documento cubre:
+\begin{itemize}
+    \item Controles de seguridad implementados en la capa de almacenamiento de datos
+    \item Controles de criptografía aplicados
+    \item Gestión de autenticación y sesiones
+    \item Comunicaciones de red seguras
+    \item Protección de código y datos sensibles
+\end{itemize}
+
+\subsection{Arquitectura del Sistema Planty}
+
+El sistema está compuesto por:
+
+\textbf{Frontend:}
+\begin{itemize}
+    \item Aplicación móvil Flutter (Android/iOS)
+    \item Arquitectura hexagonal + MVVM
+    \item Provider para gestión de estado
+\end{itemize}
+
+\textbf{Backend (Microservicios):}
+\begin{itemize}
+    \item API Gateway (Express, puerto 3000)
+    \item Authentication Service (JWT, puerto 3002)
+    \item Users Service (MongoDB, puerto 3001)
+    \item Chatbot Service (Ollama + RAG, puerto 3003)
+\end{itemize}
+
+% --- DIAGRAMA: Arquitectura General del Sistema ---
+\begin{figure}[H]
+    \centering
+    \textbf{Aquí diagrama de Arquitectura General del Sistema}
+
+    \vspace{0.3cm}
+
+    \url{https://www.canva.com/design/LINK_ARQUITECTURA_GENERAL/edit}
+    \caption{Arquitectura General del Sistema Planty}
+    \label{fig:arquitectura-general}
+\end{figure}
+
+\clearpage
+
+\section{Controles OWASP Implementados}
+\label{sec:controles}
+
+\subsection{MSTG-STORAGE: Almacenamiento de Datos}
+
+\subsubsection{MSTG-STORAGE-1: Almacenamiento Seguro de Credenciales}
+
+\textbf{Control:} Los datos sensibles de usuario (tokens JWT, datos de sesión) deben almacenarse de forma segura usando las capacidades del sistema.
+
+\textbf{Implementación en Planty:}
+
+\begin{lstlisting}[language=Dart, caption={Uso de Flutter Secure Storage para tokens JWT}]
+// Archivo: lib/features/auth/data/datasource/storage_service.dart
+class StorageService implements SecureStorage {
+  final FlutterSecureStorage _storage;
+
+  StorageService({FlutterSecureStorage? storage})
+      : _storage = storage ?? const FlutterSecureStorage();
+
+  @override
+  Future<void> write(String key, String value) async {
+    await _storage.write(key: key, value: value);
+  }
+
+  @override
+  Future<String?> read(String key) async {
+    return await _storage.read(key: key);
+  }
+
+  @override
+  Future<void> delete(String key) async {
+    await _storage.delete(key: key);
+  }
+}
+\end{lstlisting}
+
+\textbf{Tecnología utilizada:}
+\begin{itemize}
+    \item \texttt{flutter\_secure\_storage}: Utiliza Keychain en iOS y KeyStore en Android
+    \item Encriptación AES-256 automática
+    \item Protección contra extracción mediante backup
+\end{itemize}
+
+\textbf{Datos almacenados de forma segura:}
+\begin{itemize}
+    \item Token JWT de autenticación
+    \item Datos de sesión del usuario (encriptados)
+    \item Preferencias sensibles de configuración
+\end{itemize}
+
+\textbf{Estado de implementación:} \textcolor{VerdeOWASP}{\textbf{COMPLETADO (100\%)}}
+
+\subsubsection{MSTG-STORAGE-2: No Almacenar Datos Sensibles en Logs}
+
+\textbf{Control:} Los datos sensibles no deben escribirse en los logs de la aplicación.
+
+\textbf{Implementación en Planty:}
+
+Para el ambiente de producción, se ha configurado:
+
+\begin{lstlisting}[language=Dart, caption={Configuración de logs sin datos sensibles}]
+// Archivo: lib/core/network/http_client.dart
+class HttpClient {
+  Future<http.Response> post(Uri url, {Map<String, String>? headers, Object? body}) async {
+    // NO se imprimen headers que contienen Authorization
+    // NO se imprime el body que puede contener passwords
+    return await client.post(url, headers: finalHeaders, body: body);
+  }
+}
+\end{lstlisting}
+
+\textbf{Medidas implementadas:}
+\begin{itemize}
+    \item Eliminación de \texttt{print()} statements en producción
+    \item Uso de niveles de log apropiados
+    \item Sanitización de datos antes de logging
+    \item No impresión de tokens, passwords o PII
+\end{itemize}
+
+\textbf{Estado de implementación:} \textcolor{VerdeOWASP}{\textbf{COMPLETADO (100\%)}}
+
+% --- DIAGRAMA: Flujo de Almacenamiento Seguro ---
+\begin{figure}[H]
+    \centering
+    \textbf{Aquí diagrama de Flujo de Almacenamiento Seguro}
+
+    \vspace{0.3cm}
+
+    \url{https://www.canva.com/design/LINK_FLUJO_ALMACENAMIENTO/edit}
+    \caption{Flujo de Almacenamiento Seguro de Credenciales}
+    \label{fig:almacenamiento-seguro}
+\end{figure}
+
+\clearpage
+
+\subsection{MSTG-CRYPTO: Criptografía}
+
+\subsubsection{MSTG-CRYPTO-1: Uso de Criptografía Estándar}
+
+\textbf{Control:} La aplicación utiliza primitivas criptográficas estándar y ampliamente aceptadas.
+
+\textbf{Implementación en Planty:}
+
+\textbf{Backend - Hashing de contraseñas:}
+\begin{lstlisting}[language=JavaScript, caption={Servicio de hashing con Bcrypt}]
+// Archivo: authentication/src/infrastructure/services/BcryptService.ts
+export class BcryptService implements IHashService {
+  private readonly saltRounds = 10;
+
+  async hash(plainText: string): Promise<string> {
+    return await bcrypt.hash(plainText, this.saltRounds);
+  }
+
+  async compare(plainText: string, hash: string): Promise<boolean> {
+    return await bcrypt.compare(plainText, hash);
+  }
+}
+\end{lstlisting}
+
+\textbf{Backend - JWT:}
+\begin{lstlisting}[language=JavaScript, caption={Servicio JWT con HS256}]
+// Archivo: authentication/src/infrastructure/services/JwtService.ts
+export class JwtService implements ITokenService {
+  private readonly secret: string;
+  private readonly expiresIn = '24h';
+
+  generate(payload: TokenPayload): string {
+    return jwt.sign(payload, this.secret, {
+      expiresIn: this.expiresIn,
+      algorithm: 'HS256'
+    });
+  }
+
+  verify(token: string): TokenPayload | null {
+    try {
+      return jwt.verify(token, this.secret) as TokenPayload;
+    } catch (error) {
+      return null;
+    }
+  }
+}
+\end{lstlisting}
+
+\textbf{Algoritmos criptográficos utilizados:}
+\begin{itemize}
+    \item \textbf{Bcrypt}: Para hashing de contraseñas (salt rounds = 10)
+    \item \textbf{HS256 (HMAC-SHA256)}: Para firma de tokens JWT
+    \item \textbf{AES-256}: Para almacenamiento seguro en dispositivo (Flutter Secure Storage)
+\end{itemize}
+
+\textbf{Estado de implementación:} \textcolor{VerdeOWASP}{\textbf{COMPLETADO (100\%)}}
+
+\subsubsection{MSTG-CRYPTO-2: No Usar Criptografía Personalizada}
+
+\textbf{Control:} La aplicación no debe implementar algoritmos criptográficos personalizados.
+
+\textbf{Implementación en Planty:}
+
+Se utilizan exclusivamente librerías estándar y ampliamente auditadas:
+
+\textbf{Backend:}
+\begin{itemize}
+    \item \texttt{bcryptjs} v2.4.3
+    \item \texttt{jsonwebtoken} v9.0.2
+    \item \texttt{crypto} (módulo nativo de Node.js)
+\end{itemize}
+
+\textbf{Frontend:}
+\begin{itemize}
+    \item \texttt{flutter\_secure\_storage} v9.2.2 (usa KeyStore/Keychain nativos)
+    \item \texttt{crypto} (módulo nativo de Dart)
+\end{itemize}
+
+\textbf{Política implementada:}
+\begin{itemize}
+    \item Prohibido implementar algoritmos de cifrado propios
+    \item Uso obligatorio de librerías estándar
+    \item Revisión de código para detectar implementaciones custom
+\end{itemize}
+
+\textbf{Estado de implementación:} \textcolor{VerdeOWASP}{\textbf{COMPLETADO (100\%)}}
+
+% --- DIAGRAMA: Arquitectura de Criptografía ---
+\begin{figure}[H]
+    \centering
+    \textbf{Aquí diagrama de Arquitectura de Criptografía}
+
+    \vspace{0.3cm}
+
+    \url{https://www.canva.com/design/LINK_ARQUITECTURA_CRIPTOGRAFIA/edit}
+    \caption{Arquitectura de Criptografía en Planty}
+    \label{fig:arquitectura-criptografia}
+\end{figure}
+
+\clearpage
+
+\subsection{MSTG-AUTH: Autenticación y Gestión de Sesiones}
+
+\subsubsection{MSTG-AUTH-1: Autenticación Segura}
+
+\textbf{Control:} Si la aplicación provee acceso remoto, se debe implementar autenticación apropiada en el backend.
+
+\textbf{Implementación en Planty:}
+
+\textbf{Arquitectura de autenticación:}
+\begin{enumerate}
+    \item Usuario se registra/inicia sesión
+    \item Backend valida credenciales
+    \item Backend genera token JWT firmado
+    \item Token se envía en header \texttt{Authorization}
+    \item Cliente almacena token en Secure Storage
+    \item Token se incluye en todas las peticiones protegidas
+\end{enumerate}
+
+\textbf{Validación de credenciales:}
+\begin{lstlisting}[language=JavaScript, caption={Caso de uso de login}]
+// Archivo: authentication/src/application/usecases/LoginUseCase.ts
+export class LoginUseCase {
+  async execute(email: string, password: string): Promise<AuthResult> {
+    const user = await this.userService.findByEmail(email);
+
+    if (!user) {
+      throw new Error('Credenciales invalidas');
+    }
+
+    const isValid = await this.hashService.compare(password, user.password);
+
+    if (!isValid) {
+      throw new Error('Credenciales invalidas');
+    }
+
+    const token = this.tokenService.generate({
+      userId: user.id,
+      email: user.email
+    });
+
+    return {
+      token,
+      user: { ...user, password: undefined }
+    };
+  }
+}
+\end{lstlisting}
+
+\textbf{Rutas protegidas:}
+\begin{lstlisting}[language=JavaScript, caption={Middleware de validacion de token}]
+// Archivo: api-gateway/src/middleware/validateTokenWithAuthService.ts
+export async function validateTokenWithAuthService(
+  req: Request, res: Response, next: NextFunction
+) {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+
+  if (!token) {
+    return res.status(401).json({ error: 'Token no proporcionado' });
+  }
+
+  try {
+    const response = await axios.post(
+      'http://localhost:3002/auth/validate',
+      { token }
+    );
+
+    if (response.data.valid) {
+      req.user = response.data.user;
+      next();
+    } else {
+      res.status(401).json({ error: 'Token invalido' });
+    }
+  } catch (error) {
+    res.status(401).json({ error: 'Error validando token' });
+  }
+}
+\end{lstlisting}
+
+\textbf{Estado de implementación:} \textcolor{VerdeOWASP}{\textbf{COMPLETADO (100\%)}}
+
+% --- DIAGRAMA: Flujo de Autenticación JWT ---
+\begin{figure}[H]
+    \centering
+    \textbf{Aquí diagrama de Flujo de Autenticación JWT}
+
+    \vspace{0.3cm}
+
+    \url{https://www.canva.com/design/LINK_FLUJO_AUTENTICACION_JWT/edit}
+    \caption{Diagrama de Secuencia: Autenticación con JWT}
+    \label{fig:autenticacion-jwt}
+\end{figure}
+
+\subsubsection{MSTG-AUTH-2: Sesiones Administradas en el Backend}
+
+\textbf{Control:} La sesión del usuario se debe administrar en el backend. Los tokens de sesión deben ser generados de forma segura.
+
+\textbf{Implementación en Planty:}
+
+\begin{itemize}
+    \item \textbf{Tokens JWT}: Generados por el servicio de autenticación
+    \item \textbf{Expiración}: 24 horas
+    \item \textbf{Algoritmo}: HS256 con secret compartido
+    \item \textbf{Payload}: userId, email, iat, exp
+    \item \textbf{Revocación}: No implementada aún (pendiente)
+\end{itemize}
+
+\textbf{Flujo de manejo de sesión:}
+\begin{enumerate}
+    \item Login exitoso → Se genera JWT
+    \item Token almacenado en Secure Storage
+    \item Token enviado en cada petición
+    \item Backend valida token en cada request
+    \item Si token expiró → Error 401
+    \item Cliente redirige a login
+\end{enumerate}
+
+\textbf{Estado de implementación:} \textcolor{orange}{\textbf{PARCIAL (70\%)} - Falta revocación de tokens}
+
+\clearpage
+
+\subsection{MSTG-NETWORK: Comunicaciones de Red}
+
+\subsubsection{MSTG-NETWORK-1: TLS para Comunicaciones}
+
+\textbf{Control:} Los datos deben ser cifrados usando TLS durante la transmisión.
+
+\textbf{Implementación planeada:}
+
+\textbf{Configuración del servidor (producción):}
+\begin{itemize}
+    \item Certificado SSL/TLS de Let's Encrypt
+    \item Protocolo: TLS 1.3 (mínimo TLS 1.2)
+    \item Cipher suites seguros
+    \item HSTS habilitado
+\end{itemize}
+
+\textbf{Configuración del cliente (Flutter):}
+\begin{lstlisting}[language=Dart, caption={Configuracion HTTPS en Flutter}]
+// Archivo: lib/core/network/http_client.dart (futuro)
+class HttpClient {
+  HttpClient() {
+    // Validacion de certificados SSL
+    HttpOverrides.global = CustomHttpOverrides();
+  }
+}
+
+class CustomHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) {
+        // En produccion: false (rechazar certificados invalidos)
+        // En desarrollo: true (permitir certificados autofirmados)
+        return false;
+      };
+  }
+}
+\end{lstlisting}
+
+\textbf{Estado de implementación:} \textcolor{red}{\textbf{PENDIENTE (0\%)} - Actualmente usa HTTP en desarrollo}
+
+\subsubsection{MSTG-NETWORK-2: Validación de Certificados}
+
+\textbf{Control:} La aplicación debe validar los certificados TLS del servidor.
+
+\textbf{Implementación planeada:}
+
+\begin{itemize}
+    \item Certificate pinning para API principal
+    \item Validación de cadena de certificados
+    \item Rechazo de certificados autofirmados en producción
+    \item Manejo de errores de certificado
+\end{itemize}
+
+\textbf{Estado de implementación:} \textcolor{red}{\textbf{PENDIENTE (0\%)}}
+
+\clearpage
+
+\subsection{MSTG-CODE: Calidad y Seguridad del Código}
+
+\subsubsection{MSTG-CODE-1: Firma de la Aplicación}
+
+\textbf{Control:} La aplicación debe estar firmada con un certificado válido.
+
+\textbf{Implementación:}
+
+\textbf{Android:}
+\begin{itemize}
+    \item Keystore generado para firma de release
+    \item Algoritmo: RSA 2048 bits
+    \item Validez: 25 años
+    \item Configuración en \texttt{android/app/build.gradle}
+\end{itemize}
+
+\textbf{iOS:}
+\begin{itemize}
+    \item Perfil de aprovisionamiento de App Store
+    \item Certificado de distribución de Apple
+\end{itemize}
+
+\textbf{Estado de implementación:} \textcolor{orange}{\textbf{PARCIAL (50\%)} - Configurado para Android, pendiente iOS}
+
+\subsubsection{MSTG-CODE-2: Modo de Depuración Deshabilitado}
+
+\textbf{Control:} La aplicación debe ser lanzada en modo release con depuración deshabilitada.
+
+\textbf{Implementación:}
+
+\begin{lstlisting}[language=Dart, caption={Verificacion de modo debug}]
+// Archivo: lib/main.dart
+void main() async {
+  // Deshabilitar logs en produccion
+  if (kReleaseMode) {
+    debugPrint = (String? message, {int? wrapWidth}) {};
+  }
+
+  runApp(const MyApp());
+}
+\end{lstlisting}
+
+\textbf{Verificaciones:}
+\begin{itemize}
+    \item \texttt{debuggable = false} en AndroidManifest.xml (release)
+    \item Eliminación de \texttt{print()} statements
+    \item Uso de \texttt{kDebugMode} para código de desarrollo
+\end{itemize}
+
+\textbf{Estado de implementación:} \textcolor{VerdeOWASP}{\textbf{COMPLETADO (100\%)}}
+
+\clearpage
+
+\section{Resumen de Implementación}
+\label{sec:resumen}
+
+\subsection{Tabla de Controles OWASP}
+
+\begin{table}[H]
+    \centering
+    \caption{Estado de Implementación de Controles OWASP}
+    \label{tab:controles}
+    \begin{tabular}{|p{3cm}|p{7cm}|p{2cm}|}
+        \toprule
+        \textbf{Control} & \textbf{Descripción} & \textbf{Estado} \\
+        \midrule
+        MSTG-STORAGE-1 & Almacenamiento seguro de credenciales & \textcolor{VerdeOWASP}{100\%} \\
+        MSTG-STORAGE-2 & No logs con datos sensibles & \textcolor{VerdeOWASP}{100\%} \\
+        \midrule
+        MSTG-CRYPTO-1 & Criptografía estándar & \textcolor{VerdeOWASP}{100\%} \\
+        MSTG-CRYPTO-2 & No criptografía custom & \textcolor{VerdeOWASP}{100\%} \\
+        \midrule
+        MSTG-AUTH-1 & Autenticación segura & \textcolor{VerdeOWASP}{100\%} \\
+        MSTG-AUTH-2 & Sesiones en backend & \textcolor{orange}{70\%} \\
+        \midrule
+        MSTG-NETWORK-1 & TLS para comunicaciones & \textcolor{red}{0\%} \\
+        MSTG-NETWORK-2 & Validación de certificados & \textcolor{red}{0\%} \\
+        \midrule
+        MSTG-CODE-1 & Firma de aplicación & \textcolor{orange}{50\%} \\
+        MSTG-CODE-2 & Modo depuración deshabilitado & \textcolor{VerdeOWASP}{100\%} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Progreso General}
+
+\begin{itemize}
+    \item \textbf{Controles completados:} 6/10 (60\%)
+    \item \textbf{Controles parciales:} 2/10 (20\%)
+    \item \textbf{Controles pendientes:} 2/10 (20\%)
+    \item \textbf{Progreso total:} 70\% (excede el mínimo del 30\%)
+\end{itemize}
+
+\clearpage
+
+\section{Recomendaciones y Próximos Pasos}
+\label{sec:recomendaciones}
+
+\subsection{Implementaciones Prioritarias}
+
+\begin{enumerate}
+    \item \textbf{Configurar HTTPS/TLS:}
+    \begin{itemize}
+        \item Obtener certificado SSL (Let's Encrypt)
+        \item Configurar Nginx como reverse proxy
+        \item Habilitar HSTS
+        \item Forzar redirección HTTP → HTTPS
+    \end{itemize}
+
+    \item \textbf{Certificate Pinning:}
+    \begin{itemize}
+        \item Implementar pinning para API principal
+        \item Incluir certificados de respaldo
+        \item Configurar fallback seguro
+    \end{itemize}
+
+    \item \textbf{Revocación de Tokens:}
+    \begin{itemize}
+        \item Implementar blacklist de tokens
+        \item Usar Redis para tokens revocados
+        \item Endpoint de logout
+    \end{itemize}
+
+    \item \textbf{Firma iOS:}
+    \begin{itemize}
+        \item Configurar perfil de aprovisionamiento
+        \item Obtener certificado de distribución
+        \item Configurar firma automática en CI/CD
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Mejoras Adicionales}
+
+\begin{itemize}
+    \item Implementar rate limiting por usuario
+    \item Agregar autenticación de dos factores (2FA)
+    \item Implementar refresh tokens
+    \item Configurar Content Security Policy (CSP)
+    \item Agregar detección de jailbreak/root
+\end{itemize}
+
+\clearpage
+
+\section{Conclusiones}
+\label{sec:conclusiones}
+
+Se ha logrado implementar el 70\% de los controles de seguridad prioritarios del estándar OWASP Mobile Application Security, superando el objetivo mínimo del 30\% para esta entrega.
+
+\textbf{Fortalezas del proyecto:}
+\begin{itemize}
+    \item Almacenamiento seguro de credenciales implementado correctamente
+    \item Uso de criptografía estándar en toda la aplicación
+    \item Sistema de autenticación robusto con JWT
+    \item Separación de responsabilidades en microservicios
+    \item Arquitectura limpia y mantenible
+\end{itemize}
+
+\textbf{Áreas de mejora:}
+\begin{itemize}
+    \item Implementación de HTTPS/TLS (crítico para producción)
+    \item Certificate pinning
+    \item Revocación de tokens JWT
+    \item Firma completa para iOS
+\end{itemize}
+
+El proyecto Planty cuenta con una base sólida de seguridad que cumple con los estándares de la industria para la mayoría de controles críticos. Las implementaciones pendientes están planificadas para las próximas iteraciones del desarrollo.
+
+\clearpage
+
+\section{Anexos}
+\label{sec:anexos}
+
+\subsection{Estructura de Directorios del Proyecto}
+
+\begin{verbatim}
+ApiGateway/
+├── api-gateway/          # API Gateway (Express)
+├── authentication/       # Servicio de autenticación (JWT)
+├── api-users/            # Servicio de usuarios (MongoDB)
+├── api-chatbot/          # Servicio de chatbot (Ollama + RAG)
+├── Planty/               # Aplicación móvil (Flutter)
+│   ├── lib/
+│   │   ├── core/         # Core (DI, routing, network)
+│   │   ├── features/     # Features (auth, home, chatbot)
+│   │   └── shared/       # Componentes compartidos
+│   └── android/          # Configuración Android
+└── docker-compose.yml    # Orquestación de servicios
+\end{verbatim}
+
+% --- DIAGRAMA: Estructura de Directorios ---
+\begin{figure}[H]
+    \centering
+    \textbf{Aquí diagrama de Estructura de Directorios}
+
+    \vspace{0.3cm}
+
+    \url{https://www.canva.com/design/LINK_ESTRUCTURA_DIRECTORIOS/edit}
+    \caption{Estructura de Directorios del Proyecto Planty}
+    \label{fig:estructura-directorios}
+\end{figure}
+
+\subsection{Variables de Entorno}
+
+\textbf{Archivo: .env (backend)}
+\begin{lstlisting}[language=bash]
+# JWT Secret (debe ser complejo en produccion)
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+
+# MongoDB
+MONGODB_URI=mongodb://localhost:27017/users_db
+
+# Servicios
+AUTH_SERVICE_URL=http://localhost:3002
+USERS_SERVICE_URL=http://localhost:3001
+CHATBOT_SERVICE_URL=http://localhost:3003
+
+# Ollama
+OLLAMA_BASE_URL=http://localhost:11434
+CHAT_MODEL=llama3.2
+EMBEDDING_MODEL=nomic-embed-text
+
+# ChromaDB
+CHROMA_URL=http://localhost:8000
+\end{lstlisting}
+
+\textbf{Archivo: .env (Flutter)}
+\begin{lstlisting}[language=bash]
+API_URL=http://192.168.100.62:3000/api
+\end{lstlisting}
+
+\subsection{Referencias}
+
+\begin{itemize}
+    \item OWASP Mobile Application Security Verification Standard (MASVS): \\
+    \url{https://github.com/OWASP/owasp-masvs}
+
+    \item OWASP Mobile Security Testing Guide (MSTG): \\
+    \url{https://github.com/OWASP/owasp-mstg}
+
+    \item Flutter Secure Storage: \\
+    \url{https://pub.dev/packages/flutter_secure_storage}
+
+    \item JWT Best Practices: \\
+    \url{https://tools.ietf.org/html/rfc8725}
+\end{itemize}
+
+\end{document}

@@ -1,0 +1,253 @@
+\documentclass[12pt, a4paper]{article} % Clase de documento: 'article' es estándar para trabajos cortos. 12pt es el tamaño de letra. A4 es el formato de papel.
+
+% --- PAQUETES ESENCIALES ---
+\usepackage[utf8]{inputenc} % Para la codificación de caracteres, esencial para acentos y eñes
+\usepackage[T1]{fontenc}    % Fuente moderna para PDFs
+\usepackage[spanish]{babel} % Soporte para idioma español (guionización, fechas, etc.)
+\usepackage{amsmath}        % Para matemáticas avanzadas (si fuera necesario)
+\usepackage{graphicx}       % Para insertar imágenes
+\usepackage{booktabs}       % Mejora el aspecto de las tablas (líneas más profesionales)
+\usepackage{geometry}       % Para configurar los márgenes
+\usepackage{hyperref}       % Para crear enlaces en el índice y referencias (¡muy recomendado!)
+\usepackage{fancyhdr}       % Para personalizar encabezados y pies de página (opcional)
+\usepackage[spanish]{babel}
+% ¡Asegúrate de que xcolor esté aquí!
+\usepackage[table]{xcolor} % 'table' es útil para compatibilidad con listings/tablas
+\usepackage{listings}       % Paquete para el formato de código fuente
+% --- MODIFICACIÓN DE LA ETIQUETA 'LISTING' A 'LISTADO' ---
+\addto{\captionsspanish}{\renewcommand{\lstlistingname}{Listado}}
+\addto{\captionsspanish}{\renewcommand{\lstlistlistingname}{Listado de Códigos}}
+% --- DEFINICIÓN DE COLOR GRIS Y ESTILO DE CÓDIGO ---
+
+% Definimos un color gris claro para el fondo (usando el modelo RGB)
+% Los valores entre 0 y 1. (0.95, 0.95, 0.95 es un gris muy claro)
+\definecolor{GrisClaro}{rgb}{0.95, 0.95, 0.95}
+
+% Configuramos el estilo por defecto para todos los bloques de código (lstlisting)
+\lstset{
+    language=TeX, % Lenguaje por defecto (puedes cambiarlo, ej: Python, C, Java)
+    backgroundcolor=\color{GrisClaro}, % Fondo gris claro
+    basicstyle=\ttfamily\small,      % Tipo de fuente: typewriter (\ttfamily) y pequeño (\small)
+    breaklines=true,                 % Permite saltos de línea largos
+    showstringspaces=false,          % No mostrar espacios como caracteres
+    numbers=left,                    % Numeración de líneas a la izquierda
+    numberstyle=\tiny\color{gray},   % Estilo del número de línea
+    frame=single,                    % Dibuja un marco alrededor del código
+    framesep=5pt,                    % Espacio entre el marco y el código
+    rulesepcolor=\color{black},      % Color de las líneas del marco
+    keywordstyle=\color{blue}\bfseries, % Palabras clave en azul y negrita
+    commentstyle=\color{green!60!black}\itshape, % Comentarios en verde oscuro y cursiva
+    stringstyle=\color{orange},      % Cadenas de texto en naranja
+}
+% --- CONFIGURACIÓN DE MARGENES ---
+\geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=25mm,
+ right=25mm,
+ top=30mm,
+ bottom=30mm,
+ }
+
+% --- CONFIGURACIÓN DE ENCABEZADOS Y PIES (OPCIONAL) ---
+\pagestyle{fancy}
+\fancyhf{} % Limpiar encabezados y pies
+\renewcommand{\headrulewidth}{0pt} % Eliminar línea en el encabezado
+\rfoot{\thepage} % Número de página a la derecha en el pie
+\lfoot{ Seguridad de la Información / Leonardo Favio Najera Morales} % Texto en el pie de página izquierdo
+
+% --- DATOS DEL DOCUMENTO (PARA LA PORTADA) ---
+\newcommand{\nombreuniversidad}{Universidad Politécnica de Chiapas}
+\newcommand{\nombrecarrera}{Ingeniería en Software}
+\newcommand{\nombremateria}{Seguridad de la Información}
+\newcommand{\nombreprofesor}{MC. José Alonso Macías Montoya}
+\newcommand{\corte}{Corte/Unidad [Número de Corte]}
+\newcommand{\actividad}{Actividad [Número] - [Nombre de la Actividad]}
+\newcommand{\nombres}{Leonardo Favio Najera Morales}
+\newcommand{\matricula}{231230}
+\newcommand{\fechaentrega}{\today} % \today inserta la fecha actual automáticamente
+\newcommand{\ciudad}{Ciudad, Estado}
+
+\usepackage[utf8]{inputenc} % ¡ESTA LÍNEA ES FUNDAMENTAL!
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+% --- INICIO DEL DOCUMENTO ---
+\begin{document}
+
+% --- PORTADA ---
+\begin{titlepage}
+    \centering
+    \vspace*{1cm} % Espacio vertical
+    {\Huge\bfseries \nombreuniversidad \par} % Título principal: Nombre de la Universidad
+    \vspace{0.5cm}
+    {\Large \nombrecarrera \par} % Nombre de la Carrera
+    
+    \vspace{2cm}
+    \rule{\textwidth}{1.5pt} % Línea gruesa
+    \vspace{0.4cm}
+    {\Large\bfseries \actividad \par} % Título del Trabajo
+    \vspace{0.4cm}
+    \rule{\textwidth}{1.5pt} % Línea gruesa
+    
+    \vspace{3cm}
+    
+    % --- DATOS DEL ALUMNO Y CURSO (EN UNA SOLA COLUMNA) ---
+    % Se eliminaron los entornos minipage y \hfill
+    \begin{flushleft}
+        \centering % Centra las líneas dentro del entorno flushleft
+        \textbf{Materia:} \nombremateria \\
+        \textbf{Profesor:} \nombreprofesor \\
+        \textbf{Corte:} \corte
+    \end{flushleft}
+
+    \vspace{0.5cm} % Pequeño espacio de separación
+    
+    \begin{flushleft}
+        \centering % Centra las líneas dentro del entorno flushleft
+        \textbf{Alumno:} \nombres \\
+        \textbf{Matrícula:} \matricula \\
+    \end{flushleft}
+    % --- FIN DE DATOS EN UNA SOLA COLUMNA ---
+    
+    \vfill % Empuja el contenido restante al final de la página
+    
+    % Fecha y Ciudad
+    \vspace{1cm}
+    \textbf{\ciudad, a \fechaentrega}
+    
+\end{titlepage}
+
+\clearpage % Salto de página para empezar el contenido
+
+% --- ÍNDICE/TABLA DE CONTENIDO ---
+% Se recomienda usar la instrucción \tableofcontents inmediatamente después de la portada.
+% LaTeX genera automáticamente el índice a partir de las secciones (\section, \subsection, etc.)
+\tableofcontents
+\clearpage
+
+% --- CUERPO DEL TRABAJO ---
+
+\section{Introducción}
+\label{sec:introduccion}
+La introducción es la primera sección formal de nuestro trabajo. Aquí se presenta el tema, el objetivo del estudio, la justificación de su importancia y la estructura general del documento.
+
+\section{Recursos Utilizados}
+\label{sec:recursos}
+En esta sección se listan y describen brevemente las herramientas, software, bibliografía o fuentes de datos que fueron fundamentales para la realización de la actividad.
+
+\begin{itemize}
+    \item \textbf{Software:} Overleaf y compilador \LaTeX{}.
+    \item \textbf{Bibliografía:} Libros y artículos relacionados con la plantilla de trabajos académicos.
+    \item \textbf{Otros:} Datos de la universidad, nombre de la carrera, etc.
+\end{itemize}
+
+\section{Desarrollo}
+\label{sec:desarrollo}
+Esta es la parte central del trabajo. Se presenta la metodología, el marco teórico y la ejecución de los pasos necesarios para cumplir con el objetivo.
+
+\subsection{Texto de Ejemplo y Estructura}
+\label{sec:texto}
+El texto en \LaTeX{} se escribe de forma natural. Los comandos como \verb|\section{}| y \verb|\subsection{}| son claves para estructurar el documento y generar automáticamente el índice. Para enfatizar, podemos usar \textbf{negritas} o \textit{cursivas}.
+
+\subsubsection{Sub-subsección de Ejemplo}
+Aquí se puede profundizar en un punto específico. Un entorno de lista numerada se crea con \texttt{enumerate}:
+\begin{enumerate}
+    \item Primer punto de la lista.
+    \item Segundo punto importante.
+\end{enumerate}
+
+\subsection{Ejemplo de Inserción de Imágenes}
+Para insertar una imagen, debes subir el archivo (por ejemplo, \texttt{logouniversidad.png}) a tu proyecto de Overleaf. Usamos el entorno \texttt{figure} para que la imagen se coloque correctamente y pueda tener un título (caption) y una referencia (label).
+
+\begin{figure}[h] % [h] intenta colocar la figura "aquí" (here)
+    \centering
+    % \includegraphics[width=0.8\textwidth]{logouniversidad.png} % Descomentar y cambiar "logouniversidad.png"
+    \includegraphics[width=0.7\textwidth]{tecnologias.jpg} 
+    \caption{Ejemplo de una imagen o gráfico insertado en el documento.}
+    \label{fig:ejemploimagen}
+\end{figure}
+
+Podemos referenciar la figura automáticamente: Ver la Figura \ref{fig:ejemploimagen}.
+
+\subsection{Ejemplo de Inserción de Tablas}
+Para las tablas, el entorno \texttt{tabular} es el más común, pero \texttt{booktabs} mejora mucho su aspecto. Usamos \texttt{table} para que la tabla sea flotante y tenga título y referencia.
+
+\begin{table}[h]
+    \centering
+    \caption{Resultados Obtenidos en la Práctica}
+    \label{tab:ejemplotabla}
+    \begin{tabular}{lccc} % l: izquierda, c: centrado, r: derecha
+        \toprule % Línea superior de booktabs
+        \textbf{Variable} & \textbf{Valor Inicial} & \textbf{Valor Final} & \textbf{Diferencia} \\
+        \midrule % Línea intermedia de booktabs
+        Temperatura ($^{\circ}$C) & 25.0 & 32.5 & +7.5 \\
+        Presión (kPa) & 101.3 & 100.9 & -0.4 \\
+        Humedad relativa (\%) & 65 & 58 & -7 \\
+        \bottomrule % Línea inferior de booktabs
+    \end{tabular}
+    \vspace{0.5em} % Espacio vertical
+    \footnotesize Nota: Los datos son meramente ilustrativos para el ejemplo.
+\end{table}
+
+Podemos referenciar la tabla: Consultar los datos en la Tabla \ref{tab:ejemplotabla}.
+
+\section{Resultados y Conclusiones}
+\label{sec:resultados}
+En esta sección se presentan los \textbf{resultados clave} derivados del desarrollo, seguidos por las \textbf{conclusiones}. La conclusión debe ser un resumen conciso de los hallazgos y si se lograron los objetivos planteados en la introducción.
+\begin{itemize}
+    \item \textbf{Resultado 1:} Se logró definir una plantilla funcional.
+    \item \textbf{Conclusión:} \LaTeX{} es una herramienta poderosa para la redacción académica.
+\end{itemize}
+
+\clearpage % Salto de página para empezar los anexos
+
+\section{Anexos}
+\label{sec:anexos}
+Los anexos incluyen material complementario que no es esencial para la comprensión del cuerpo principal del trabajo, pero que lo respalda (ej. capturas de pantalla, código fuente extenso, encuestas, etc.).
+
+\subsection{Capturas de pantalla Adicional}
+Se puede incluir acciones ó código en un entorno especial (si usas el paquete \texttt{listings} o similar).
+
+\begin{figure}[h] % [h] intenta colocar la figura "aquí" (here)
+    \centering
+    % \includegraphics[width=0.8\textwidth]{logouniversidad.png} % Descomentar y cambiar "logouniversidad.png"
+    \includegraphics[width=0.7\textwidth]{tecnologias2.jpg} 
+    \caption{Segundo Ejemplo de una imagen o gráfico insertado en el documento.}
+    \label{fig:ejemploimagen}
+\end{figure}
+
+\begin{verbatim}
+% Ejemplo de código o texto sin formato
+if (resultado > 100) {
+    print("Éxito");
+} else {
+    print("Fallo");
+}
+\end{verbatim}
+
+\clearpage % Salto de página para empezar los anexos
+
+\subsection{Código Fuente Adicional (Con Estilo Mejorado)}
+Para incluir código fuente de manera profesional y con estilo, utilizamos el entorno \texttt{lstlisting}. Si necesitas cambiar el lenguaje para resaltar la sintaxis correctamente, simplemente añade la opción \texttt{language}.
+
+Texto antes del espacio.
+\vspace{1cm} % Inserta un espacio vertical de 1 centímetro de altura.
+Texto después del espacio de 1 cm.
+
+\vspace{5ex} % Inserta un espacio vertical equivalente a 5 veces la altura de la 'x' de la fuente actual.
+Otro texto.
+
+\begin{lstlisting}[language=Python, caption={Ejemplo de un script en Python}]
+# Definición de una función simple
+def saludar(nombre):
+    """Esta función saluda a la persona pasada como parámetro."""
+    mensaje = "Hola, " + nombre + ". Bienvenido a Overleaf."
+    return mensaje
+
+# Uso de la función
+usuario = "Estudiante"
+resultado = saludar(usuario)
+print(resultado)
+\end{lstlisting}
+
+\end{document}
