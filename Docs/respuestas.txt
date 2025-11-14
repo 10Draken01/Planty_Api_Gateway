@@ -1,0 +1,124 @@
+1. Datos de la Institución Educativa:
+Nombre completo de la institución: Universidad Politecnica de Chiapas
+Dirección completa: __________________________________
+Ciudad/Estado: Suchiapas, Chiapas, Mexico
+Código Postal: 29150
+Teléfono de contacto: _________________________________
+
+2. Responsable del Tratamiento de Datos:
+Nombre del responsable/profesor: Armando Rodriguez Villarreal
+Cargo: Analista de Datos
+Correo electrónico institucional: 231184@ids.upchiapas.edu.mx
+
+3. Proyecto Integrador:
+Nombre oficial del proyecto: Planty
+Matrícula(s) de estudiantes: 
+    - 231230 Leonardo Favio Najera Morales
+    - 231221 Edgar Fabricio Jimenez Urbina
+    - 231184 Armando Rodriguez Villarreal
+    - 223270 Angel Gabriel Guzman Perez
+
+Fecha de inicio del proyecto: 01/11/2025
+¿Es solo para fines académicos? (Sí/No): Si
+
+4. Sobre el Chatbot:
+¿Qué servicio de IA usa? (OpenAI, Gemini, local): Local llama3.2
+¿Se guardan las conversaciones? (Sí/No): No
+¿Por cuánto tiempo?: Solo en la aplicacion no en api
+¿Se comparten con terceros?: __________________________
+
+5. Microservicio de Notificaciones:
+¿Qué plataforma usa? (Firebase, OneSignal, etc.): Fire Base Cloud Message
+¿Se recopila token de dispositivo?: si
+¿Tipos de notificaciones?:
+  [ x ] Recordatorios de riego
+  [ x ] Alertas de clima
+  [ ] Actualizaciones del sistema
+  [ x ] Recomendaciones de Huertos
+  [ ] Otros: _________________________________________
+
+6. Microservicio de Huertos:
+¿Qué datos se almacenan?:
+
+	Orchard
+_id	UUID
+name	String
+description	String
+plants_id	List<Plant_id>
+width	Double
+heigth	Double
+state	Bool
+crateAt	Date
+updateAt	Date
+timeOfLife	Int
+streakOfDays	Int
+countPlants	Int
+
+	Plant
+_id	UUID
+name	String
+species	String
+scientificName	String
+type	Enum
+sunRequirement	Enum
+weeklyWatering	Int
+harvestDays	Int
+soilType	String
+waterPerKg	Int
+benefits	List<String>
+size	Int
+notes	String
+tags	List<Sting>
+
+  [ ] Nombre del huerto
+  [ ] Ubicación GPS (Sí/No): __________________________
+  [ ] Fotos de plantas
+  [ ] Datos de sensores (temperatura, humedad)
+  [ ] Historial de actividades (riego, fertilización)
+  [ ] Especies de plantas
+  [ ] Otros: _________________________________________
+
+7. Microservicio de Algoritmo Genético:
+¿Qué datos analiza?:
+    Genera 3 plantillas de huertos a partir de estos datos, plantas dadas, espacio width heigth, requerimiento hidrico, categoria [Vegetal | Medicinal | Ornamental | Aromatica]
+
+7.1 Modelo de Modelo
+    - Se usara para categorizar usuarios y dar recomendacione de huertos, ademas de dar recordatorios para riego y riesgos de las plantas
+
+8. Almacenamiento y Seguridad:
+¿Dónde se almacenan los datos?:
+  [ ] Servidor propio de la institución
+  [ x ] Nube pública (AWS, Google Cloud, Azure)
+  [ ] Servidor local
+  [ ] Otro: __________________________________________
+
+País donde se almacenan: _____________________________
+¿Se hace respaldo de datos? (Sí/No): _________________
+Frecuencia de respaldos: _____________________________
+
+9. Período de Conservación:
+¿Cuánto tiempo se conservarán los datos?:
+  [ x ] Durante el proyecto integrador
+  [ ] 6 meses después de terminar
+  [ ] 1 año después de terminar
+  [ ] Indefinidamente mientras el usuario no solicite eliminación
+  [ ] Otro: __________________________________________
+
+10. Transferencias de Datos:
+¿Se comparten datos con terceros? (Sí/No): ____________
+Si sí, ¿con quién?:
+  [ ] Servicios de IA (OpenAI, etc.)
+  [ x ] Servicios de notificaciones
+  [ x ] Servicios de almacenamiento en nube
+  [ ] Instituciones académicas para investigación
+  [ ] Otros: _________________________________________
+
+11. Derechos ARCO:
+Correo para ejercer derechos ARCO: bs.personal.0001@gmail.com
+Persona que atenderá solicitudes: Leonardo Favio Najera Morales
+Tiempo de respuesta estimado: 1hr
+
+12. Menores de Edad:
+¿Puede ser usado por menores de 18 años? (Sí/No): si
+Si sí, ¿requiere consentimiento de tutores? (Sí/No): si
+Edad mínima para usar la app: 13
