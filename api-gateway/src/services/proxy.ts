@@ -48,3 +48,30 @@ export const protectedChatbotProxy = createProxyMiddleware({
     }
   },
 });
+
+/**
+ * Proxy para el servicio de Orchards
+ * Redirige todas las peticiones a /orchards al microservicio api-orchard
+ */
+export const orchardServiceProxy = createProxyMiddleware({
+  target: process.env.ORCHARD_SERVICE_URL || 'http://localhost:3004',
+  changeOrigin: true,
+  pathRewrite: { '^/api/orchards': '/orchards' },
+  logLevel: 'debug',
+
+  onProxyReq: (proxyReq, req) => {
+    // Pasar información del usuario autenticado al microservicio (si existe)
+    const user = (req as any).user;
+    if (user) {
+      proxyReq.setHeader('X-User-Id', user.userId);
+      proxyReq.setHeader('X-User-Email', user.email);
+    }
+
+    if (req.body && Object.keys(req.body).length) {
+      const bodyData = JSON.stringify(req.body);
+      proxyReq.setHeader('Content-Type', 'application/json');
+      proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+      proxyReq.write(bodyData);
+    }
+  },
+});

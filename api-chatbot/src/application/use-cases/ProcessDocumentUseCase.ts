@@ -48,7 +48,7 @@ export class ProcessDocumentUseCase {
 
     if (document.status === DocumentStatus.PROCESSED) {
       throw new Error('El documento ya fue procesado');
-    }
+    } 
 
     try {
       // 2. Marcar como procesando
@@ -63,12 +63,12 @@ export class ProcessDocumentUseCase {
         throw new Error('No se pudo extraer texto del PDF');
       }
 
-      // 4. Dividir en chunks (procesar por bloques para PDFs grandes)
+      // 4. Dividir en chunks (procesar por bloques para PDFs grandes) 
       console.log(`Dividiendo texto en chunks (size: ${chunkSize}, overlap: ${chunkOverlap})`);
       console.log(`Tamaño del texto: ${text.length} caracteres`);
 
       const textChunks: string[] = [];
-      const BLOCK_SIZE = 1000000; // Procesar 1MB de texto a la vez
+      const BLOCK_SIZE = 1000000; 
 
       // Si el texto es muy grande, procesarlo por bloques
       if (text.length > BLOCK_SIZE) {

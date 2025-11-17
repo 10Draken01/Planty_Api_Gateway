@@ -136,6 +136,34 @@ services:
       retries: 3
       start_period: 60s
 
+  # Orchard Service
+  api-orchard:
+    image: draken101/planty-api-orchard:latest
+    container_name: planty-api-orchard
+    restart: unless-stopped
+    ports:
+      - "3004:3004"
+    environment:
+      - NODE_ENV=production
+      - PORT=3004
+      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+      - MONGO_URI=mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-password123}@mongodb:27017/planty_orchards?authSource=admin
+      - MONGO_DB_NAME=planty_orchards
+      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-900000}
+      - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS:-100}
+      - JWT_SECRET=${JWT_SECRET:-planty-super-secret-jwt-key-2024-change-in-production}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - planty-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3004/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
   # API Gateway
   api-gateway:
     image: draken101/planty-api-gateway:latest
@@ -155,12 +183,15 @@ services:
       - USERS_SERVICE_URL=http://api-users:3001
       - AUTH_SERVICE_URL=http://authentication:3002
       - CHATBOT_SERVICE_URL=http://api-chatbot:3003
+      - ORCHARD_SERVICE_URL=http://api-orchard:3004
     depends_on:
       api-users:
         condition: service_healthy
       authentication:
         condition: service_healthy
       api-chatbot:
+        condition: service_healthy
+      api-orchard:
         condition: service_healthy
     networks:
       - planty-network

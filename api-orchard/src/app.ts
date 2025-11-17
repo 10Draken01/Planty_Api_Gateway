@@ -1,6 +1,6 @@
 /**
- * Aplicación Principal del Microservicio Chatbot
- * Puerto: 3003
+ * Aplicación Principal del Microservicio Orchard
+ * Puerto: 3004
  */
 
 import express, { Application, Request, Response } from 'express';
@@ -10,7 +10,7 @@ import rateLimit from 'express-rate-limit';
 import { config, validateEnvironment } from './config/environment';
 import { DependencyContainer } from './infrastructure/container/DependencyContainer';
 
-class ChatbotApp {
+class OrchardApp {
   private app: Application;
   private container: DependencyContainer;
 
@@ -29,7 +29,7 @@ class ChatbotApp {
     // Configurar middlewares
     this.setupMiddlewares();
 
-    // Inicializar ChromaDB
+    // Inicializar dependencias
     await this.container.initialize();
 
     // Verificar servicios externos
@@ -61,8 +61,8 @@ class ChatbotApp {
     this.app.use(express.json({ limit: '10mb' }));
     this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-    // Rate limiting general
-    const generalLimiter = rateLimit({
+    // Rate limiting
+    const limiter = rateLimit({
       windowMs: config.rateLimit.windowMs,
       max: config.rateLimit.maxRequests,
       message: 'Demasiadas peticiones desde esta IP, por favor intenta más tarde',
@@ -70,18 +70,7 @@ class ChatbotApp {
       legacyHeaders: false
     });
 
-    this.app.use('/', generalLimiter);
-
-    // Rate limiting específico para chat (más restrictivo)
-    const chatLimiter = rateLimit({
-      windowMs: config.rateLimit.windowMs,
-      max: config.rateLimit.chatMaxRequests,
-      message: 'Demasiados mensajes de chat, por favor intenta más tarde',
-      standardHeaders: true,
-      legacyHeaders: false
-    });
-
-    this.app.use('/chat/message', chatLimiter);
+    this.app.use('/orchards', limiter);
 
     // Logger de peticiones
     this.app.use((req, _res, next) => {
@@ -95,10 +84,10 @@ class ChatbotApp {
    */
   private setupRoutes(): void {
     // Health check general
-    this.app.get('/chat/health', (_req: Request, res: Response) => {
+    this.app.get('/health', (_req: Request, res: Response) => {
       res.json({
         success: true,
-        service: 'chatbot-api',
+        service: 'orchard-api',
         status: 'healthy',
         timestamp: new Date().toISOString(),
         version: '1.0.0'
@@ -106,7 +95,7 @@ class ChatbotApp {
     });
 
     // System info
-    this.app.get('/chat/info', async (_req: Request, res: Response) => {
+    this.app.get('/info', async (_req: Request, res: Response) => {
       try {
         const systemInfo = this.container.getSystemInfo();
         const services = await this.container.checkServices();
@@ -126,11 +115,8 @@ class ChatbotApp {
       }
     });
 
-    // Rutas de documentos
-    this.app.use('/chat/documents', this.container.getDocumentRoutes());
-
-    // Rutas de chat
-    this.app.use('/chat', this.container.getChatRoutes());
+    // Rutas de orchards
+    this.app.use('/orchards', this.container.getOrchardRoutes());
 
     // Ruta 404
     this.app.use((_req: Request, res: Response) => {
@@ -163,7 +149,18 @@ class ChatbotApp {
     // Manejo de excepciones no capturadas
     process.on('uncaughtException', (error) => {
       console.error('Excepción no capturada:', error);
-      process.exit(1);
+      this.shutdown();
+    });
+
+    // Manejo de señales de terminación
+    process.on('SIGTERM', () => {
+      console.log('SIGTERM recibido, cerrando servidor...');
+      this.shutdown();
+    });
+
+    process.on('SIGINT', () => {
+      console.log('\nSIGINT recibido, cerrando servidor...');
+      this.shutdown();
     });
   }
 
@@ -171,29 +168,15 @@ class ChatbotApp {
    * Verifica que los servicios externos estén disponibles
    */
   private async checkExternalServices(): Promise<void> {
-    console.log('\n🔍 Verificando servicios externos...');
+    console.log('🔍 Verificando servicios externos...');
 
     const services = await this.container.checkServices();
 
-    console.log(`  - ChromaDB: ${services.chromadb ? '✓' : '✗'}`);
-    console.log(`  - Ollama Embedding (${config.ollama.embeddingModel}): ${services.ollamaEmbedding ? '✓' : '✗'}`);
-    console.log(`  - Ollama Chat (${config.ollama.chatModel}): ${services.ollamaChat ? '✓' : '✗'}`);
+    console.log(`  - MongoDB: ${services.mongodb ? '✓' : '✗'}`);
 
-    if (!services.chromadb) {
-      console.warn('\n⚠️  ADVERTENCIA: ChromaDB no está disponible');
-      console.warn('   Asegúrate de que ChromaDB esté corriendo en:', `${config.chroma.host}:${config.chroma.port}`);
-    }
-
-    if (!services.ollamaEmbedding || !services.ollamaChat) {
-      console.warn('\n⚠️  ADVERTENCIA: Algunos modelos de Ollama no están disponibles');
-      console.warn('   Asegúrate de que Ollama esté corriendo en:', config.ollama.baseUrl);
-      console.warn('   Descarga los modelos con:');
-      if (!services.ollamaEmbedding) {
-        console.warn(`     ollama pull ${config.ollama.embeddingModel}`);
-      }
-      if (!services.ollamaChat) {
-        console.warn(`     ollama pull ${config.ollama.chatModel}`);
-      }
+    if (!services.mongodb) {
+      console.warn('\n⚠️  ADVERTENCIA: MongoDB no está disponible');
+      console.warn('   Asegúrate de que MongoDB esté corriendo en:', config.mongodb.uri);
     }
 
     console.log('');
@@ -205,20 +188,38 @@ class ChatbotApp {
   start(): void {
     this.app.listen(config.port, () => {
       console.log('\n╔════════════════════════════════════════════════════════╗');
-      console.log('║      CHATBOT API - Plantas de Suchiapa             ║');
+      console.log('║      ORCHARD API - Gestión de Huertos              ║');
       console.log('╚════════════════════════════════════════════════════════╝');
       console.log(`\n✓ Servidor corriendo en puerto ${config.port}`);
       console.log(`✓ Entorno: ${config.nodeEnv}`);
       console.log(`\n📚 Endpoints disponibles:`);
-      console.log(`   GET  http://localhost:${config.port}/chat/health`);
-      console.log(`   GET  http://localhost:${config.port}/chat/info`);
-      console.log(`   POST http://localhost:${config.port}/chat/documents/upload`);
-      console.log(`   POST http://localhost:${config.port}/chat/documents/:id/process`);
-      console.log(`   GET  http://localhost:${config.port}/chat/documents`);
-      console.log(`   POST http://localhost:${config.port}/chat/message`);
-      console.log(`   GET  http://localhost:${config.port}/chat/history/:sessionId`);
+      console.log(`   GET    http://localhost:${config.port}/health`);
+      console.log(`   GET    http://localhost:${config.port}/info`);
+      console.log(`   GET    http://localhost:${config.port}/orchards/health`);
+      console.log(`   POST   http://localhost:${config.port}/orchards`);
+      console.log(`   GET    http://localhost:${config.port}/orchards`);
+      console.log(`   GET    http://localhost:${config.port}/orchards/:id`);
+      console.log(`   PUT    http://localhost:${config.port}/orchards/:id`);
+      console.log(`   DELETE http://localhost:${config.port}/orchards/:id`);
+      console.log(`   PATCH  http://localhost:${config.port}/orchards/:id/activate`);
+      console.log(`   PATCH  http://localhost:${config.port}/orchards/:id/deactivate`);
+      console.log(`   POST   http://localhost:${config.port}/orchards/:id/plants`);
+      console.log(`   DELETE http://localhost:${config.port}/orchards/:id/plants/:plantId`);
       console.log(`\n💡 Presiona Ctrl+C para detener el servidor\n`);
     });
+  }
+
+  /**
+   * Cierra el servidor y las conexiones
+   */
+  private async shutdown(): Promise<void> {
+    try {
+      await this.container.shutdown();
+      process.exit(0);
+    } catch (error) {
+      console.error('Error durante el cierre:', error);
+      process.exit(1);
+    }
   }
 
   /**
@@ -232,7 +233,7 @@ class ChatbotApp {
 // Iniciar la aplicación
 async function main() {
   try {
-    const app = new ChatbotApp();
+    const app = new OrchardApp();
     await app.initialize();
     app.start();
   } catch (error) {

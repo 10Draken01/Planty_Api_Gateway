@@ -1,9 +1,3 @@
-/**
- * Use Case: Eliminar un documento
- * - Elimina los chunks del vector store
- * - Elimina el archivo físico
- * - Elimina el registro de la BD
- */
 
 import { DocumentRepository } from '@domain/repositories/DocumentRepository';
 import { VectorRepository } from '@domain/repositories/VectorRepository';
@@ -16,13 +10,13 @@ export class DeleteDocumentUseCase {
   ) {}
 
   async execute(documentId: string): Promise<boolean> {
-    // 1. Buscar el documento
+  
     const document = await this.documentRepository.findById(documentId);
     if (!document) {
       throw new Error(`Documento no encontrado: ${documentId}`);
     }
 
-    // 2. Eliminar chunks del vector store
+    
     try {
       console.log(`Eliminando chunks del documento ${documentId} de ChromaDB`);
       await this.vectorRepository.deleteByDocumentId(documentId);
