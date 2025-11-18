@@ -102,3 +102,30 @@ export const algorithmGenServiceProxy = createProxyMiddleware({
     }
   },
 });
+
+/**
+ * Proxy para el servicio de Notificaciones
+ * Redirige todas las peticiones a /notifications al microservicio de notificaciones
+ */
+export const notificationsServiceProxy = createProxyMiddleware({
+  target: process.env.NOTIFICATIONS_SERVICE_URL || 'http://localhost:3006',
+  changeOrigin: true,
+  pathRewrite: { '^/api/notifications': '/api/notifications' },
+  logLevel: 'debug',
+
+  onProxyReq: (proxyReq, req) => {
+    // Pasar información del usuario autenticado al microservicio (si existe)
+    const user = (req as any).user;
+    if (user) {
+      proxyReq.setHeader('X-User-Id', user.userId);
+      proxyReq.setHeader('X-User-Email', user.email);
+    }
+
+    if (req.body && Object.keys(req.body).length) {
+      const bodyData = JSON.stringify(req.body);
+      proxyReq.setHeader('Content-Type', 'application/json');
+      proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+      proxyReq.write(bodyData);
+    }
+  },
+});

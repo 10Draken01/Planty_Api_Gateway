@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { userServiceProxy, authServiceProxy, protectedChatbotProxy, orchardServiceProxy, algorithmGenServiceProxy } from '../services/proxy';
+import { userServiceProxy, authServiceProxy, protectedChatbotProxy, orchardServiceProxy, algorithmGenServiceProxy, notificationsServiceProxy } from '../services/proxy';
 import { validateTokenWithAuthService } from '../middleware/validateTokenWithAuthService';
 
 const router = Router();
@@ -28,5 +28,9 @@ router.use('/orchards', orchardServiceProxy);
 // Sin autenticación por defecto
 router.use('/algorithm-gen', algorithmGenServiceProxy);
 // router.use('/algorithm-gen', validateTokenWithAuthService, algorithmGenServiceProxy); // Con autenticación
+
+// Ruta para el servicio de Notificaciones
+// Con autenticación por defecto (las notificaciones son personales)
+router.use('/notifications', validateTokenWithAuthService, notificationsServiceProxy);
 
 export default router;
