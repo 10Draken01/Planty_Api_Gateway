@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { userServiceProxy, authServiceProxy, protectedChatbotProxy, orchardServiceProxy } from '../services/proxy';
+import { userServiceProxy, authServiceProxy, protectedChatbotProxy, orchardServiceProxy, algorithmGenServiceProxy } from '../services/proxy';
 import { validateTokenWithAuthService } from '../middleware/validateTokenWithAuthService';
 
 const router = Router();
@@ -23,5 +23,10 @@ router.use('/chat/message', validateTokenWithAuthService, protectedChatbotProxy)
 // Puedes descomentar validateTokenWithAuthService si quieres que requiera autenticación
 router.use('/orchards', orchardServiceProxy);
 // router.use('/orchards', validateTokenWithAuthService, orchardServiceProxy); // Con autenticación
+
+// Ruta para el servicio de Algoritmo Genético (PlantGen)
+// Sin autenticación por defecto
+router.use('/algorithm-gen', algorithmGenServiceProxy);
+// router.use('/algorithm-gen', validateTokenWithAuthService, algorithmGenServiceProxy); // Con autenticación
 
 export default router;

@@ -164,6 +164,36 @@ services:
       retries: 3
       start_period: 40s
 
+  # Algorithm Genetic Service (PlantGen)
+  api-algorithm-gen:
+    build:
+      context: ./Proyecto_AG_C2
+      dockerfile: Dockerfile
+    container_name: planty-api-algorithm-gen
+    restart: unless-stopped
+    ports:
+      - "3005:3005"
+    environment:
+      - MONGO_ROOT_USER=${MONGO_ROOT_USER:-admin}
+      - MONGO_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-password123}
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
+      - MONGO_DATABASE=Data_plants
+      - PORT=3005
+      - ENVIRONMENT=production
+      - LOG_LEVEL=INFO
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - planty-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:3005/algorithm_gen/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
   # API Gateway
   api-gateway:
     image: draken101/planty-api-gateway:latest
@@ -184,6 +214,7 @@ services:
       - AUTH_SERVICE_URL=http://authentication:3002
       - CHATBOT_SERVICE_URL=http://api-chatbot:3003
       - ORCHARD_SERVICE_URL=http://api-orchard:3004
+      - ALGORITHM_GEN_SERVICE_URL=http://api-algorithm-gen:3005
     depends_on:
       api-users:
         condition: service_healthy
@@ -192,6 +223,8 @@ services:
       api-chatbot:
         condition: service_healthy
       api-orchard:
+        condition: service_healthy
+      api-algorithm-gen:
         condition: service_healthy
     networks:
       - planty-network

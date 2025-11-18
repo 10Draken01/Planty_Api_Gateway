@@ -75,3 +75,30 @@ export const orchardServiceProxy = createProxyMiddleware({
     }
   },
 });
+
+/**
+ * Proxy para el servicio de Algoritmo Genético (PlantGen)
+ * Redirige todas las peticiones a /algorithm-gen al microservicio de Python
+ */
+export const algorithmGenServiceProxy = createProxyMiddleware({
+  target: process.env.ALGORITHM_GEN_SERVICE_URL || 'http://localhost:3005',
+  changeOrigin: true,
+  pathRewrite: { '^/api/algorithm-gen': '/algorithm_gen' },
+  logLevel: 'debug',
+
+  onProxyReq: (proxyReq, req) => {
+    // Pasar información del usuario autenticado al microservicio (si existe)
+    const user = (req as any).user;
+    if (user) {
+      proxyReq.setHeader('X-User-Id', user.userId);
+      proxyReq.setHeader('X-User-Email', user.email);
+    }
+
+    if (req.body && Object.keys(req.body).length) {
+      const bodyData = JSON.stringify(req.body);
+      proxyReq.setHeader('Content-Type', 'application/json');
+      proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+      proxyReq.write(bodyData);
+    }
+  },
+});
