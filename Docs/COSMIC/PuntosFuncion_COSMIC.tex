@@ -1,0 +1,1144 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{multirow}
+
+\geometry{margin=2.5cm}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Medición COSMIC - ApiGateway}
+\fancyhead[R]{\small \today}
+\fancyfoot[C]{\thepage}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+\title{\textbf{MEDICIÓN DE PUNTOS FUNCIÓN COSMIC}\\
+\large Sistema ApiGateway - Arquitectura de Microservicios}
+\author{Especialista Certificado COSMIC (CCFL)}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+\newpage
+
+\tableofcontents
+\newpage
+
+\section{Resumen Ejecutivo}
+
+El presente documento reporta la medición funcional del proyecto \textbf{ApiGateway}, un sistema distribuido basado en arquitectura de microservicios, utilizando el método COSMIC (Common Software Measurement International Consortium) versión 4.0.
+
+\subsection{Resultado de la Medición}
+
+\begin{center}
+\begin{tabular}{|l|r|}
+\hline
+\textbf{Concepto} & \textbf{Valor} \\
+\hline
+\hline
+Total de Procesos Funcionales Identificados & 23 \\
+\hline
+\textbf{Total de Puntos Función COSMIC (CFPs)} & \textbf{117} \\
+\hline
+\hline
+\multicolumn{2}{|l|}{\textit{Desagregado por tipo de movimiento:}} \\
+\hline
+Movimientos Entry (E) & 51 \\
+Movimientos Exit (X) & 23 \\
+Movimientos Read (R) & 25 \\
+Movimientos Write (W) & 18 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Distribución por Microservicio}
+
+\begin{center}
+\begin{tabular}{|l|c|r|}
+\hline
+\textbf{Microservicio} & \textbf{Procesos} & \textbf{CFPs} \\
+\hline
+Authentication Service & 3 & 12 \\
+Users Service & 5 & 29 \\
+Chatbot Service (RAG) & 6 & 32 \\
+Orchard Service & 9 & 44 \\
+\hline
+\textbf{Total} & \textbf{23} & \textbf{117} \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Interpretación}
+
+El sistema presenta un tamaño funcional de \textbf{117 CFPs}, lo cual corresponde a un sistema de mediana complejidad con funcionalidades distribuidas en cuatro microservicios independientes. El servicio de Orchard representa el 37.6\% del tamaño funcional total, seguido por el servicio de Chatbot con RAG (27.4\%), evidenciando la complejidad de las operaciones de gestión agrícola y procesamiento de lenguaje natural con recuperación aumentada.
+
+\newpage
+
+\section{Alcance del Conteo}
+
+\subsection{Propósito de la Medición}
+
+Esta medición COSMIC tiene como propósitos:
+
+\begin{itemize}
+    \item Cuantificar el tamaño funcional del sistema para estimación de esfuerzo y costos
+    \item Proporcionar una métrica objetiva para planificación de proyecto
+    \item Establecer una línea base para mediciones futuras y control de cambios
+    \item Facilitar la comunicación técnica con stakeholders mediante métricas estándar
+    \item Permitir benchmarking con proyectos similares en la industria
+\end{itemize}
+
+\subsection{Alcance Funcional}
+
+El alcance de la medición incluye todos los procesos funcionales implementados en los siguientes componentes:
+
+\begin{enumerate}
+    \item \textbf{API Gateway}: Componente de enrutamiento y proxy (sin contabilización de procesos propios según COSMIC 4.0)
+    \item \textbf{Authentication Service}: Gestión de autenticación JWT y validación de tokens
+    \item \textbf{Users Service}: Operaciones CRUD completas sobre entidades de usuario
+    \item \textbf{Chatbot Service}: Inteligencia artificial conversacional con RAG (Retrieval-Augmented Generation) incluyendo:
+    \begin{itemize}
+        \item Gestión de documentos PDF
+        \item Procesamiento de embeddings vectoriales
+        \item Búsqueda semántica
+        \item Generación de respuestas con LLM
+    \end{itemize}
+    \item \textbf{Orchard Service}: Gestión completa de huertos agrícolas y sus plantas asociadas
+\end{enumerate}
+
+\subsection{Exclusiones}
+
+\textbf{No se incluyen en esta medición:}
+
+\begin{itemize}
+    \item Servicios de notificaciones (mencionados en router pero sin implementación visible)
+    \item Servicios de algoritmo genético (mencionados en router pero sin implementación visible)
+    \item Funciones de infraestructura pura (logging, monitoring, health checks simples)
+    \item Servicios externos (Ollama LLM, MongoDB, ChromaDB) considerados fuera del límite
+\end{itemize}
+
+\newpage
+
+\section{Metodología COSMIC Aplicada}
+
+\subsection{Marco Conceptual}
+
+La medición COSMIC (versión 4.0) se basa en los siguientes principios fundamentales:
+
+\subsubsection{Límite del Software}
+
+El límite del software define la frontera conceptual entre:
+\begin{itemize}
+    \item \textbf{Interior}: El software medido (los 4 microservicios)
+    \item \textbf{Exterior}: Usuarios funcionales y almacenamiento persistente
+\end{itemize}
+
+Para este proyecto:
+\begin{itemize}
+    \item \textbf{Usuarios Funcionales}: Aplicación cliente, administrador, servicio Ollama (LLM externo)
+    \item \textbf{Almacenamiento Persistente}: MongoDB, ChromaDB, sistema de archivos
+\end{itemize}
+
+\subsubsection{Proceso Funcional}
+
+Un proceso funcional es un conjunto cohesivo de movimientos de datos que implementa un requisito funcional único. Cada endpoint REST que manipula datos constituye típicamente un proceso funcional independiente.
+
+\subsubsection{Movimientos de Datos}
+
+COSMIC reconoce cuatro tipos de movimientos de datos:
+
+\begin{enumerate}
+    \item \textbf{Entry (E)}: Movimiento de datos desde un usuario funcional hacia el proceso
+    \item \textbf{Exit (X)}: Movimiento de datos desde el proceso hacia un usuario funcional
+    \item \textbf{Read (R)}: Movimiento de datos desde almacenamiento persistente al proceso
+    \item \textbf{Write (W)}: Movimiento de datos desde el proceso a almacenamiento persistente
+\end{enumerate}
+
+\textbf{Regla fundamental}: 1 movimiento de datos = 1 CFP
+
+\subsection{Proceso de Medición Aplicado}
+
+\begin{enumerate}
+    \item \textbf{Identificación del límite}: Análisis de arquitectura de microservicios
+    \item \textbf{Identificación de procesos funcionales}: Mapeo de endpoints REST a requisitos funcionales
+    \item \textbf{Identificación de movimientos}: Análisis de código fuente (controladores, casos de uso, repositorios)
+    \item \textbf{Aplicación de reglas de medición}: Contabilización según estándar COSMIC 4.0
+    \item \textbf{Agregación}: Suma de movimientos por proceso, servicio y total
+\end{enumerate}
+
+\newpage
+
+\section{Procesos Funcionales Identificados}
+
+Esta sección detalla todos los procesos funcionales medidos, organizados por microservicio.
+
+\subsection{Authentication Service (12 CFPs)}
+
+\subsubsection{PF-AUTH-001: Registro de Usuario (6 CFPs)}
+
+\textbf{Descripción}: Permite a un nuevo usuario registrarse en el sistema proporcionando credenciales.
+
+\textbf{Endpoint}: \texttt{POST /api/auth/register}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 3 & name, email, password \\
+Read (R) & 1 & Consulta de usuario existente en Users Service \\
+Write (W) & 1 & Creación de usuario en Users Service \\
+Exit (X) & 1 & Token JWT + datos de usuario \\
+\hline
+\textbf{Total CFPs} & \textbf{6} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{authentication/src/application/usecases/RegisterUseCase.ts:22}
+
+\subsubsection{PF-AUTH-002: Inicio de Sesión (4 CFPs)}
+
+\textbf{Descripción}: Autentica a un usuario existente y genera token de sesión.
+
+\textbf{Endpoint}: \texttt{POST /api/auth/login}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 2 & email, password \\
+Read (R) & 1 & Consulta de usuario por email en Users Service \\
+Exit (X) & 1 & Token JWT + datos de usuario \\
+\hline
+\textbf{Total CFPs} & \textbf{4} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{authentication/src/application/usecases/LoginUseCase.ts}
+
+\subsubsection{PF-AUTH-003: Validación de Token (2 CFPs)}
+
+\textbf{Descripción}: Valida un token JWT y retorna información del usuario autenticado.
+
+\textbf{Endpoint}: \texttt{POST /api/auth/validate}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 1 & token \\
+Exit (X) & 1 & resultado de validación + userId + email \\
+\hline
+\textbf{Total CFPs} & \textbf{2} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{authentication/src/application/usecases/ValidateTokenUseCase.ts}
+
+\subsection{Users Service (29 CFPs)}
+
+\subsubsection{PF-USER-001: Creación de Usuario (9 CFPs)}
+
+\textbf{Descripción}: Crea un nuevo usuario en la base de datos con todos sus atributos.
+
+\textbf{Endpoint}: \texttt{POST /api/users/create}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 6 & name, email, password, experience\_level, \\
+& & profile\_image, historyTimeUse\_ids \\
+Read (R) & 1 & Verificación de usuario existente en MongoDB \\
+Write (W) & 1 & Persistencia de usuario en MongoDB \\
+Exit (X) & 1 & Datos completos del usuario creado \\
+\hline
+\textbf{Total CFPs} & \textbf{9} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-users/src/presentation/controllers/UserController.ts:18}
+
+\subsubsection{PF-USER-002: Consulta de Usuario por ID (3 CFPs)}
+
+\textbf{Descripción}: Obtiene los datos de un usuario específico por su identificador.
+
+\textbf{Endpoint}: \texttt{GET /api/users/:id}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 1 & id (parámetro de ruta) \\
+Read (R) & 1 & Consulta de usuario en MongoDB \\
+Exit (X) & 1 & Datos del usuario (sin contraseña) \\
+\hline
+\textbf{Total CFPs} & \textbf{3} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-users/src/presentation/controllers/UserController.ts:108}
+
+\subsubsection{PF-USER-003: Consulta de Usuario por Email (3 CFPs)}
+
+\textbf{Descripción}: Obtiene usuario por email (incluye contraseña para autenticación).
+
+\textbf{Endpoint}: \texttt{GET /api/users/email/:email}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 1 & email (parámetro de ruta) \\
+Read (R) & 1 & Consulta de usuario en MongoDB \\
+Exit (X) & 1 & Datos completos del usuario (incluye password hash) \\
+\hline
+\textbf{Total CFPs} & \textbf{3} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-users/src/presentation/controllers/UserController.ts:153}
+
+\subsubsection{PF-USER-004: Actualización de Usuario (10 CFPs)}
+
+\textbf{Descripción}: Actualiza los datos de un usuario existente.
+
+\textbf{Endpoint}: \texttt{PUT /api/users/:id}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 6 & id, name, email, password, experience\_level, \\
+& & profile\_image (todos opcionales excepto id) \\
+Read (R) & 2 & Consulta de usuario existente + \\
+& & Verificación de email duplicado \\
+Write (W) & 1 & Actualización de usuario en MongoDB \\
+Exit (X) & 1 & Datos actualizados del usuario \\
+\hline
+\textbf{Total CFPs} & \textbf{10} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-users/src/presentation/controllers/UserController.ts:191}
+
+\subsubsection{PF-USER-005: Eliminación de Usuario (4 CFPs)}
+
+\textbf{Descripción}: Elimina un usuario del sistema de forma permanente.
+
+\textbf{Endpoint}: \texttt{DELETE /api/users/:id}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 1 & id (parámetro de ruta) \\
+Read (R) & 1 & Verificación de existencia en MongoDB \\
+Write (W) & 1 & Eliminación de usuario en MongoDB \\
+Exit (X) & 1 & Mensaje de confirmación \\
+\hline
+\textbf{Total CFPs} & \textbf{4} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-users/src/presentation/controllers/UserController.ts:280}
+
+\subsection{Chatbot Service (32 CFPs)}
+
+\subsubsection{PF-CHAT-001: Envío de Mensaje al Chatbot (9 CFPs)}
+
+\textbf{Descripción}: Procesa un mensaje del usuario, realiza búsqueda semántica en documentos y genera respuesta con LLM utilizando arquitectura RAG (Retrieval-Augmented Generation).
+
+\textbf{Endpoint}: \texttt{POST /api/chat/message}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 3 & message, includeContext, maxContextChunks \\
+Read (R) & 3 & Generación de embedding (Ollama) + \\
+& & Búsqueda semántica (ChromaDB) + \\
+& & Consulta al LLM (Ollama) \\
+Write (W) & 2 & Almacenamiento de mensaje del usuario + \\
+& & Almacenamiento de respuesta \\
+Exit (X) & 1 & Respuesta generada por el LLM \\
+\hline
+\textbf{Total CFPs} & \textbf{9} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-chatbot/src/application/use-cases/SendMessageUseCase.ts}
+
+\subsubsection{PF-CHAT-002: Consulta de Historial de Chat (3 CFPs)}
+
+\textbf{Descripción}: Obtiene el historial completo de conversación de una sesión.
+
+\textbf{Endpoint}: \texttt{GET /api/chat/history/:sessionId}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 1 & sessionId (parámetro de ruta) \\
+Read (R) & 1 & Consulta de mensajes en repositorio \\
+Exit (X) & 1 & Lista de mensajes de la sesión \\
+\hline
+\textbf{Total CFPs} & \textbf{3} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-chatbot/src/presentation/controllers/ChatController.ts:57}
+
+\subsubsection{PF-DOC-001: Carga de Documento PDF (5 CFPs)}
+
+\textbf{Descripción}: Sube un archivo PDF al sistema y registra sus metadatos.
+
+\textbf{Endpoint}: \texttt{POST /api/documents/upload}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 2 & file (archivo PDF multipart), metadata (JSON) \\
+Write (W) & 2 & Almacenamiento del archivo + \\
+& & Registro de documento en repositorio \\
+Exit (X) & 1 & Información del documento creado \\
+\hline
+\textbf{Total CFPs} & \textbf{5} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-chatbot/src/application/use-cases/UploadDocumentUseCase.ts}
+
+\subsubsection{PF-DOC-002: Procesamiento de Documento (8 CFPs)}
+
+\textbf{Descripción}: Extrae texto del PDF, divide en chunks, genera embeddings y almacena en ChromaDB.
+
+\textbf{Endpoint}: \texttt{POST /api/documents/:id/process}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 3 & id, chunkSize, chunkOverlap \\
+Read (R) & 2 & Lectura del PDF + Generación de embeddings \\
+Write (W) & 2 & Almacenamiento de chunks + \\
+& & Almacenamiento de vectores (ChromaDB) \\
+Exit (X) & 1 & Resultado del procesamiento \\
+\hline
+\textbf{Total CFPs} & \textbf{8} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-chatbot/src/application/use-cases/ProcessDocumentUseCase.ts}
+
+\subsubsection{PF-DOC-003: Listar Documentos (2 CFPs)}
+
+\textbf{Descripción}: Obtiene la lista de todos los documentos cargados en el sistema.
+
+\textbf{Endpoint}: \texttt{GET /api/documents}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Read (R) & 1 & Consulta de todos los documentos \\
+Exit (X) & 1 & Lista de documentos con metadatos \\
+\hline
+\textbf{Total CFPs} & \textbf{2} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-chatbot/src/application/use-cases/GetDocumentsUseCase.ts}
+
+\subsubsection{PF-DOC-004: Eliminación de Documento (5 CFPs)}
+
+\textbf{Descripción}: Elimina un documento y sus vectores asociados del sistema.
+
+\textbf{Endpoint}: \texttt{DELETE /api/documents/:id}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 1 & id (documento a eliminar) \\
+Read (R) & 1 & Consulta de documento en repositorio \\
+Write (W) & 2 & Eliminación del archivo + \\
+& & Eliminación de vectores (ChromaDB) \\
+Exit (X) & 1 & Confirmación de eliminación \\
+\hline
+\textbf{Total CFPs} & \textbf{5} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-chatbot/src/application/use-cases/DeleteDocumentUseCase.ts}
+
+\subsection{Orchard Service (44 CFPs)}
+
+\subsubsection{PF-ORC-001: Creación de Huerto (7 CFPs)}
+
+\textbf{Descripción}: Crea un nuevo huerto con sus características básicas.
+
+\textbf{Endpoint}: \texttt{POST /api/orchards}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 5 & name, location, size, soilType, climate \\
+Write (W) & 1 & Persistencia en MongoDB \\
+Exit (X) & 1 & Datos del huerto creado \\
+\hline
+\textbf{Total CFPs} & \textbf{7} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-orchard/src/application/use-cases/CreateOrchardUseCase.ts}
+
+\subsubsection{PF-ORC-002: Consulta de Huerto por ID (3 CFPs)}
+
+\textbf{Descripción}: Obtiene la información detallada de un huerto específico.
+
+\textbf{Endpoint}: \texttt{GET /api/orchards/:id}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 1 & id (identificador del huerto) \\
+Read (R) & 1 & Consulta en MongoDB \\
+Exit (X) & 1 & Datos completos del huerto \\
+\hline
+\textbf{Total CFPs} & \textbf{3} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-orchard/src/application/use-cases/GetOrchardUseCase.ts}
+
+\subsubsection{PF-ORC-003: Listar Huertos (3 CFPs)}
+
+\textbf{Descripción}: Obtiene lista de huertos con filtro opcional por estado activo.
+
+\textbf{Endpoint}: \texttt{GET /api/orchards}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 1 & active (query param: true/false/undefined) \\
+Read (R) & 1 & Consulta filtrada en MongoDB \\
+Exit (X) & 1 & Lista de huertos \\
+\hline
+\textbf{Total CFPs} & \textbf{3} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-orchard/src/application/use-cases/ListOrchardsUseCase.ts}
+
+\subsubsection{PF-ORC-004: Actualización de Huerto (9 CFPs)}
+
+\textbf{Descripción}: Modifica los datos de un huerto existente.
+
+\textbf{Endpoint}: \texttt{PUT /api/orchards/:id}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 6 & id, name, location, size, soilType, climate \\
+Read (R) & 1 & Consulta de huerto existente en MongoDB \\
+Write (W) & 1 & Actualización en MongoDB \\
+Exit (X) & 1 & Datos actualizados del huerto \\
+\hline
+\textbf{Total CFPs} & \textbf{9} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-orchard/src/application/use-cases/UpdateOrchardUseCase.ts}
+
+\subsubsection{PF-ORC-005: Eliminación de Huerto (4 CFPs)}
+
+\textbf{Descripción}: Elimina un huerto del sistema permanentemente.
+
+\textbf{Endpoint}: \texttt{DELETE /api/orchards/:id}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 1 & id (identificador) \\
+Read (R) & 1 & Verificación de existencia en MongoDB \\
+Write (W) & 1 & Eliminación en MongoDB \\
+Exit (X) & 1 & Confirmación de eliminación \\
+\hline
+\textbf{Total CFPs} & \textbf{4} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-orchard/src/application/use-cases/DeleteOrchardUseCase.ts}
+
+\subsubsection{PF-ORC-006: Activar Huerto (4 CFPs)}
+
+\textbf{Descripción}: Cambia el estado de un huerto a activo.
+
+\textbf{Endpoint}: \texttt{PATCH /api/orchards/:id/activate}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 1 & id (identificador) \\
+Read (R) & 1 & Consulta de huerto en MongoDB \\
+Write (W) & 1 & Actualización de estado a activo \\
+Exit (X) & 1 & Huerto con estado actualizado \\
+\hline
+\textbf{Total CFPs} & \textbf{4} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-orchard/src/application/use-cases/ToggleOrchardStateUseCase.ts}
+
+\subsubsection{PF-ORC-007: Desactivar Huerto (4 CFPs)}
+
+\textbf{Descripción}: Cambia el estado de un huerto a inactivo.
+
+\textbf{Endpoint}: \texttt{PATCH /api/orchards/:id/deactivate}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 1 & id (identificador) \\
+Read (R) & 1 & Consulta de huerto en MongoDB \\
+Write (W) & 1 & Actualización de estado a inactivo \\
+Exit (X) & 1 & Huerto con estado actualizado \\
+\hline
+\textbf{Total CFPs} & \textbf{4} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-orchard/src/application/use-cases/ToggleOrchardStateUseCase.ts}
+
+\subsubsection{PF-ORC-008: Agregar Planta a Huerto (5 CFPs)}
+
+\textbf{Descripción}: Asocia una planta a un huerto existente.
+
+\textbf{Endpoint}: \texttt{POST /api/orchards/:id/plants}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 2 & id (huerto), plantId \\
+Read (R) & 1 & Consulta de huerto en MongoDB \\
+Write (W) & 1 & Actualización del array de plantas \\
+Exit (X) & 1 & Huerto actualizado con nueva planta \\
+\hline
+\textbf{Total CFPs} & \textbf{5} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-orchard/src/application/use-cases/ManagePlantsUseCase.ts}
+
+\subsubsection{PF-ORC-009: Remover Planta de Huerto (5 CFPs)}
+
+\textbf{Descripción}: Elimina una planta asociada de un huerto.
+
+\textbf{Endpoint}: \texttt{DELETE /api/orchards/:id/plants/:plantId}
+
+\textbf{Movimientos de Datos}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripción} \\
+\hline
+Entry (E) & 2 & id (huerto), plantId \\
+Read (R) & 1 & Consulta de huerto en MongoDB \\
+Write (W) & 1 & Actualización del array de plantas \\
+Exit (X) & 1 & Huerto actualizado sin la planta \\
+\hline
+\textbf{Total CFPs} & \textbf{5} & \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Evidencia}: \texttt{api-orchard/src/application/use-cases/ManagePlantsUseCase.ts}
+
+\newpage
+
+\section{Tabla Consolidada de Medición}
+
+\begin{longtable}{|l|l|c|c|c|c|c|c|}
+\caption{Resumen de Procesos Funcionales y Movimientos COSMIC} \\
+\hline
+\textbf{ID} & \textbf{Proceso Funcional} & \textbf{E} & \textbf{X} & \textbf{R} & \textbf{W} & \textbf{CFP} & \textbf{Servicio} \\
+\hline
+\endfirsthead
+
+\multicolumn{8}{c}{\textit{(Continuación de la tabla)}} \\
+\hline
+\textbf{ID} & \textbf{Proceso Funcional} & \textbf{E} & \textbf{X} & \textbf{R} & \textbf{W} & \textbf{CFP} & \textbf{Servicio} \\
+\hline
+\endhead
+
+\hline
+\multicolumn{8}{r}{\textit{(Continúa en la siguiente página)}} \\
+\endfoot
+
+\hline
+\endlastfoot
+
+\multicolumn{8}{|l|}{\cellcolor{gray!30}\textbf{AUTHENTICATION SERVICE}} \\
+\hline
+PF-AUTH-001 & Registro de Usuario & 3 & 1 & 1 & 1 & 6 & Auth \\
+PF-AUTH-002 & Inicio de Sesión & 2 & 1 & 1 & 0 & 4 & Auth \\
+PF-AUTH-003 & Validación de Token & 1 & 1 & 0 & 0 & 2 & Auth \\
+\hline
+\multicolumn{2}{|l|}{\textbf{Subtotal Authentication}} & 6 & 3 & 2 & 1 & \textbf{12} & \\
+\hline
+\hline
+\multicolumn{8}{|l|}{\cellcolor{gray!30}\textbf{USERS SERVICE}} \\
+\hline
+PF-USER-001 & Creación de Usuario & 6 & 1 & 1 & 1 & 9 & Users \\
+PF-USER-002 & Consulta por ID & 1 & 1 & 1 & 0 & 3 & Users \\
+PF-USER-003 & Consulta por Email & 1 & 1 & 1 & 0 & 3 & Users \\
+PF-USER-004 & Actualización de Usuario & 6 & 1 & 2 & 1 & 10 & Users \\
+PF-USER-005 & Eliminación de Usuario & 1 & 1 & 1 & 1 & 4 & Users \\
+\hline
+\multicolumn{2}{|l|}{\textbf{Subtotal Users}} & 15 & 5 & 6 & 3 & \textbf{29} & \\
+\hline
+\hline
+\multicolumn{8}{|l|}{\cellcolor{gray!30}\textbf{CHATBOT SERVICE}} \\
+\hline
+PF-CHAT-001 & Envío de Mensaje & 3 & 1 & 3 & 2 & 9 & Chatbot \\
+PF-CHAT-002 & Historial de Chat & 1 & 1 & 1 & 0 & 3 & Chatbot \\
+PF-DOC-001 & Carga de Documento & 2 & 1 & 0 & 2 & 5 & Chatbot \\
+PF-DOC-002 & Procesamiento de Doc & 3 & 1 & 2 & 2 & 8 & Chatbot \\
+PF-DOC-003 & Listar Documentos & 0 & 1 & 1 & 0 & 2 & Chatbot \\
+PF-DOC-004 & Eliminar Documento & 1 & 1 & 1 & 2 & 5 & Chatbot \\
+\hline
+\multicolumn{2}{|l|}{\textbf{Subtotal Chatbot}} & 10 & 6 & 8 & 8 & \textbf{32} & \\
+\hline
+\hline
+\multicolumn{8}{|l|}{\cellcolor{gray!30}\textbf{ORCHARD SERVICE}} \\
+\hline
+PF-ORC-001 & Crear Huerto & 5 & 1 & 0 & 1 & 7 & Orchard \\
+PF-ORC-002 & Consulta por ID & 1 & 1 & 1 & 0 & 3 & Orchard \\
+PF-ORC-003 & Listar Huertos & 1 & 1 & 1 & 0 & 3 & Orchard \\
+PF-ORC-004 & Actualizar Huerto & 6 & 1 & 1 & 1 & 9 & Orchard \\
+PF-ORC-005 & Eliminar Huerto & 1 & 1 & 1 & 1 & 4 & Orchard \\
+PF-ORC-006 & Activar Huerto & 1 & 1 & 1 & 1 & 4 & Orchard \\
+PF-ORC-007 & Desactivar Huerto & 1 & 1 & 1 & 1 & 4 & Orchard \\
+PF-ORC-008 & Agregar Planta & 2 & 1 & 1 & 1 & 5 & Orchard \\
+PF-ORC-009 & Remover Planta & 2 & 1 & 1 & 1 & 5 & Orchard \\
+\hline
+\multicolumn{2}{|l|}{\textbf{Subtotal Orchard}} & 20 & 9 & 9 & 6 & \textbf{44} & \\
+\hline
+\hline
+\multicolumn{2}{|l|}{\cellcolor{blue!20}\textbf{TOTAL GENERAL}} & \textbf{51} & \textbf{23} & \textbf{25} & \textbf{18} & \textbf{117} & \\
+\hline
+\end{longtable}
+
+\section{Cálculo Paso a Paso}
+
+\subsection{Verificación de Totales}
+
+\textbf{Suma de movimientos de datos:}
+
+\begin{align*}
+\text{Total Entry (E)} &= 6 + 15 + 10 + 20 = 51 \text{ CFPs} \\
+\text{Total Exit (X)} &= 3 + 5 + 6 + 9 = 23 \text{ CFPs} \\
+\text{Total Read (R)} &= 2 + 6 + 8 + 9 = 25 \text{ CFPs} \\
+\text{Total Write (W)} &= 1 + 3 + 8 + 6 = 18 \text{ CFPs} \\
+\hline
+\text{\textbf{TOTAL CFPs}} &= 51 + 23 + 25 + 18 = \textbf{117 CFPs}
+\end{align*}
+
+\subsection{Distribución Porcentual}
+
+\begin{center}
+\begin{tabular}{|l|r|r|}
+\hline
+\textbf{Microservicio} & \textbf{CFPs} & \textbf{\% del Total} \\
+\hline
+Authentication Service & 12 & 10.3\% \\
+Users Service & 29 & 24.8\% \\
+Chatbot Service & 32 & 27.4\% \\
+Orchard Service & 44 & 37.6\% \\
+\hline
+\textbf{Total} & \textbf{117} & \textbf{100.0\%} \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Distribución por Tipo de Movimiento}
+
+\begin{center}
+\begin{tabular}{|l|r|r|}
+\hline
+\textbf{Tipo de Movimiento} & \textbf{Cantidad} & \textbf{\% del Total} \\
+\hline
+Entry (E) & 51 & 43.6\% \\
+Read (R) & 25 & 21.4\% \\
+Exit (X) & 23 & 19.7\% \\
+Write (W) & 18 & 15.4\% \\
+\hline
+\textbf{Total} & \textbf{117} & \textbf{100.0\%} \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Interpretación}: La distribución muestra un sistema orientado a la entrada de datos (43.6\% de movimientos Entry), característico de APIs REST que reciben múltiples parámetros. El balance entre Read (21.4\%) y Write (15.4\%) indica un sistema con operaciones tanto de consulta como de modificación.
+
+\newpage
+
+\section{Supuestos y Decisiones de Medición}
+
+\subsection{Supuestos Generales}
+
+\begin{enumerate}
+    \item \textbf{SUP-001 - Límite del Software}: El servicio Ollama se considera fuera del límite del software como un usuario funcional externo que provee servicios de IA.
+
+    \textit{Justificación}: Ollama es un servicio de terceros independiente, no forma parte del código del sistema medido. Las interacciones con Ollama se contabilizan como movimientos Read hacia un usuario funcional externo.
+
+    \item \textbf{SUP-002 - Almacenamiento Persistente}: ChromaDB se considera almacenamiento persistente dentro del límite del software.
+
+    \textit{Justificación}: ChromaDB es gestionado directamente por el microservicio de chatbot y sus datos son esenciales para la funcionalidad RAG. Los movimientos hacia ChromaDB son Write/Read estándar.
+
+    \item \textbf{SUP-003 - API Gateway}: El API Gateway no cuenta como procesos funcionales adicionales, actúa como proxy transparente.
+
+    \textit{Justificación}: Según COSMIC 4.0, los componentes de infraestructura que solo enrutan sin transformar datos no constituyen procesos funcionales propios. El gateway solo redirige peticiones HTTP.
+
+    \item \textbf{SUP-004 - Servicios No Implementados}: Los servicios de notificaciones y algoritmo genético mencionados en las rutas no fueron contabilizados por falta de implementación visible.
+
+    \textit{Justificación}: Solo se encuentran referencias en el router del API Gateway pero no hay controladores ni casos de uso implementados en el código analizado.
+
+    \item \textbf{SUP-005 - Health Checks}: Los endpoints de health check no se contabilizan como procesos funcionales.
+
+    \textit{Justificación}: Los health checks son funciones técnicas de infraestructura, no requisitos funcionales del usuario según COSMIC.
+\end{enumerate}
+
+\subsection{Decisiones de Contabilización}
+
+\begin{enumerate}
+    \item \textbf{DEC-001 - Parámetros Opcionales}: Los parámetros opcionales en endpoints PUT/PATCH se cuentan como Entry aunque no siempre se envíen.
+
+    \textit{Justificación}: COSMIC mide la funcionalidad máxima disponible, no el uso promedio. Si el endpoint acepta el parámetro, se cuenta.
+
+    \item \textbf{DEC-002 - Validaciones en Base de Datos}: Las consultas de validación (ej: verificar email duplicado) se cuentan como movimientos Read independientes.
+
+    \textit{Justificación}: Cada acceso a almacenamiento persistente con propósito distinto constituye un movimiento independiente.
+
+    \item \textbf{DEC-003 - Interacciones con Ollama}: Cada llamada al servicio Ollama (embeddings, chat completion) se cuenta como Read.
+
+    \textit{Justificación}: Ollama es un usuario funcional externo que provee datos (embeddings, respuestas LLM) al proceso.
+
+    \item \textbf{DEC-004 - Almacenamiento de Archivos}: El sistema de archivos se considera almacenamiento persistente para PDFs.
+
+    \textit{Justificación}: Los archivos persisten más allá de la ejecución del proceso funcional y son recuperables posteriormente.
+\end{enumerate}
+
+\subsection{Observaciones Relevantes}
+
+\begin{enumerate}
+    \item \textbf{OBS-001 - Complejidad del Chatbot}: El proceso de envío de mensaje al chatbot (PF-CHAT-001) tiene alta complejidad funcional con 9 CFPs debido a la integración con RAG.
+
+    \textit{Impacto}: Este proceso involucra múltiples interacciones con servicios externos (Ollama para embeddings y generación) y base de datos vectorial (ChromaDB para búsqueda semántica), además de persistencia de historial.
+
+    \item \textbf{OBS-002 - Autenticación Delegada}: El servicio de autenticación delega el almacenamiento de usuarios al servicio Users.
+
+    \textit{Impacto}: Esto genera movimientos de lectura/escritura adicionales entre microservicios que fueron contabilizados correctamente como interacciones con almacenamiento persistente (MongoDB vía Users Service).
+
+    \item \textbf{OBS-003 - Gestión de Plantas en Huertos}: Las operaciones de agregar/remover plantas modifican arrays embebidos en el documento del huerto.
+
+    \textit{Decisión}: Cada operación cuenta como Write independiente aunque modifiquen el mismo documento, ya que representan requisitos funcionales distintos.
+\end{enumerate}
+
+\subsection{Riesgos y Limitaciones}
+
+\begin{enumerate}
+    \item \textbf{RIE-001 - Posible Subdimensionamiento}: Si los servicios de notificaciones y algoritmo genético están parcialmente implementados, el tamaño real podría ser mayor.
+
+    \textit{Mitigación}: Se recomienda revisión adicional cuando estos servicios sean completamente implementados y documentados.
+
+    \item \textbf{RIE-002 - Dependencia de Servicios Externos}: El sistema depende fuertemente de Ollama para funcionalidad core del chatbot.
+
+    \textit{Observación}: La no disponibilidad de Ollama afectaría significativamente la funcionalidad medida (32 CFPs del chatbot, 27.4\% del total).
+\end{enumerate}
+
+\newpage
+
+\section{Evidencia y Trazabilidad}
+
+\subsection{Archivos de Código Analizados}
+
+La medición se basó en análisis estático de los siguientes archivos fuente:
+
+\subsubsection{API Gateway}
+\begin{itemize}
+    \item \texttt{api-gateway/src/app.ts}
+    \item \texttt{api-gateway/src/routes/index.ts}
+    \item \texttt{api-gateway/src/services/proxy.ts}
+    \item \texttt{api-gateway/src/middleware/validateTokenWithAuthService.ts}
+\end{itemize}
+
+\subsubsection{Authentication Service}
+\begin{itemize}
+    \item \texttt{authentication/src/presentation/controllers/AuthController.ts}
+    \item \texttt{authentication/src/presentation/routes/AuthRoutes.ts}
+    \item \texttt{authentication/src/application/usecases/RegisterUseCase.ts}
+    \item \texttt{authentication/src/application/usecases/LoginUseCase.ts}
+    \item \texttt{authentication/src/application/usecases/ValidateTokenUseCase.ts}
+\end{itemize}
+
+\subsubsection{Users Service}
+\begin{itemize}
+    \item \texttt{api-users/src/presentation/controllers/UserController.ts}
+    \item \texttt{api-users/src/presentation/routes/UserRoutes.ts}
+    \item \texttt{api-users/src/application/use-cases/CreateUserUseCase.ts}
+    \item \texttt{api-users/src/application/use-cases/GetUserByIdUseCase.ts}
+    \item \texttt{api-users/src/application/use-cases/GetUserByEmailUseCase.ts}
+    \item \texttt{api-users/src/application/use-cases/UpdateUserByIdUseCase.ts}
+    \item \texttt{api-users/src/application/use-cases/DeleteUserByIdUseCase.ts}
+\end{itemize}
+
+\subsubsection{Chatbot Service}
+\begin{itemize}
+    \item \texttt{api-chatbot/src/presentation/controllers/ChatController.ts}
+    \item \texttt{api-chatbot/src/presentation/controllers/DocumentController.ts}
+    \item \texttt{api-chatbot/src/presentation/routes/ChatRoutes.ts}
+    \item \texttt{api-chatbot/src/presentation/routes/DocumentRoutes.ts}
+    \item \texttt{api-chatbot/src/application/use-cases/SendMessageUseCase.ts}
+    \item \texttt{api-chatbot/src/application/use-cases/GetChatHistoryUseCase.ts}
+    \item \texttt{api-chatbot/src/application/use-cases/UploadDocumentUseCase.ts}
+    \item \texttt{api-chatbot/src/application/use-cases/ProcessDocumentUseCase.ts}
+    \item \texttt{api-chatbot/src/application/use-cases/GetDocumentsUseCase.ts}
+    \item \texttt{api-chatbot/src/application/use-cases/DeleteDocumentUseCase.ts}
+\end{itemize}
+
+\subsubsection{Orchard Service}
+\begin{itemize}
+    \item \texttt{api-orchard/src/presentation/controllers/OrchardController.ts}
+    \item \texttt{api-orchard/src/presentation/routes/OrchardRoutes.ts}
+    \item \texttt{api-orchard/src/application/use-cases/CreateOrchardUseCase.ts}
+    \item \texttt{api-orchard/src/application/use-cases/GetOrchardUseCase.ts}
+    \item \texttt{api-orchard/src/application/use-cases/ListOrchardsUseCase.ts}
+    \item \texttt{api-orchard/src/application/use-cases/UpdateOrchardUseCase.ts}
+    \item \texttt{api-orchard/src/application/use-cases/DeleteOrchardUseCase.ts}
+    \item \texttt{api-orchard/src/application/use-cases/ToggleOrchardStateUseCase.ts}
+    \item \texttt{api-orchard/src/application/use-cases/ManagePlantsUseCase.ts}
+\end{itemize}
+
+\subsection{Metodología de Análisis}
+
+\begin{enumerate}
+    \item \textbf{Identificación de Endpoints}: Revisión de archivos de rutas y controladores
+    \item \textbf{Mapeo a Requisitos Funcionales}: Análisis de la funcionalidad implementada en cada endpoint
+    \item \textbf{Conteo de Movimientos Entry}: Análisis de parámetros en \texttt{req.body}, \texttt{req.params}, \texttt{req.query}
+    \item \textbf{Conteo de Movimientos Exit}: Análisis de respuestas en \texttt{res.json()}
+    \item \textbf{Conteo de Movimientos Read/Write}: Análisis de casos de uso y repositorios
+    \item \textbf{Validación Cruzada}: Verificación de consistencia entre controladores y casos de uso
+\end{enumerate}
+
+\subsection{Documento de Referencia}
+
+La estructura y metodología de este documento se basan en:
+
+\textbf{Docs/PuntosFuncionCosmic.pdf} - Documento de referencia que contiene un ejemplo de medición COSMIC para el proyecto PIWEB, utilizado como guía metodológica y de formato.
+
+\newpage
+
+\section{Anexos}
+
+\subsection{Anexo A: Glosario de Términos}
+
+\begin{description}
+    \item[CFP] COSMIC Function Point - Unidad de medida COSMIC
+    \item[Entry (E)] Movimiento de datos desde usuario funcional hacia el proceso
+    \item[Exit (X)] Movimiento de datos desde el proceso hacia usuario funcional
+    \item[Read (R)] Movimiento de datos desde almacenamiento persistente al proceso
+    \item[Write (W)] Movimiento de datos desde el proceso a almacenamiento persistente
+    \item[RAG] Retrieval-Augmented Generation - Técnica de IA que combina búsqueda semántica con generación de lenguaje
+    \item[LLM] Large Language Model - Modelo de lenguaje de gran escala
+    \item[Embedding] Representación vectorial de texto en espacio multidimensional
+    \item[ChromaDB] Base de datos vectorial para búsqueda semántica
+    \item[Ollama] Servicio local de modelos de lenguaje de código abierto
+\end{description}
+
+\subsection{Anexo B: Referencias Normativas}
+
+\begin{enumerate}
+    \item COSMIC Measurement Manual v4.0.2, The COSMIC Functional Size Measurement Method, Version 4.0.2, January 2017
+    \item ISO/IEC 19761:2011 - Software engineering - COSMIC: a functional size measurement method
+    \item COSMIC Implementation Guide for REST APIs (aplicable a arquitecturas de microservicios)
+\end{enumerate}
+
+\subsection{Anexo C: Información del Proyecto}
+
+\begin{description}
+    \item[Nombre del Proyecto] ApiGateway - Sistema de Microservicios
+    \item[Tecnologías] Node.js, TypeScript, Express, MongoDB, ChromaDB, Ollama
+    \item[Arquitectura] Microservicios con API Gateway
+    \item[Patrón Arquitectónico] Clean Architecture / Hexagonal
+    \item[Fecha de Análisis] \today
+    \item[Versión Analizada] Versión actual del repositorio
+\end{description}
+
+\subsection{Anexo D: Contacto}
+
+Para consultas sobre esta medición:
+
+\begin{description}
+    \item[Analista] Especialista Certificado COSMIC (CCFL)
+    \item[Metodología] COSMIC v4.0
+    \item[Archivos Generados]
+    \begin{itemize}
+        \item \texttt{PuntosFuncion\_COSMIC.tex} (este documento)
+        \item \texttt{puntos\_cosmic.json} (datos estructurados)
+    \end{itemize}
+\end{description}
+
+\newpage
+
+\section{Conclusiones}
+
+\subsection{Resumen de Hallazgos}
+
+El sistema ApiGateway presenta las siguientes características de tamaño funcional:
+
+\begin{itemize}
+    \item \textbf{Tamaño Total}: 117 CFPs
+    \item \textbf{Número de Procesos Funcionales}: 23
+    \item \textbf{Promedio por Proceso}: 5.09 CFPs/proceso
+    \item \textbf{Servicio Más Complejo}: Orchard Service (44 CFPs, 37.6\%)
+    \item \textbf{Servicio Menos Complejo}: Authentication Service (12 CFPs, 10.3\%)
+\end{itemize}
+
+\subsection{Interpretación del Tamaño}
+
+Con 117 CFPs, este sistema se clasifica como:
+
+\begin{itemize}
+    \item \textbf{Categoría}: Sistema de mediana complejidad funcional
+    \item \textbf{Complejidad Distribuida}: Arquitectura de microservicios con responsabilidades bien definidas
+    \item \textbf{Funcionalidad Especializada}: 27.4\% del tamaño corresponde a funcionalidades avanzadas de IA (Chatbot con RAG)
+\end{itemize}
+
+\subsection{Aplicaciones de esta Medición}
+
+Los 117 CFPs medidos pueden utilizarse para:
+
+\begin{enumerate}
+    \item \textbf{Estimación de Esfuerzo}: Aplicando productividad histórica (CFP/hora)
+    \item \textbf{Estimación de Costos}: Multiplicando por costo unitario por CFP
+    \item \textbf{Benchmarking}: Comparación con proyectos similares de la industria
+    \item \textbf{Control de Cambios}: Medición incremental de nuevas funcionalidades
+    \item \textbf{Métricas de Productividad}: Líneas de código por CFP, defectos por CFP, etc.
+\end{enumerate}
+
+\subsection{Recomendaciones}
+
+\begin{enumerate}
+    \item Completar la implementación de los servicios de notificaciones y algoritmo genético para obtener una medición completa del sistema
+    \item Considerar una re-medición cuando se agreguen funcionalidades significativas
+    \item Utilizar esta línea base (117 CFPs) para proyecciones de crecimiento futuro
+    \item Documentar la productividad real del equipo en CFP/hora para mejorar estimaciones futuras
+\end{enumerate}
+
+\vfill
+
+\begin{center}
+\rule{0.5\textwidth}{0.4pt}
+
+\textbf{FIN DEL DOCUMENTO}
+
+\vspace{0.5cm}
+
+Documento generado por: Especialista Certificado COSMIC (CCFL)
+
+Fecha: \today
+
+\rule{0.5\textwidth}{0.4pt}
+\end{center}
+
+\end{document}

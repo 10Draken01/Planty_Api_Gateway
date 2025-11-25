@@ -1,0 +1,652 @@
+{
+  "metadata": {
+    "proyecto": "ApiGateway - Sistema de Microservicios",
+    "version_cosmic": "4.0",
+    "fecha_analisis": "2025-11-24",
+    "analista": "Especialista Certificado COSMIC (CCFL)",
+    "alcance": "Medición completa del sistema ApiGateway incluyendo todos los microservicios",
+    "proposito": "Estimación de tamaño funcional para planificación y costeo"
+  },
+  "limite_software": {
+    "descripcion": "Sistema de API Gateway con arquitectura de microservicios que provee funcionalidades de autenticación, gestión de usuarios, chatbot inteligente con RAG (Retrieval-Augmented Generation), y gestión de huertos agrícolas",
+    "componentes": [
+      "API Gateway (Proxy y Enrutamiento)",
+      "Authentication Service (Autenticación JWT)",
+      "Users Service (Gestión de Usuarios)",
+      "Chatbot Service (IA Conversacional + RAG)",
+      "Orchard Service (Gestión de Huertos)"
+    ],
+    "usuarios_funcionales": [
+      "Usuario final (aplicación cliente)",
+      "Administrador del sistema",
+      "Servicio externo Ollama (LLM)"
+    ],
+    "almacenamiento_persistente": [
+      "MongoDB (usuarios y huertos)",
+      "ChromaDB (vectores de documentos)",
+      "Sistema de archivos (PDFs y uploads)"
+    ]
+  },
+  "procesos_funcionales": [
+    {
+      "id": "PF-AUTH-001",
+      "nombre": "Registro de Usuario",
+      "descripcion": "Permite a un nuevo usuario registrarse en el sistema proporcionando credenciales",
+      "servicio": "Authentication",
+      "endpoint": "POST /api/auth/register",
+      "movimientos": {
+        "Entry": 3,
+        "Exit": 1,
+        "Read": 1,
+        "Write": 1
+      },
+      "cfp": 6,
+      "detalle_movimientos": [
+        "E: name (dato de entrada)",
+        "E: email (dato de entrada)",
+        "E: password (dato de entrada)",
+        "R: Consulta de usuario existente en Users Service",
+        "W: Creación de usuario en Users Service",
+        "X: Token JWT + datos de usuario"
+      ],
+      "evidencia": "authentication/src/application/usecases/RegisterUseCase.ts:22 + authentication/src/presentation/controllers/AuthController.ts:13"
+    },
+    {
+      "id": "PF-AUTH-002",
+      "nombre": "Inicio de Sesión",
+      "descripcion": "Autentica a un usuario existente y genera token de sesión",
+      "servicio": "Authentication",
+      "endpoint": "POST /api/auth/login",
+      "movimientos": {
+        "Entry": 2,
+        "Exit": 1,
+        "Read": 1,
+        "Write": 0
+      },
+      "cfp": 4,
+      "detalle_movimientos": [
+        "E: email (dato de entrada)",
+        "E: password (dato de entrada)",
+        "R: Consulta de usuario por email en Users Service",
+        "X: Token JWT + datos de usuario"
+      ],
+      "evidencia": "authentication/src/application/usecases/LoginUseCase.ts + authentication/src/presentation/controllers/AuthController.ts:30"
+    },
+    {
+      "id": "PF-AUTH-003",
+      "nombre": "Validación de Token",
+      "descripcion": "Valida un token JWT y retorna información del usuario autenticado",
+      "servicio": "Authentication",
+      "endpoint": "POST /api/auth/validate",
+      "movimientos": {
+        "Entry": 1,
+        "Exit": 1,
+        "Read": 0,
+        "Write": 0
+      },
+      "cfp": 2,
+      "detalle_movimientos": [
+        "E: token (dato de entrada)",
+        "X: resultado de validación + userId + email"
+      ],
+      "evidencia": "authentication/src/application/usecases/ValidateTokenUseCase.ts + authentication/src/presentation/controllers/AuthController.ts:52"
+    },
+    {
+      "id": "PF-USER-001",
+      "nombre": "Creación de Usuario",
+      "descripcion": "Crea un nuevo usuario en la base de datos con todos sus atributos",
+      "servicio": "Users",
+      "endpoint": "POST /api/users/create",
+      "movimientos": {
+        "Entry": 6,
+        "Exit": 1,
+        "Read": 1,
+        "Write": 1
+      },
+      "cfp": 9,
+      "detalle_movimientos": [
+        "E: name",
+        "E: email",
+        "E: password",
+        "E: experience_level",
+        "E: profile_image",
+        "E: historyTimeUse_ids",
+        "R: Verificación de usuario existente en MongoDB",
+        "W: Persistencia de usuario en MongoDB",
+        "X: Datos completos del usuario creado"
+      ],
+      "evidencia": "api-users/src/presentation/controllers/UserController.ts:18 + api-users/src/application/use-cases/CreateUserUseCase.ts"
+    },
+    {
+      "id": "PF-USER-002",
+      "nombre": "Consulta de Usuario por ID",
+      "descripcion": "Obtiene los datos de un usuario específico por su identificador",
+      "servicio": "Users",
+      "endpoint": "GET /api/users/:id",
+      "movimientos": {
+        "Entry": 1,
+        "Exit": 1,
+        "Read": 1,
+        "Write": 0
+      },
+      "cfp": 3,
+      "detalle_movimientos": [
+        "E: id (parámetro de ruta)",
+        "R: Consulta de usuario en MongoDB",
+        "X: Datos del usuario (sin contraseña)"
+      ],
+      "evidencia": "api-users/src/presentation/controllers/UserController.ts:108 + api-users/src/application/use-cases/GetUserByIdUseCase.ts"
+    },
+    {
+      "id": "PF-USER-003",
+      "nombre": "Consulta de Usuario por Email",
+      "descripcion": "Obtiene usuario por email (incluye contraseña para autenticación)",
+      "servicio": "Users",
+      "endpoint": "GET /api/users/email/:email",
+      "movimientos": {
+        "Entry": 1,
+        "Exit": 1,
+        "Read": 1,
+        "Write": 0
+      },
+      "cfp": 3,
+      "detalle_movimientos": [
+        "E: email (parámetro de ruta)",
+        "R: Consulta de usuario en MongoDB",
+        "X: Datos completos del usuario (incluye password hash)"
+      ],
+      "evidencia": "api-users/src/presentation/controllers/UserController.ts:153 + api-users/src/application/use-cases/GetUserByEmailUseCase.ts"
+    },
+    {
+      "id": "PF-USER-004",
+      "nombre": "Actualización de Usuario",
+      "descripcion": "Actualiza los datos de un usuario existente",
+      "servicio": "Users",
+      "endpoint": "PUT /api/users/:id",
+      "movimientos": {
+        "Entry": 6,
+        "Exit": 1,
+        "Read": 2,
+        "Write": 1
+      },
+      "cfp": 10,
+      "detalle_movimientos": [
+        "E: id (parámetro de ruta)",
+        "E: name (opcional)",
+        "E: email (opcional)",
+        "E: password (opcional)",
+        "E: experience_level (opcional)",
+        "E: profile_image (opcional)",
+        "R: Consulta de usuario existente en MongoDB",
+        "R: Verificación de email duplicado en MongoDB",
+        "W: Actualización de usuario en MongoDB",
+        "X: Datos actualizados del usuario"
+      ],
+      "evidencia": "api-users/src/presentation/controllers/UserController.ts:191 + api-users/src/application/use-cases/UpdateUserByIdUseCase.ts"
+    },
+    {
+      "id": "PF-USER-005",
+      "nombre": "Eliminación de Usuario",
+      "descripcion": "Elimina un usuario del sistema de forma permanente",
+      "servicio": "Users",
+      "endpoint": "DELETE /api/users/:id",
+      "movimientos": {
+        "Entry": 1,
+        "Exit": 1,
+        "Read": 1,
+        "Write": 1
+      },
+      "cfp": 4,
+      "detalle_movimientos": [
+        "E: id (parámetro de ruta)",
+        "R: Verificación de existencia en MongoDB",
+        "W: Eliminación de usuario en MongoDB",
+        "X: Mensaje de confirmación"
+      ],
+      "evidencia": "api-users/src/presentation/controllers/UserController.ts:280 + api-users/src/application/use-cases/DeleteUserByIdUseCase.ts"
+    },
+    {
+      "id": "PF-CHAT-001",
+      "nombre": "Envío de Mensaje al Chatbot",
+      "descripcion": "Procesa un mensaje del usuario, realiza búsqueda semántica en documentos y genera respuesta con LLM",
+      "servicio": "Chatbot",
+      "endpoint": "POST /api/chat/message",
+      "movimientos": {
+        "Entry": 3,
+        "Exit": 1,
+        "Read": 3,
+        "Write": 2
+      },
+      "cfp": 9,
+      "detalle_movimientos": [
+        "E: message (texto del usuario)",
+        "E: includeContext (boolean)",
+        "E: maxContextChunks (número)",
+        "R: Generación de embedding del mensaje (Ollama)",
+        "R: Búsqueda semántica en ChromaDB",
+        "R: Consulta al LLM (Ollama) con contexto",
+        "W: Almacenamiento del mensaje del usuario",
+        "W: Almacenamiento de la respuesta del chatbot",
+        "X: Respuesta generada por el LLM"
+      ],
+      "evidencia": "api-chatbot/src/presentation/controllers/ChatController.ts:19 + api-chatbot/src/application/use-cases/SendMessageUseCase.ts"
+    },
+    {
+      "id": "PF-CHAT-002",
+      "nombre": "Consulta de Historial de Chat",
+      "descripcion": "Obtiene el historial completo de conversación de una sesión",
+      "servicio": "Chatbot",
+      "endpoint": "GET /api/chat/history/:sessionId",
+      "movimientos": {
+        "Entry": 1,
+        "Exit": 1,
+        "Read": 1,
+        "Write": 0
+      },
+      "cfp": 3,
+      "detalle_movimientos": [
+        "E: sessionId (parámetro de ruta)",
+        "R: Consulta de mensajes en repositorio de chat",
+        "X: Lista de mensajes de la sesión"
+      ],
+      "evidencia": "api-chatbot/src/presentation/controllers/ChatController.ts:57 + api-chatbot/src/application/use-cases/GetChatHistoryUseCase.ts"
+    },
+    {
+      "id": "PF-DOC-001",
+      "nombre": "Carga de Documento PDF",
+      "descripcion": "Sube un archivo PDF al sistema y registra sus metadatos",
+      "servicio": "Chatbot",
+      "endpoint": "POST /api/documents/upload",
+      "movimientos": {
+        "Entry": 2,
+        "Exit": 1,
+        "Read": 0,
+        "Write": 2
+      },
+      "cfp": 5,
+      "detalle_movimientos": [
+        "E: file (archivo PDF multipart)",
+        "E: metadata (JSON opcional)",
+        "W: Almacenamiento del archivo en sistema de archivos",
+        "W: Registro de documento en repositorio",
+        "X: Información del documento creado (id, nombre, ruta)"
+      ],
+      "evidencia": "api-chatbot/src/presentation/controllers/DocumentController.ts:23 + api-chatbot/src/application/use-cases/UploadDocumentUseCase.ts"
+    },
+    {
+      "id": "PF-DOC-002",
+      "nombre": "Procesamiento de Documento",
+      "descripcion": "Extrae texto del PDF, divide en chunks, genera embeddings y almacena en ChromaDB",
+      "servicio": "Chatbot",
+      "endpoint": "POST /api/documents/:id/process",
+      "movimientos": {
+        "Entry": 3,
+        "Exit": 1,
+        "Read": 2,
+        "Write": 2
+      },
+      "cfp": 8,
+      "detalle_movimientos": [
+        "E: id (documento a procesar)",
+        "E: chunkSize (tamaño de fragmentos)",
+        "E: chunkOverlap (solapamiento)",
+        "R: Lectura del archivo PDF del sistema de archivos",
+        "R: Generación de embeddings (Ollama)",
+        "W: Almacenamiento de chunks en repositorio",
+        "W: Almacenamiento de vectores en ChromaDB",
+        "X: Resultado del procesamiento (número de chunks, estado)"
+      ],
+      "evidencia": "api-chatbot/src/presentation/controllers/DocumentController.ts:58 + api-chatbot/src/application/use-cases/ProcessDocumentUseCase.ts"
+    },
+    {
+      "id": "PF-DOC-003",
+      "nombre": "Listar Documentos",
+      "descripcion": "Obtiene la lista de todos los documentos cargados en el sistema",
+      "servicio": "Chatbot",
+      "endpoint": "GET /api/documents",
+      "movimientos": {
+        "Entry": 0,
+        "Exit": 1,
+        "Read": 1,
+        "Write": 0
+      },
+      "cfp": 2,
+      "detalle_movimientos": [
+        "R: Consulta de todos los documentos en repositorio",
+        "X: Lista de documentos con metadatos"
+      ],
+      "evidencia": "api-chatbot/src/presentation/controllers/DocumentController.ts:95 + api-chatbot/src/application/use-cases/GetDocumentsUseCase.ts"
+    },
+    {
+      "id": "PF-DOC-004",
+      "nombre": "Eliminación de Documento",
+      "descripcion": "Elimina un documento y sus vectores asociados del sistema",
+      "servicio": "Chatbot",
+      "endpoint": "DELETE /api/documents/:id",
+      "movimientos": {
+        "Entry": 1,
+        "Exit": 1,
+        "Read": 1,
+        "Write": 2
+      },
+      "cfp": 5,
+      "detalle_movimientos": [
+        "E: id (documento a eliminar)",
+        "R: Consulta de documento en repositorio",
+        "W: Eliminación del archivo del sistema de archivos",
+        "W: Eliminación de vectores en ChromaDB",
+        "X: Confirmación de eliminación"
+      ],
+      "evidencia": "api-chatbot/src/presentation/controllers/DocumentController.ts:116 + api-chatbot/src/application/use-cases/DeleteDocumentUseCase.ts"
+    },
+    {
+      "id": "PF-ORC-001",
+      "nombre": "Creación de Huerto",
+      "descripcion": "Crea un nuevo huerto con sus características básicas",
+      "servicio": "Orchard",
+      "endpoint": "POST /api/orchards",
+      "movimientos": {
+        "Entry": 5,
+        "Exit": 1,
+        "Read": 0,
+        "Write": 1
+      },
+      "cfp": 7,
+      "detalle_movimientos": [
+        "E: name (nombre del huerto)",
+        "E: location (ubicación)",
+        "E: size (tamaño en hectáreas)",
+        "E: soilType (tipo de suelo)",
+        "E: climate (clima)",
+        "W: Persistencia en MongoDB",
+        "X: Datos del huerto creado"
+      ],
+      "evidencia": "api-orchard/src/presentation/controllers/OrchardController.ts:30 + api-orchard/src/application/use-cases/CreateOrchardUseCase.ts"
+    },
+    {
+      "id": "PF-ORC-002",
+      "nombre": "Consulta de Huerto por ID",
+      "descripcion": "Obtiene la información detallada de un huerto específico",
+      "servicio": "Orchard",
+      "endpoint": "GET /api/orchards/:id",
+      "movimientos": {
+        "Entry": 1,
+        "Exit": 1,
+        "Read": 1,
+        "Write": 0
+      },
+      "cfp": 3,
+      "detalle_movimientos": [
+        "E: id (identificador del huerto)",
+        "R: Consulta en MongoDB",
+        "X: Datos completos del huerto"
+      ],
+      "evidencia": "api-orchard/src/presentation/controllers/OrchardController.ts:52 + api-orchard/src/application/use-cases/GetOrchardUseCase.ts"
+    },
+    {
+      "id": "PF-ORC-003",
+      "nombre": "Listar Huertos",
+      "descripcion": "Obtiene lista de huertos con filtro opcional por estado activo",
+      "servicio": "Orchard",
+      "endpoint": "GET /api/orchards",
+      "movimientos": {
+        "Entry": 1,
+        "Exit": 1,
+        "Read": 1,
+        "Write": 0
+      },
+      "cfp": 3,
+      "detalle_movimientos": [
+        "E: active (query param opcional: true/false/undefined)",
+        "R: Consulta filtrada en MongoDB",
+        "X: Lista de huertos"
+      ],
+      "evidencia": "api-orchard/src/presentation/controllers/OrchardController.ts:77 + api-orchard/src/application/use-cases/ListOrchardsUseCase.ts"
+    },
+    {
+      "id": "PF-ORC-004",
+      "nombre": "Actualización de Huerto",
+      "descripcion": "Modifica los datos de un huerto existente",
+      "servicio": "Orchard",
+      "endpoint": "PUT /api/orchards/:id",
+      "movimientos": {
+        "Entry": 6,
+        "Exit": 1,
+        "Read": 1,
+        "Write": 1
+      },
+      "cfp": 9,
+      "detalle_movimientos": [
+        "E: id (identificador)",
+        "E: name (opcional)",
+        "E: location (opcional)",
+        "E: size (opcional)",
+        "E: soilType (opcional)",
+        "E: climate (opcional)",
+        "R: Consulta de huerto existente en MongoDB",
+        "W: Actualización en MongoDB",
+        "X: Datos actualizados del huerto"
+      ],
+      "evidencia": "api-orchard/src/presentation/controllers/OrchardController.ts:107 + api-orchard/src/application/use-cases/UpdateOrchardUseCase.ts"
+    },
+    {
+      "id": "PF-ORC-005",
+      "nombre": "Eliminación de Huerto",
+      "descripcion": "Elimina un huerto del sistema permanentemente",
+      "servicio": "Orchard",
+      "endpoint": "DELETE /api/orchards/:id",
+      "movimientos": {
+        "Entry": 1,
+        "Exit": 1,
+        "Read": 1,
+        "Write": 1
+      },
+      "cfp": 4,
+      "detalle_movimientos": [
+        "E: id (identificador)",
+        "R: Verificación de existencia en MongoDB",
+        "W: Eliminación en MongoDB",
+        "X: Confirmación de eliminación"
+      ],
+      "evidencia": "api-orchard/src/presentation/controllers/OrchardController.ts:132 + api-orchard/src/application/use-cases/DeleteOrchardUseCase.ts"
+    },
+    {
+      "id": "PF-ORC-006",
+      "nombre": "Activar Huerto",
+      "descripcion": "Cambia el estado de un huerto a activo",
+      "servicio": "Orchard",
+      "endpoint": "PATCH /api/orchards/:id/activate",
+      "movimientos": {
+        "Entry": 1,
+        "Exit": 1,
+        "Read": 1,
+        "Write": 1
+      },
+      "cfp": 4,
+      "detalle_movimientos": [
+        "E: id (identificador)",
+        "R: Consulta de huerto en MongoDB",
+        "W: Actualización de estado a activo",
+        "X: Huerto con estado actualizado"
+      ],
+      "evidencia": "api-orchard/src/presentation/controllers/OrchardController.ts:156 + api-orchard/src/application/use-cases/ToggleOrchardStateUseCase.ts"
+    },
+    {
+      "id": "PF-ORC-007",
+      "nombre": "Desactivar Huerto",
+      "descripcion": "Cambia el estado de un huerto a inactivo",
+      "servicio": "Orchard",
+      "endpoint": "PATCH /api/orchards/:id/deactivate",
+      "movimientos": {
+        "Entry": 1,
+        "Exit": 1,
+        "Read": 1,
+        "Write": 1
+      },
+      "cfp": 4,
+      "detalle_movimientos": [
+        "E: id (identificador)",
+        "R: Consulta de huerto en MongoDB",
+        "W: Actualización de estado a inactivo",
+        "X: Huerto con estado actualizado"
+      ],
+      "evidencia": "api-orchard/src/presentation/controllers/OrchardController.ts:181 + api-orchard/src/application/use-cases/ToggleOrchardStateUseCase.ts"
+    },
+    {
+      "id": "PF-ORC-008",
+      "nombre": "Agregar Planta a Huerto",
+      "descripcion": "Asocia una planta a un huerto existente",
+      "servicio": "Orchard",
+      "endpoint": "POST /api/orchards/:id/plants",
+      "movimientos": {
+        "Entry": 2,
+        "Exit": 1,
+        "Read": 1,
+        "Write": 1
+      },
+      "cfp": 5,
+      "detalle_movimientos": [
+        "E: id (identificador del huerto)",
+        "E: plantId (identificador de la planta)",
+        "R: Consulta de huerto en MongoDB",
+        "W: Actualización del array de plantas en MongoDB",
+        "X: Huerto actualizado con nueva planta"
+      ],
+      "evidencia": "api-orchard/src/presentation/controllers/OrchardController.ts:206 + api-orchard/src/application/use-cases/ManagePlantsUseCase.ts"
+    },
+    {
+      "id": "PF-ORC-009",
+      "nombre": "Remover Planta de Huerto",
+      "descripcion": "Elimina una planta asociada de un huerto",
+      "servicio": "Orchard",
+      "endpoint": "DELETE /api/orchards/:id/plants/:plantId",
+      "movimientos": {
+        "Entry": 2,
+        "Exit": 1,
+        "Read": 1,
+        "Write": 1
+      },
+      "cfp": 5,
+      "detalle_movimientos": [
+        "E: id (identificador del huerto)",
+        "E: plantId (identificador de la planta)",
+        "R: Consulta de huerto en MongoDB",
+        "W: Actualización del array de plantas en MongoDB",
+        "X: Huerto actualizado sin la planta"
+      ],
+      "evidencia": "api-orchard/src/presentation/controllers/OrchardController.ts:233 + api-orchard/src/application/use-cases/ManagePlantsUseCase.ts"
+    }
+  ],
+  "resumen_por_servicio": {
+    "Authentication": {
+      "procesos": 3,
+      "cfp_total": 12,
+      "detalle": {
+        "Entry": 6,
+        "Exit": 3,
+        "Read": 2,
+        "Write": 1
+      }
+    },
+    "Users": {
+      "procesos": 5,
+      "cfp_total": 29,
+      "detalle": {
+        "Entry": 15,
+        "Exit": 5,
+        "Read": 6,
+        "Write": 3
+      }
+    },
+    "Chatbot": {
+      "procesos": 6,
+      "cfp_total": 32,
+      "detalle": {
+        "Entry": 10,
+        "Exit": 6,
+        "Read": 8,
+        "Write": 8
+      }
+    },
+    "Orchard": {
+      "procesos": 9,
+      "cfp_total": 44,
+      "detalle": {
+        "Entry": 20,
+        "Exit": 9,
+        "Read": 9,
+        "Write": 6
+      }
+    }
+  },
+  "totales_proyecto": {
+    "total_procesos_funcionales": 23,
+    "total_cfp": 117,
+    "total_entry": 51,
+    "total_exit": 23,
+    "total_read": 25,
+    "total_write": 18,
+    "verificacion_suma": "51 + 23 + 25 + 18 = 117 CFPs"
+  },
+  "supuestos_y_observaciones": [
+    {
+      "id": "SUP-001",
+      "categoria": "Límite del software",
+      "supuesto": "El servicio Ollama se considera fuera del límite del software como un usuario funcional externo que provee servicios de IA",
+      "justificacion": "Ollama es un servicio de terceros independiente, no forma parte del código del sistema medido"
+    },
+    {
+      "id": "SUP-002",
+      "categoria": "Almacenamiento",
+      "supuesto": "ChromaDB se considera almacenamiento persistente dentro del límite del software",
+      "justificacion": "ChromaDB es gestionado directamente por el microservicio de chatbot y sus datos son esenciales para la funcionalidad RAG"
+    },
+    {
+      "id": "SUP-003",
+      "categoria": "API Gateway",
+      "supuesto": "El API Gateway no cuenta como procesos funcionales adicionales, actúa como proxy transparente",
+      "justificacion": "Según COSMIC 4.0, los componentes de infraestructura que solo enrutan sin transformar datos no constituyen procesos funcionales propios"
+    },
+    {
+      "id": "SUP-004",
+      "categoria": "Servicios de notificaciones y algoritmo genético",
+      "supuesto": "Los servicios de notificaciones y algoritmo genético mencionados en las rutas no fueron contabilizados por falta de implementación visible",
+      "justificacion": "Solo se encuentran referencias en el router pero no hay controladores ni casos de uso implementados en el código analizado"
+    },
+    {
+      "id": "OBS-001",
+      "categoria": "Complejidad del Chatbot",
+      "observacion": "El proceso de envío de mensaje al chatbot (PF-CHAT-001) tiene alta complejidad funcional con 9 CFPs debido a la integración con RAG",
+      "impacto": "Este proceso involucra múltiples interacciones con servicios externos (Ollama) y base de datos vectorial (ChromaDB)"
+    },
+    {
+      "id": "OBS-002",
+      "categoria": "Autenticación delegada",
+      "observacion": "El servicio de autenticación delega el almacenamiento de usuarios al servicio Users",
+      "impacto": "Esto genera movimientos de lectura/escritura adicionales entre microservicios que fueron contabilizados correctamente"
+    },
+    {
+      "id": "RIE-001",
+      "categoria": "Riesgo",
+      "descripcion": "Posible subdimensionamiento si los servicios de notificaciones y algoritmo genético están parcialmente implementados",
+      "mitigacion": "Se recomienda revisión adicional cuando estos servicios sean completamente implementados"
+    }
+  ],
+  "trazabilidad": {
+    "archivos_analizados": [
+      "api-gateway/src/app.ts",
+      "api-gateway/src/routes/index.ts",
+      "authentication/src/presentation/controllers/AuthController.ts",
+      "authentication/src/application/usecases/*.ts",
+      "api-users/src/presentation/controllers/UserController.ts",
+      "api-users/src/application/use-cases/*.ts",
+      "api-chatbot/src/presentation/controllers/ChatController.ts",
+      "api-chatbot/src/presentation/controllers/DocumentController.ts",
+      "api-chatbot/src/application/use-cases/*.ts",
+      "api-orchard/src/presentation/controllers/OrchardController.ts",
+      "api-orchard/src/application/use-cases/*.ts"
+    ],
+    "metodologia": "Análisis estático de código fuente + Mapeo de endpoints REST a procesos funcionales COSMIC",
+    "referencia_documento": "Docs/PuntosFuncionCosmic.pdf (documento de referencia metodológica)"
+  }
+}
