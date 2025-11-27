@@ -7,6 +7,7 @@ export interface UserProps {
   count_orchards?: number;
   experience_level?: 1 | 2 | 3;
   profile_image?: string;
+  tokenFCM?: string; // Token de Firebase Cloud Messaging para notificaciones push
   createdAt?: Date;
   historyTimeUse_ids?: Date[];
 
@@ -21,6 +22,7 @@ export class User {
   private _count_orchards: number;
   private _experience_level: 1 | 2 | 3;
   private _profile_image: string;
+  private _tokenFCM: string | undefined;
   private _createdAt: Date;
   private _historyTimeUse_ids: Date[];
 
@@ -34,6 +36,7 @@ export class User {
     this._count_orchards = props.count_orchards || 0;
     this._experience_level = props.experience_level || 1;
     this._profile_image = props.profile_image || 'https://imgs.search.brave.com/4UEc9qL-ya5yCbrX6t3vwBJRKoFVHndy9k0d9DuWMJY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9oaXBz/LmhlYXJzdGFwcHMu/Y29tL2htZy1wcm9k/L2ltYWdlcy9zd2Vl/dC1wb3RhdG8tcGxh/bnQtcm95YWx0eS1m/cmVlLWltYWdlLTE3/NDI0MjMxMDIucGpw/ZWc_Y3JvcD0wLjY2/OHh3OjEuMDB4aDsw/LjAyMDR4dyww';
+    this._tokenFCM = props.tokenFCM;
     this._createdAt = props.createdAt || new Date();
     this._historyTimeUse_ids = props.historyTimeUse_ids || [];
   }
@@ -78,6 +81,14 @@ export class User {
     return [...this._historyTimeUse_ids];
   }
 
+  get tokenFCM(): string | undefined {
+    return this._tokenFCM;
+  }
+
+  set tokenFCM(token: string | undefined) {
+    this._tokenFCM = token;
+  }
+
   private generateId(): string {
     return Date.now().toString() + Math.random().toString(36).substr(2, 9);
   }
@@ -92,6 +103,7 @@ export class User {
       count_orchards: this._count_orchards,
       experience_level: this._experience_level,
       profile_image: this._profile_image,
+      tokenFCM: this._tokenFCM,
       createdAt: this._createdAt,
       historyTimeUse_ids: this._historyTimeUse_ids
     };

@@ -9,6 +9,7 @@ export interface UserDocument extends Document {
   count_orchards: number;
   experience_level: 1 | 2 | 3;
   profile_image: string;
+  tokenFCM?: string; // Token de Firebase Cloud Messaging
   historyTimeUse_ids: Date[];
   createdAt: Date;
   updatedAt: Date;
@@ -46,12 +47,17 @@ const UserSchema = new Schema<UserDocument>({
     type: String,
     required: false
   },
+  tokenFCM: {
+    type: String,
+    required: false,
+    default: null
+  },
   historyTimeUse_ids: {
     type: [String],
     default: []
   }
 }, {
-  timestamps: true, 
+  timestamps: true,
   versionKey: false
 });
 

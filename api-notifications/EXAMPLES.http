@@ -1,0 +1,193 @@
+### ====================================
+### NOTIFICATIONS SERVICE - API EXAMPLES
+### ====================================
+### Base URL: http://localhost:3005
+### ====================================
+
+### 1. Health Check
+GET http://localhost:3005/notify/health
+
+### ====================================
+### 2. Enviar Notificación a Un Usuario
+### ====================================
+
+POST http://localhost:3005/notify/user/123
+Content-Type: application/json
+
+{
+  "title": "Nueva actualización disponible",
+  "body": "Hemos agregado nuevas funcionalidades a tu aplicación. Actualiza ahora para disfrutarlas.",
+  "data": {
+    "type": "update",
+    "version": "2.0.0",
+    "action": "open_app_store"
+  }
+}
+
+### ====================================
+### 3. Notificación con Imagen
+### ====================================
+
+POST http://localhost:3005/notify/user/456
+Content-Type: application/json
+
+{
+  "title": "Tu huerto necesita atención",
+  "body": "Han pasado 3 días desde tu última visita. Tus plantas te extrañan!",
+  "imageUrl": "https://example.com/orchard-image.jpg",
+  "data": {
+    "orchardId": "orchard-789",
+    "action": "open_orchard"
+  }
+}
+
+### ====================================
+### 4. Enviar a Múltiples Usuarios
+### ====================================
+
+POST http://localhost:3005/notify/users
+Content-Type: application/json
+
+{
+  "userIds": ["user1", "user2", "user3"],
+  "title": "Evento Especial",
+  "body": "Únete a nuestra transmisión en vivo mañana a las 6 PM",
+  "data": {
+    "eventId": "event-123",
+    "eventDate": "2025-11-25T18:00:00Z",
+    "action": "open_event_details"
+  }
+}
+
+### ====================================
+### 5. Broadcast a Todos los Usuarios
+### ====================================
+
+POST http://localhost:3005/notify/broadcast
+Content-Type: application/json
+
+{
+  "title": "Mantenimiento Programado",
+  "body": "El sistema estará en mantenimiento mañana de 2 AM a 4 AM (GMT-6). Disculpa las molestias.",
+  "data": {
+    "type": "maintenance",
+    "startTime": "2025-11-26T02:00:00Z",
+    "endTime": "2025-11-26T04:00:00Z",
+    "priority": "high"
+  }
+}
+
+### ====================================
+### 6. Notificación de Recordatorio
+### ====================================
+
+POST http://localhost:3005/notify/user/789
+Content-Type: application/json
+
+{
+  "title": "Recordatorio: Regar tus plantas",
+  "body": "Es hora de regar tus tomates. No olvides revisar el nivel de humedad.",
+  "data": {
+    "reminderType": "watering",
+    "plantType": "tomatoes",
+    "orchardId": "orchard-456"
+  }
+}
+
+### ====================================
+### 7. Notificación con Datos Personalizados
+### ====================================
+
+POST http://localhost:3005/notify/users
+Content-Type: application/json
+
+{
+  "userIds": ["premium-user-1", "premium-user-2"],
+  "title": "Acceso Exclusivo Desbloqueado",
+  "body": "Como miembro premium, ahora tienes acceso a nuestro nuevo módulo de análisis avanzado",
+  "imageUrl": "https://example.com/premium-feature.png",
+  "data": {
+    "feature": "advanced_analytics",
+    "accessLevel": "premium",
+    "action": "open_analytics",
+    "deepLink": "myapp://analytics"
+  }
+}
+
+### ====================================
+### 8. Notificación de Alerta Crítica
+### ====================================
+
+POST http://localhost:3005/notify/user/critical-user-1
+Content-Type: application/json
+
+{
+  "title": "⚠️ ALERTA: Problema Detectado",
+  "body": "Se ha detectado una plaga en tu huerto. Toma acción inmediata.",
+  "data": {
+    "alertType": "pest_detected",
+    "severity": "critical",
+    "orchardId": "orchard-999",
+    "action": "open_pest_control"
+  }
+}
+
+### ====================================
+### USERS SERVICE - Actualizar Token FCM
+### (Cliente móvil debe llamar esto primero)
+### ====================================
+
+PATCH http://localhost:3001/:id/fcm-token
+Content-Type: application/json
+
+{
+  "tokenFCM": "eXYmPkjCT_WOkRqX2qHpgR:APA91bFz1..."
+}
+
+### ====================================
+### ERROR CASES - Para Testing
+### ====================================
+
+### Usuario sin token FCM
+POST http://localhost:3005/notify/user/user-without-token
+Content-Type: application/json
+
+{
+  "title": "Test",
+  "body": "Este usuario no tiene token FCM registrado"
+}
+
+### Usuario inexistente
+POST http://localhost:3005/notify/user/non-existent-user
+Content-Type: application/json
+
+{
+  "title": "Test",
+  "body": "Este usuario no existe"
+}
+
+### Validación fallida (sin title)
+POST http://localhost:3005/notify/user/123
+Content-Type: application/json
+
+{
+  "body": "Falta el título"
+}
+
+### Validación fallida (sin body)
+POST http://localhost:3005/notify/user/123
+Content-Type: application/json
+
+{
+  "title": "Falta el cuerpo"
+}
+
+### Array vacío de usuarios
+POST http://localhost:3005/notify/users
+Content-Type: application/json
+
+{
+  "userIds": [],
+  "title": "Test",
+  "body": "Array vacío"
+}

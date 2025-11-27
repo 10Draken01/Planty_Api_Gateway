@@ -16,6 +16,9 @@ export class UserRoutes {
     this.router.get('/:id', (req, res) => this.userController.getUserById(req, res));
     this.router.put('/:id', (req, res) => this.userController.updateUserById(req, res));
     this.router.delete('/:id', (req, res) => this.userController.deleteUserById(req, res));
+
+    // Endpoint para actualizar token FCM (usado por Notifications Service)
+    this.router.patch('/:id/fcm-token', (req, res) => this.userController.updateTokenFCM(req, res));
   }
 
   getRouter(): Router {

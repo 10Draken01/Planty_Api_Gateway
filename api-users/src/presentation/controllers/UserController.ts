@@ -4,6 +4,7 @@ import { GetUserByIdUseCase } from'../../application/use-cases/GetUserByIdUseCas
 import { GetUserByEmailUseCase } from '../../application/use-cases/GetUserByEmailUseCase';
 import { UpdateUserByIdUseCase } from '../../application/use-cases/UpdateUserByIdUseCase';
 import { DeleteUserByIdUseCase } from '../../application/use-cases/DeleteUserByIdUseCase';
+import { UpdateTokenFCMUseCase } from '../../application/use-cases/UpdateTokenFCMUseCase';
 
 
 export class UserController {
@@ -12,7 +13,8 @@ export class UserController {
     private getUserByIdUseCase: GetUserByIdUseCase,
     private getUserByEmailUseCase: GetUserByEmailUseCase,
     private updateUserByIdUseCase: UpdateUserByIdUseCase,
-    private deleteUserByIdUseCase: DeleteUserByIdUseCase
+    private deleteUserByIdUseCase: DeleteUserByIdUseCase,
+    private updateTokenFCMUseCase: UpdateTokenFCMUseCase
   ) {}
 
   async createUser(req: Request, res: Response): Promise<void> {
@@ -317,6 +319,58 @@ export class UserController {
       }
 
       // Error genérico del servidor
+      res.status(500).json({
+        message: 'Error en el servidor',
+        error: error.message,
+        status: 500
+      });
+    }
+  }
+
+  /**
+   * Actualiza el token FCM de un usuario
+   * Endpoint usado por el cliente móvil para registrar el token de notificaciones
+   */
+  async updateTokenFCM(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { tokenFCM } = req.body;
+
+      if (!tokenFCM) {
+        res.status(400).json({
+          message: 'El tokenFCM es requerido',
+          status: 400
+        });
+        return;
+      }
+
+      await this.updateTokenFCMUseCase.execute({
+        userId: id,
+        tokenFCM
+      });
+
+      res.status(200).json({
+        message: 'Token FCM actualizado exitosamente',
+        status: 200
+      });
+
+    } catch (error: any) {
+      if (error.message === 'Usuario no encontrado') {
+        res.status(404).json({
+          message: error.message,
+          status: 404
+        });
+        return;
+      }
+
+      if (error.message === 'El formato del tokenFCM no es válido') {
+        res.status(400).json({
+          message: error.message,
+          status: 400
+        });
+        return;
+      }
+
       res.status(500).json({
         message: 'Error en el servidor',
         error: error.message,
