@@ -90,6 +90,7 @@ class AgService {
         logger.info(`Environment: ${env.nodeEnv}`);
         logger.info(`API Version: ${env.apiVersion}`);
         logger.info(`Health check: http://localhost:${env.port}/${env.apiVersion}/health`);
+        logger.info(`Generate garden: http://localhost:${env.port}/${env.apiVersion}/generate`);
       });
     } catch (error) {
       logger.error('Failed to start service', { error });
