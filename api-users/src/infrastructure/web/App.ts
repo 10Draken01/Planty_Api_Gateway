@@ -21,7 +21,7 @@ export class App {
       mongoRootPassword,
       mongoDbName
     );
-    
+
     this.initializeMiddlewares();
     this.initializeRoutes();
   }
@@ -39,13 +39,16 @@ export class App {
 
     // User routes
     const userRoutes = this.dependencyContainer.createUserRoutes();
+    this.app.get('/health', (req, res) => {
+      res.json({ status: 'ok', service: 'users' });
+    });
     this.app.use('/api', userRoutes.getRouter());
   }
 
   async start(): Promise<void> {
     try {
       // Conectar a la base de datos
-      
+
       // Iniciar servidor
       this.app.listen(this.port, () => {
         console.log(`🚀 Servidor corriendo en puerto ${this.port}`);

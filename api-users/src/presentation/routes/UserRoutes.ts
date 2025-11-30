@@ -10,6 +10,7 @@ export class UserRoutes {
   }
 
   private setupRoutes(): void {
+    
     this.router.post('/create', (req, res) => this.userController.createUser(req, res));
     this.router.get('/email/:email', (req, res) => this.userController.getUserByEmail(req, res));
 
