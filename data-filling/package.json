@@ -1,0 +1,31 @@
+{
+  "name": "plantgen-db-fill",
+  "version": "1.0.0",
+  "description": "Generador masivo de usuarios y huertos para PlantGen",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "generate": "ts-node src/generate_100k.ts",
+    "mock-server": "ts-node mock_server/server.ts",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": ["plantgen", "data-generation", "faker"],
+  "author": "PlantGen Team",
+  "license": "MIT",
+  "dependencies": {
+    "@faker-js/faker": "^8.3.1",
+    "axios": "^1.6.2",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.3.1",
+    "p-queue": "^8.0.1",
+    "cli-progress": "^3.12.0",
+    "colors": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "@types/bcrypt": "^5.0.2",
+    "@types/cli-progress": "^3.11.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
