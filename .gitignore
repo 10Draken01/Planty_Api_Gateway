@@ -1,2 +1,76 @@
 .claude
 Planty
+nul
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+**/.env
+**/.env.local
+
+# Firebase credentials
+**/firebase-service-account.json
+**/google-services.json
+firebase-adminsdk-*.json
+
+# Node modules
+node_modules/
+**/node_modules/
+
+# Python virtual environments
+venv/
+env/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Build outputs
+dist/
+build/
+*.log
+*.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Checkpoints y datos temporales
+checkpoint.json
+final_checkpoint.json
+**/checkpoint.json
+**/final_checkpoint.json
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# MongoDB data
+data/
+mongo-data/
+
+# Coverage
+coverage/
+*.lcov
+.nyc_output/
+
+# Latex temporary files
+*.aux
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.out
+*.toc

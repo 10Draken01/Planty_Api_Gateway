@@ -1,0 +1,682 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{tcolorbox}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{helvet}
+\usepackage{array}
+\usepackage{colortbl}
+
+\geometry{top=2cm, bottom=2cm, left=2cm, right=2cm}
+
+% Definición de colores
+\definecolor{darkblue}{RGB}{17,70,99}
+\definecolor{lightblue}{RGB}{91,155,213}
+\definecolor{paleblue}{RGB}{217,225,242}
+\definecolor{creamcolor}{RGB}{242,242,242}
+\definecolor{yellow}{RGB}{255,204,0}
+\definecolor{greentable}{RGB}{169,208,142}
+\definecolor{bluetable}{RGB}{91,155,213}
+
+% Configuración de fuente sans-serif
+\renewcommand{\familydefault}{\sfdefault}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\begin{document}
+
+% ============================================
+% PORTADA
+% ============================================
+\begin{titlepage}
+\pagecolor{darkblue}
+\begin{tikzpicture}[remember picture,overlay]
+    % Decoraciones de portada
+    \draw[white, line width=1.5pt, opacity=0.3] (-5,8) -- (-2,12);
+    \draw[white, line width=1.5pt, opacity=0.3] (-4.5,8) -- (-1.5,12);
+    \draw[white, line width=1.5pt, opacity=0.3] (-4,8) -- (-1,12);
+
+    \foreach \i in {1,...,8} {
+        \draw[white, line width=1pt, opacity=0.2] (18,-\i) arc (180:270:\i cm);
+    }
+\end{tikzpicture}
+
+\vspace*{2cm}
+
+\begin{center}
+    {\large \color{white} PLANTY API GATEWAY}\\[0.3cm]
+    {\large \color{white} [Tu Nombre]}\\
+    {\large \color{white} [Nombres del Equipo]}\\
+    {\large \color{white} Presupuesto por actividades}\\[3cm]
+
+    \colorbox{white}{
+        \parbox{0.8\textwidth}{
+            \centering
+            {\Large \color{darkblue}\textit{Presupuesto por actividades}}
+        }
+    }\\[2cm]
+
+    {\Huge \color{white}\textbf{PLANTY}}\\[0.5cm]
+    {\huge \color{white}\textbf{API GATEWAY}}\\[3cm]
+
+    \colorbox{white}{
+        \parbox{0.8\textwidth}{
+            \centering
+            {\large \color{darkblue}\textit{[Tu Nombre]}}\\
+            {\large \color{darkblue}\textit{[Integrante 2]}}\\
+            {\large \color{darkblue}\textit{[Integrante 3]}}\\
+            {\large \color{darkblue}\textit{[Integrante 4]}}
+        }
+    }
+\end{center}
+\end{titlepage}
+
+\nopagecolor
+\pagecolor{white}
+
+% ============================================
+% PROBLEMÁTICA
+% ============================================
+\newpage
+
+\vspace{2cm}
+
+\noindent
+\begin{tikzpicture}
+    \fill[darkblue] (0,0) rectangle (3,8);
+    \node[white, align=left, font=\LARGE\bfseries] at (1.5,4) {PROBLEMÁTICA};
+\end{tikzpicture}
+\hspace{0.5cm}
+\begin{minipage}[t]{0.7\textwidth}
+    \vspace{1cm}
+    \large
+    Los sistemas de gestión agrícola tradicionales presentan limitaciones significativas:
+    falta de integración entre diferentes módulos, ausencia de asistencia inteligente
+    personalizada, gestión ineficiente de huertos y plantas, y optimización manual de
+    recursos. Para resolver estos problemas, se desarrollará una plataforma integral
+    basada en microservicios que incluirá gestión completa de usuarios y autenticación
+    segura, un chatbot inteligente con RAG (Retrieval-Augmented Generation) que aprende
+    de documentos, administración de huertos con seguimiento en tiempo real, y un algoritmo
+    genético para optimizar la configuración de plantas considerando compatibilidad entre
+    especies, eficiencia hídrica y utilización de espacio. Esta solución mejorará la
+    productividad agrícola, reducirá errores de planificación, optimizará el uso de recursos,
+    y proporcionará asistencia personalizada a agricultores. El desarrollo se completará en
+    un plazo de dos meses.
+\end{minipage}
+
+% ============================================
+% FICHA DEL PRODUCTO
+% ============================================
+\newpage
+
+\begin{center}
+    {\huge\bfseries FICHA DEL PRODUCTO}
+\end{center}
+
+\vspace{1cm}
+
+\begin{minipage}[t]{0.55\textwidth}
+    \colorbox{darkblue}{
+        \parbox{0.95\textwidth}{
+            \color{white}\Large\bfseries Descripción
+        }
+    }
+
+    \vspace{0.3cm}
+
+    Plataforma de microservicios para gestión agrícola inteligente. Permite a los agricultores
+    gestionar usuarios, autenticarse de forma segura, administrar huertos completos, interactuar
+    con un chatbot con IA que aprende de documentos PDF, y optimizar configuraciones de plantas
+    usando algoritmos genéticos. Todo orquestado a través de un API Gateway centralizado.
+
+    \vspace{0.5cm}
+
+    \colorbox{darkblue}{
+        \parbox{0.95\textwidth}{
+            \color{white}\Large\bfseries Características
+        }
+    }
+
+    \vspace{0.3cm}
+
+    \begin{itemize}[leftmargin=*,itemsep=0pt]
+        \item \textbf{Plataforma}: Web API RESTful + Microservicios Docker
+        \item \textbf{Microservicios principales}:
+        \begin{itemize}[itemsep=0pt]
+            \item \textbf{API Gateway}: Enrutador centralizado con seguridad
+            \item \textbf{API Users}: Gestión completa de usuarios
+            \item \textbf{Authentication}: Autenticación JWT
+            \item \textbf{API Chatbot}: Chat inteligente con RAG + Ollama
+            \item \textbf{API Orchard}: Gestión de huertos y plantas
+            \item \textbf{PlantGen}: Algoritmos genéticos multi-objetivo
+        \end{itemize}
+        \item \textbf{Base de datos}: MongoDB + ChromaDB (vectorial)
+        \item \textbf{IA/ML}: Ollama (llama3.2 + nomic-embed-text)
+        \item \textbf{Arquitectura}: Clean Architecture + DDD
+        \item \textbf{Seguridad}: JWT, bcryptjs, rate limiting, CORS, Helmet
+        \item \textbf{Orquestación}: Docker Compose
+    \end{itemize}
+
+    \vspace{0.3cm}
+
+    \textbf{Tecnologías utilizadas}: Node.js + Express (Backend primario),
+    Python + FastAPI (Algoritmos genéticos), TypeScript, MongoDB, ChromaDB,
+    Ollama (LLM local), Docker.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \colorbox{darkblue}{
+        \parbox{0.95\textwidth}{
+            \color{white}\Large\bfseries Costo del producto
+        }
+    }
+
+    \vspace{0.5cm}
+
+    \begin{center}
+        {\Huge\bfseries \$43,500 MXN}
+    \end{center}
+
+    \vspace{0.5cm}
+
+    \colorbox{darkblue}{
+        \parbox{0.95\textwidth}{
+            \color{white}\Large\bfseries Beneficios
+        }
+    }
+
+    \vspace{0.3cm}
+
+    \begin{itemize}[leftmargin=*,itemsep=0pt]
+        \item Gestión centralizada de usuarios
+        \item Autenticación segura con JWT
+        \item Asistencia inteligente personalizada 24/7
+        \item Optimización automática de huertos
+        \item Búsqueda semántica en documentos
+        \item Arquitectura escalable y modular
+        \item Integración con IA local (sin costos externos)
+        \item Seguimiento completo de huertos
+    \end{itemize}
+
+    \vspace{0.5cm}
+
+    \colorbox{darkblue}{
+        \parbox{0.95\textwidth}{
+            \color{white}\Large\bfseries Implementación
+        }
+    }
+
+    \vspace{0.3cm}
+
+    \begin{itemize}[leftmargin=*,itemsep=0pt]
+        \item Desarrollo estimado en 2 meses
+        \item 6 microservicios independientes
+        \item Despliegue con Docker Compose
+    \end{itemize}
+\end{minipage}
+
+% ============================================
+% SALARIOS DE LOS PUESTOS DE TRABAJO
+% ============================================
+\newpage
+
+\begin{center}
+    {\huge\bfseries SALARIOS DE LOS PUESTOS DE}\\
+    {\huge\bfseries TRABAJO}
+\end{center}
+
+\vspace{2cm}
+
+\begin{center}
+\begin{tabular}{cccc}
+    % Las imágenes son opcionales - puedes omitirlas si no las tienes
+    % \includegraphics[width=0.2\textwidth]{analyst-icon.png} &
+    % \includegraphics[width=0.2\textwidth]{tester-icon.png} &
+    % \includegraphics[width=0.2\textwidth]{designer-icon.png} &
+    % \includegraphics[width=0.2\textwidth]{developer-icon.png} \\[0.5cm]
+
+    \colorbox{darkblue}{
+        \parbox{0.2\textwidth}{
+            \centering\color{white}\Large\bfseries ANALISTA DE\\CALIDAD
+        }
+    } &
+    \colorbox{darkblue}{
+        \parbox{0.2\textwidth}{
+            \centering\color{white}\Large\bfseries TESTER
+        }
+    } &
+    \colorbox{darkblue}{
+        \parbox{0.2\textwidth}{
+            \centering\color{white}\Large\bfseries UX/UI\\DESIGNER
+        }
+    } &
+    \colorbox{darkblue}{
+        \parbox{0.2\textwidth}{
+            \centering\color{white}\Large\bfseries BACKEND\\DEVELOPER
+        }
+    } \\[0.5cm]
+
+    \begin{tabular}{l}
+        \textbf{Sueldo:} \\
+        Mes: \$10,000 \\
+        Día: \$333.33 \\
+        Hora: \$41.67
+    \end{tabular} &
+    \begin{tabular}{l}
+        \textbf{Sueldo:} \\
+        Mes: \$11,000 \\
+        Día: \$366.66 \\
+        Hora: \$45.83
+    \end{tabular} &
+    \begin{tabular}{l}
+        \textbf{Sueldo:} \\
+        Mes: \$10,500 \\
+        Día: \$350 \\
+        Hora: \$43.75
+    \end{tabular} &
+    \begin{tabular}{l}
+        \textbf{Sueldo:} \\
+        Mes: \$12,000 \\
+        Día: \$400 \\
+        Hora: \$50
+    \end{tabular}
+\end{tabular}
+\end{center}
+
+% ============================================
+% DIAGRAMA DE ACTIVIDADES
+% ============================================
+\newpage
+
+\begin{center}
+    {\huge\bfseries DIAGRAMA DE ACTIVIDADES}
+\end{center}
+
+\vspace{1cm}
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=2.5cm,
+    activity/.style={circle, draw=darkblue, fill=darkblue, text=white,
+                     minimum size=2.8cm, align=center, font=\small\bfseries},
+    subactivity/.style={circle, draw=darkblue, fill=darkblue, text=white,
+                        minimum size=2.5cm, align=center, font=\footnotesize},
+    arrow/.style={->, >=stealth, thick, dotted}
+]
+
+% Actividades principales
+\node[activity] (a1) at (0,0) {1.Investigación\\del mercado\\24 - AC};
+\node[activity] (a2) at (3.5,0) {2.Especificación\\de\\requerimientos\\20 - AC};
+\node[activity] (a3) at (7,0.5) {3.Diseño de\\arquitectura\\24 - AC\\8 - UX/UI};
+\node[activity] (a4) at (10.5,0.5) {4.Desarrollo\\API Gateway\\20 - BD};
+\node[activity] (a5) at (14,0) {5.Desarrollo\\microservicios\\32 - BD\\25 - T};
+
+% Subactividades
+\node[subactivity] (a31) at (7,-3) {3.1.Diseño de\\base de datos\\24 - BD};
+\node[subactivity] (a41) at (10.5,-3) {4.1.Desarrollo\\Auth Service\\24 - BD};
+\node[subactivity] (a51) at (14,-3) {5.1.Chatbot\\con RAG\\32 - BD};
+
+\node[activity] (a6) at (3.5,-6) {6.Integración\\y pruebas\\32 - T\\16 - AC};
+\node[activity] (a7) at (7,-6) {7.Documentación\\20 - AC};
+\node[activity] (a8) at (11,-6) {8.Finalización\\del proyecto};
+
+% Flechas
+\draw[arrow] (a1) -- (a2);
+\draw[arrow] (a2) -- (a3);
+\draw[arrow] (a3) -- (a4);
+\draw[arrow] (a4) -- (a5);
+\draw[arrow] (a2) -- (a31);
+\draw[arrow] (a31) -- (a41);
+\draw[arrow] (a41) -- (a51);
+\draw[arrow] (a51) -- (a6);
+\draw[arrow] (a5) -- (a6);
+\draw[arrow] (a6) -- (a7);
+\draw[arrow] (a7) -- (a8);
+\draw[arrow] (a2) -- (a7);
+
+\end{tikzpicture}
+\end{center}
+
+% ============================================
+% TABLA DE ACTIVIDADES
+% ============================================
+\newpage
+
+\begin{center}
+    {\Large\bfseries TABLA DE ACTIVIDADES PARA EL ALCANCE}
+\end{center}
+
+\vspace{1cm}
+
+\renewcommand{\arraystretch}{1.8}
+\begin{tabularx}{\textwidth}{|>{\centering\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}p{2.5cm}|>{\centering\arraybackslash}p{2cm}|}
+\hline
+\rowcolor{darkblue}
+\color{white}\textbf{ID} & \color{white}\textbf{ACTIVIDAD} & \color{white}\textbf{DESCRIPCIÓN} & \color{white}\textbf{RESPONSABLE} & \color{white}\textbf{TIEMPO} \\
+\hline
+\rowcolor{yellow!30}
+1 & Investigación del mercado & Análisis de competidores (ToastPOS, Square, Soft Restaurant) y necesidades de sistemas agrícolas inteligentes & AC & 56 horas \\
+\hline
+\rowcolor{yellow!30}
+2 & Especificación de requerimientos & Definir funcionalidades de los 6 microservicios, arquitectura de comunicación, y requisitos de IA & AC & 56 horas \\
+\hline
+\rowcolor{yellow!30}
+3 & Diseño de arquitectura & Diseño de arquitectura de microservicios, API Gateway, flujos de datos entre servicios & AC, UX/UI & 56 horas \\
+\hline
+\rowcolor{greentable!40}
+3.1 & Diseño de base de datos & Estructura de MongoDB (users\_db, planty\_orchards, Data\_plants) y ChromaDB para vectores & BD & 56 horas \\
+\hline
+\rowcolor{greentable!40}
+4 & Desarrollo API Gateway & Implementación del enrutador centralizado con proxy, autenticación, rate limiting & BD & 56 horas \\
+\hline
+\rowcolor{bluetable!40}
+4.1 & Desarrollo Auth Service & Implementación de autenticación JWT, registro, login, validación de tokens & BD, T & 56 horas \\
+\hline
+\rowcolor{bluetable!40}
+5 & Desarrollo de microservicios & Implementación de API Users, API Orchard, API Chatbot con RAG, PlantGen & BD & 56 horas \\
+\hline
+\end{tabularx}
+
+\newpage
+
+\renewcommand{\arraystretch}{1.8}
+\begin{tabularx}{\textwidth}{|>{\centering\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}p{2.5cm}|>{\centering\arraybackslash}p{2cm}|}
+\hline
+\rowcolor{darkblue}
+\color{white}\textbf{ID} & \color{white}\textbf{ACTIVIDAD} & \color{white}\textbf{DESCRIPCIÓN} & \color{white}\textbf{RESPONSABLE} & \color{white}\textbf{TIEMPO} \\
+\hline
+\rowcolor{bluetable!40}
+5.1 & Chatbot con RAG & Implementación de procesamiento de PDFs, generación de embeddings con Ollama, ChromaDB, y chat inteligente & BD, T & 56 horas \\
+\hline
+\rowcolor{bluetable!40}
+6 & Integración y pruebas & Pruebas end-to-end de todos los microservicios, comunicación entre servicios, Docker Compose & T, AC & 56 horas \\
+\hline
+\rowcolor{yellow!30}
+7 & Documentación & Registro formal de arquitectura, APIs, endpoints, casos de uso, y manual de despliegue & AC & 56 horas \\
+\hline
+\rowcolor{greentable!40}
+8 & Finalización del proyecto & Cierre, entrega del sistema completo dockerizado y documentado & & 56 horas \\
+\hline
+\end{tabularx}
+
+% ============================================
+% CRONOGRAMA DE ACTIVIDADES
+% ============================================
+\newpage
+
+\begin{minipage}[t]{0.3\textwidth}
+    \vspace{3cm}
+    {\huge\bfseries CRONOGRAMA}\\[0.5cm]
+    {\huge\bfseries DE}\\[0.5cm]
+    {\huge\bfseries ACTIVIDADES}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.65\textwidth}
+    \vspace{1cm}
+    \small
+    \begin{tabular}{|p{3.5cm}|*{8}{>{\centering\arraybackslash}p{0.8cm}|}}
+    \hline
+    \rowcolor{gray!20}
+    \textbf{Actividades} & \multicolumn{4}{c|}{\textbf{Febrero}} & \multicolumn{4}{c|}{\textbf{Marzo}} \\
+    \hline
+    \rowcolor{gray!20}
+    & \textbf{S1} & \textbf{S2} & \textbf{S3} & \textbf{S4} & \textbf{S1} & \textbf{S2} & \textbf{S3} & \textbf{S4} \\
+    \hline
+    1.Investigación del mercado & \cellcolor{yellow} & \cellcolor{yellow} & & & & & & \\
+    \hline
+    2.Especificación de requerimientos & & \cellcolor{yellow} & \cellcolor{yellow} & & & & & \\
+    \hline
+    3.Diseño de arquitectura & & & \cellcolor{yellow} & \cellcolor{yellow} & & & & \\
+    \hline
+    3.1.Diseño de base de datos & & & & \cellcolor{gray!50} & \cellcolor{gray!50} & & & \\
+    \hline
+    4.Desarrollo API Gateway & & & & \cellcolor{gray!50} & \cellcolor{gray!50} & & & \\
+    \hline
+    4.1.Desarrollo Auth Service & & & & & \cellcolor{gray!50} & \cellcolor{gray!50} & & \\
+    \hline
+    5.Desarrollo de microservicios & & & & & & \cellcolor{gray!50} & \cellcolor{gray!50} & \\
+    \hline
+    5.1.Chatbot con RAG & & & & & & \cellcolor{gray!50} & \cellcolor{gray!50} & \\
+    \hline
+    6.Integración y pruebas & & & & & & & \cellcolor{gray!50} & \cellcolor{gray!50} \\
+    \hline
+    7.Documentación & & & & & & & & \cellcolor{yellow} \\
+    \hline
+    8.Finalización del proyecto & & & & & & & & \cellcolor{yellow} \\
+    \hline
+    \end{tabular}
+\end{minipage}
+
+% ============================================
+% TABLA DE COSTOS
+% ============================================
+\newpage
+
+\begin{minipage}[t]{0.5\textwidth}
+\renewcommand{\arraystretch}{2}
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}p{3cm}|}
+\hline
+\rowcolor{darkblue}
+\color{white}\textbf{CONCEPTO} & \color{white}\textbf{COSTO} \\
+\hline
+\rowcolor{bluetable!30}
+Investigación del mercado & \$1,000.68 \\
+\hline
+\rowcolor{bluetable!30}
+Especificación de requerimientos & \$833.40 \\
+\hline
+\rowcolor{bluetable!30}
+Diseño de arquitectura & \$2,583.36 \\
+\hline
+\rowcolor{bluetable!30}
+Diseño de base de datos & \$2,400 \\
+\hline
+\rowcolor{bluetable!30}
+Desarrollo API Gateway & \$2,800 \\
+\hline
+\rowcolor{bluetable!30}
+Desarrollo Auth Service & \$3,600 \\
+\hline
+\rowcolor{bluetable!30}
+Desarrollo de microservicios & \$4,800 \\
+\hline
+\rowcolor{bluetable!30}
+Chatbot con RAG & \$4,800 \\
+\hline
+\rowcolor{bluetable!30}
+Integración y pruebas & \$3,466.56 \\
+\hline
+\rowcolor{bluetable!30}
+Documentación & \$666.72 \\
+\hline
+\end{tabularx}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+    \vspace{2cm}
+
+    \begin{center}
+    \vspace{0.5cm}
+
+    {\Large\bfseries TABLA DE COSTOS}
+
+    \vspace{2cm}
+
+    {\huge\bfseries Total: \$26,951.22}
+    \end{center}
+\end{minipage}
+
+% ============================================
+% PRESUPUESTO
+% ============================================
+\newpage
+
+\begin{center}
+    {\huge\bfseries PRESUPUESTO}
+\end{center}
+
+\vspace{1cm}
+
+\begin{minipage}[t]{0.5\textwidth}
+\renewcommand{\arraystretch}{2.2}
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}p{3.5cm}|}
+\hline
+\rowcolor{darkblue}
+\color{white}\textbf{CONCEPTO} & \color{white}\textbf{COSTO} \\
+\hline
+\rowcolor{bluetable!30}
+Costo por actividades & \$26,951.22 \\
+\hline
+\rowcolor{bluetable!30}
+Recursos & \$5,200 \\
+\hline
+\rowcolor{bluetable!40}
+\textbf{Subtotal} & \$32,151.22 \\
+\hline
+\rowcolor{bluetable!30}
+Ganancias (10\%) & \$3,215.12 \\
+\hline
+\rowcolor{bluetable!40}
+\textbf{Subtotal} & \$35,366.34 \\
+\hline
+\rowcolor{bluetable!30}
+Impuestos (16\%) & \$5,658.61 \\
+\hline
+\end{tabularx}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+    \vspace{4cm}
+
+    \begin{center}
+    {\Huge\bfseries Total: \$41,024.95}
+    \end{center}
+\end{minipage}
+
+% ============================================
+% ANÁLISIS DE PUNTO DE EQUILIBRIO
+% ============================================
+\newpage
+
+\begin{center}
+    {\Large\bfseries ANÁLISIS DE PUNTO DE EQUILIBRIO}
+\end{center}
+
+\vspace{1cm}
+
+\begin{minipage}[t]{0.45\textwidth}
+\renewcommand{\arraystretch}{2}
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}p{3cm}|}
+\hline
+\rowcolor{darkblue}
+\color{white}\textbf{CONCEPTO} & \color{white}\textbf{COSTO} \\
+\hline
+\rowcolor{bluetable!30}
+Dominio & \$200 \\
+\hline
+\rowcolor{bluetable!30}
+Servidores AWS & \$2,400 \\
+\hline
+\rowcolor{bluetable!30}
+Base de datos MongoDB Atlas & \$1,500 \\
+\hline
+\rowcolor{bluetable!30}
+ChromaDB Cloud & \$600 \\
+\hline
+\rowcolor{bluetable!30}
+Certificados SSL & \$500 \\
+\hline
+\rowcolor{bluetable!40}
+\textbf{Total} & \$5,200 \\
+\hline
+\end{tabularx}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.5\textwidth}
+    \colorbox{creamcolor}{
+        \parbox{0.95\textwidth}{
+            \textbf{Costos fijos}
+
+            \vspace{0.3cm}
+
+            \textbf{PE} = Costos Fijos / (Precio de Venta - Costo de venta)\\
+            \textbf{PE} = \$5,200 / (\$41,024.95 - \$26,951.22)\\
+            \textbf{PE} = \$5,200 / \$14,073.73\\
+            \textbf{PE} = 0.37
+
+            \vspace{0.5cm}
+
+            \textbf{Punto de equilibrio}
+
+            \vspace{0.3cm}
+
+            \textbf{PE} = Costos Fijos / (1 - Costo de venta / Precio de Venta)\\
+            \textbf{PE} = \$5,200 / (1 - \$26,951.22 / \$41,024.95)\\
+            \textbf{PE} = \$5,200 / (1 - 0.66)\\
+            \textbf{PE} = \$5,200 / 0.34\\
+            \textbf{PE} = \$15,294.12
+        }
+    }
+\end{minipage}
+
+% ============================================
+% PRECIO EN MERCADO
+% ============================================
+\newpage
+
+\begin{center}
+    {\Large\bfseries PRECIO EN MERCADO - ANÁLISIS COMPETITIVO}
+\end{center}
+
+\vspace{1cm}
+
+\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabularx}{\textwidth}{|>{\centering\arraybackslash}p{2.5cm}|>{\centering\arraybackslash}p{2cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{darkblue}
+\color{white}\textbf{COMPETIDOR} & \color{white}\textbf{POSICIONAMIENTO DE PRECIO} & \color{white}\textbf{COSTO} & \color{white}\textbf{PROS} & \color{white}\textbf{CONTRAS} \\
+\hline
+\rowcolor{gray!10}
+Toast POS & Alto & Suscripción: \$69 USD/mes por terminal. Hardware: \$1,024 USD & Solución integral. Funciones avanzadas para restaurantes & Precio elevado. Requiere hardware específico \\
+\hline
+\rowcolor{gray!10}
+Square for Restaurants & Medio & Suscripción: \$69 USD/mes. Hardware: \$799 USD & Flexibilidad. Integración con pagos & Funcionalidades limitadas para grandes restaurantes \\
+\hline
+\rowcolor{gray!10}
+Lightspeed Restaurant & Medio-Alto & Suscripción: \$69 USD/mes por terminal & Altamente personalizable. Múltiples integraciones & Configuración compleja. Requiere entrenamiento \\
+\hline
+\rowcolor{gray!10}
+Soft Restaurant & Alto & Licencia perpetua: \$10,000 MXN por terminal & Popular en México. Compatible con múltiples dispositivos & Costo elevado. Interfaz menos intuitiva \\
+\hline
+\rowcolor{yellow!20}
+\textbf{PLANTY API Gateway} & \textbf{Competitivo} & \textbf{Licencia única: \$41,024.95 MXN} & \textbf{IA integrada. Optimización con algoritmos genéticos. Sin costos recurrentes. Completamente customizable. Arquitectura escalable} & \textbf{Requiere infraestructura cloud. Implementación inicial más compleja} \\
+\hline
+\end{tabularx}
+
+% ============================================
+% PÁGINA FINAL
+% ============================================
+\newpage
+
+\pagecolor{darkblue}
+
+\vspace*{8cm}
+
+\begin{center}
+    \vspace{1cm}
+
+    {\Huge\color{white}\bfseries Gracias}
+\end{center}
+
+\end{document}

@@ -1,0 +1,800 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{tcolorbox}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{helvet}
+\usepackage{array}
+\usepackage{colortbl}
+
+\geometry{top=2cm, bottom=2cm, left=2cm, right=2cm}
+
+% Definición de colores
+\definecolor{darkblue}{RGB}{17,70,99}
+\definecolor{lightblue}{RGB}{91,155,213}
+\definecolor{paleblue}{RGB}{217,225,242}
+\definecolor{creamcolor}{RGB}{242,242,242}
+\definecolor{yellow}{RGB}{255,204,0}
+\definecolor{greentable}{RGB}{169,208,142}
+\definecolor{bluetable}{RGB}{91,155,213}
+\definecolor{orangetable}{RGB}{255,192,0}
+
+% Configuración de fuente sans-serif
+\renewcommand{\familydefault}{\sfdefault}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\begin{document}
+
+% ============================================
+% PORTADA
+% ============================================
+\begin{titlepage}
+\pagecolor{darkblue}
+\begin{tikzpicture}[remember picture,overlay]
+    \draw[white, line width=1.5pt, opacity=0.3] (-5,8) -- (-2,12);
+    \draw[white, line width=1.5pt, opacity=0.3] (-4.5,8) -- (-1.5,12);
+    \draw[white, line width=1.5pt, opacity=0.3] (-4,8) -- (-1,12);
+
+    \foreach \i in {1,...,8} {
+        \draw[white, line width=1pt, opacity=0.2] (18,-\i) arc (180:270:\i cm);
+    }
+\end{tikzpicture}
+
+\vspace*{2cm}
+
+\begin{center}
+    {\large \color{white} PLANTY - SISTEMA COMPLETO}\\[0.3cm]
+    {\large \color{white} Backend + Frontend + IA}\\
+    {\large \color{white} Presupuesto por actividades}\\[3cm]
+
+    \colorbox{white}{
+        \parbox{0.8\textwidth}{
+            \centering
+            {\Large \color{darkblue}\textit{Presupuesto por actividades}}
+        }
+    }\\[2cm]
+
+    {\Huge \color{white}\textbf{PLANTY}}\\[0.5cm]
+    {\huge \color{white}\textbf{PLATAFORMA COMPLETA}}\\[0.3cm]
+    {\Large \color{white} Backend (6 Microservicios) + Frontend Flutter}\\[3cm]
+
+    \colorbox{white}{
+        \parbox{0.8\textwidth}{
+            \centering
+            {\large \color{darkblue}\textit{[Tu Nombre]}}\\
+            {\large \color{darkblue}\textit{[Integrante 2]}}\\
+            {\large \color{darkblue}\textit{[Integrante 3]}}\\
+            {\large \color{darkblue}\textit{[Integrante 4]}}
+        }
+    }
+\end{center}
+\end{titlepage}
+
+\nopagecolor
+\pagecolor{white}
+
+% ============================================
+% PROBLEMÁTICA
+% ============================================
+\newpage
+
+\vspace{2cm}
+
+\noindent
+\begin{tikzpicture}
+    \fill[darkblue] (0,0) rectangle (3,8);
+    \node[white, align=left, font=\LARGE\bfseries] at (1.5,4) {PROBLEMÁTICA};
+\end{tikzpicture}
+\hspace{0.5cm}
+\begin{minipage}[t]{0.7\textwidth}
+    \vspace{1cm}
+    \large
+    Los sistemas de gestión agrícola tradicionales presentan limitaciones significativas:
+    falta de integración entre diferentes módulos, ausencia de asistencia inteligente
+    personalizada, interfaces móviles deficientes, gestión ineficiente de huertos y plantas,
+    y optimización manual de recursos. Para resolver estos problemas, se desarrollará una
+    \textbf{plataforma integral full-stack} que incluye: \textbf{Backend} con 6 microservicios
+    (API Gateway, Authentication, Users, Chatbot con RAG, Orchards, Algoritmos Genéticos),
+    y \textbf{Frontend} multiplataforma en Flutter (Android, iOS, Web, Desktop) con arquitectura
+    limpia, autenticación JWT, chat inteligente con IA local (Ollama), gestión de huertos,
+    y sistema de diseño neumórfico. Esta solución mejorará la productividad agrícola, reducirá
+    errores de planificación, optimizará el uso de recursos, y proporcionará asistencia
+    personalizada a agricultores desde cualquier dispositivo. El desarrollo se completará en
+    un plazo de tres meses.
+\end{minipage}
+
+% ============================================
+% FICHA DEL PRODUCTO
+% ============================================
+\newpage
+
+\begin{center}
+    {\huge\bfseries FICHA DEL PRODUCTO}
+\end{center}
+
+\vspace{1cm}
+
+\begin{minipage}[t]{0.55\textwidth}
+    \colorbox{darkblue}{
+        \parbox{0.95\textwidth}{
+            \color{white}\Large\bfseries Descripción
+        }
+    }
+
+    \vspace{0.3cm}
+
+    Plataforma full-stack de microservicios para gestión agrícola inteligente. \textbf{Backend}
+    con arquitectura de microservicios orquestados por Docker, APIs REST, bases de datos
+    MongoDB + ChromaDB, e IA local con Ollama. \textbf{Frontend} multiplataforma en Flutter
+    con Clean Architecture, MVVM, Atomic Design, autenticación JWT persistente, y diseño
+    Material 3 adaptativo. Sistema completo integrado para agricultores profesionales.
+
+    \vspace{0.5cm}
+
+    \colorbox{darkblue}{
+        \parbox{0.95\textwidth}{
+            \color{white}\Large\bfseries Características
+        }
+    }
+
+    \vspace{0.3cm}
+
+    \textbf{BACKEND (Node.js/Python):}
+    \begin{itemize}[leftmargin=*,itemsep=0pt]
+        \item 6 microservicios independientes
+        \item API Gateway centralizado
+        \item Autenticación JWT
+        \item MongoDB + ChromaDB (vectorial)
+        \item IA local (Ollama + RAG)
+        \item Algoritmos genéticos multi-objetivo
+        \item Docker Compose orquestado
+    \end{itemize}
+
+    \textbf{FRONTEND (Flutter):}
+    \begin{itemize}[leftmargin=*,itemsep=0pt]
+        \item Multiplataforma (Android, iOS, Web, Desktop)
+        \item Clean Architecture + MVVM
+        \item Provider (State Management)
+        \item GoRouter con rutas protegidas
+        \item Atomic Design System
+        \item Material 3 + Neumorphic UI
+        \item SecureStorage para tokens
+        \item 59 archivos Dart organizados
+    \end{itemize}
+
+    \textbf{Tecnologías}: Node.js, Express, Python, FastAPI, Flutter, Dart,
+    TypeScript, MongoDB, ChromaDB, Ollama, Docker, JWT.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \colorbox{darkblue}{
+        \parbox{0.95\textwidth}{
+            \color{white}\Large\bfseries Costo del producto
+        }
+    }
+
+    \vspace{0.5cm}
+
+    \begin{center}
+        {\Huge\bfseries \$82,500 MXN}
+    \end{center}
+
+    \vspace{0.5cm}
+
+    \colorbox{darkblue}{
+        \parbox{0.95\textwidth}{
+            \color{white}\Large\bfseries Beneficios
+        }
+    }
+
+    \vspace{0.3cm}
+
+    \begin{itemize}[leftmargin=*,itemsep=0pt]
+        \item Sistema completo full-stack
+        \item Multiplataforma (5 plataformas)
+        \item IA integrada sin costos recurrentes
+        \item Autenticación segura JWT
+        \item Asistencia inteligente 24/7
+        \item Optimización automática de huertos
+        \item Arquitectura escalable y modular
+        \item Sesión persistente entre dispositivos
+        \item UI/UX profesional adaptativo
+    \end{itemize}
+
+    \vspace{0.5cm}
+
+    \colorbox{darkblue}{
+        \parbox{0.95\textwidth}{
+            \color{white}\Large\bfseries Implementación
+        }
+    }
+
+    \vspace{0.3cm}
+
+    \begin{itemize}[leftmargin=*,itemsep=0pt]
+        \item Desarrollo estimado en 3 meses
+        \item 6 microservicios backend
+        \item 1 aplicación Flutter multiplataforma
+        \item Despliegue con Docker Compose
+    \end{itemize}
+\end{minipage}
+
+% ============================================
+% SALARIOS
+% ============================================
+\newpage
+
+\begin{center}
+    {\huge\bfseries SALARIOS DE LOS PUESTOS DE TRABAJO}
+\end{center}
+
+\vspace{2cm}
+
+\begin{center}
+\begin{tabular}{ccccc}
+    \colorbox{darkblue}{
+        \parbox{0.17\textwidth}{
+            \centering\color{white}\large\bfseries ANALISTA\\DE CALIDAD
+        }
+    } &
+    \colorbox{darkblue}{
+        \parbox{0.17\textwidth}{
+            \centering\color{white}\large\bfseries TESTER
+        }
+    } &
+    \colorbox{darkblue}{
+        \parbox{0.17\textwidth}{
+            \centering\color{white}\large\bfseries UX/UI\\DESIGNER
+        }
+    } &
+    \colorbox{darkblue}{
+        \parbox{0.17\textwidth}{
+            \centering\color{white}\large\bfseries BACKEND\\DEVELOPER
+        }
+    } &
+    \colorbox{darkblue}{
+        \parbox{0.17\textwidth}{
+            \centering\color{white}\large\bfseries MOBILE\\DEVELOPER
+        }
+    } \\[0.5cm]
+
+    \begin{tabular}{l}
+        \textbf{Sueldo:} \\
+        Mes: \$10,000 \\
+        Día: \$333.33 \\
+        Hora: \$41.67
+    \end{tabular} &
+    \begin{tabular}{l}
+        \textbf{Sueldo:} \\
+        Mes: \$11,000 \\
+        Día: \$366.66 \\
+        Hora: \$45.83
+    \end{tabular} &
+    \begin{tabular}{l}
+        \textbf{Sueldo:} \\
+        Mes: \$10,500 \\
+        Día: \$350 \\
+        Hora: \$43.75
+    \end{tabular} &
+    \begin{tabular}{l}
+        \textbf{Sueldo:} \\
+        Mes: \$12,000 \\
+        Día: \$400 \\
+        Hora: \$50
+    \end{tabular} &
+    \begin{tabular}{l}
+        \textbf{Sueldo:} \\
+        Mes: \$13,000 \\
+        Día: \$433.33 \\
+        Hora: \$54.17
+    \end{tabular}
+\end{tabular}
+\end{center}
+
+% ============================================
+% DIAGRAMA DE ACTIVIDADES
+% ============================================
+\newpage
+
+\begin{center}
+    {\huge\bfseries DIAGRAMA DE ACTIVIDADES}
+\end{center}
+
+\vspace{0.5cm}
+
+\begin{center}
+\begin{tikzpicture}[
+    scale=0.85,
+    node distance=2cm,
+    activity/.style={circle, draw=darkblue, fill=darkblue, text=white,
+                     minimum size=2.3cm, align=center, font=\tiny\bfseries},
+    subactivity/.style={circle, draw=darkblue, fill=darkblue, text=white,
+                        minimum size=2cm, align=center, font=\tiny},
+    arrow/.style={->, >=stealth, thick, dotted}
+]
+
+% Fila 1
+\node[activity] (a1) at (0,0) {1.Investigación\\mercado\\24-AC};
+\node[activity] (a2) at (2.5,0) {2.Req.\\Backend\\20-AC};
+\node[activity] (a3) at (5,0) {3.Req.\\Frontend\\16-AC\\8-UX};
+\node[activity] (a4) at (7.5,0) {4.Diseño\\Arq.\\24-AC};
+\node[activity] (a5) at (10,0) {5.Diseño\\UI/UX\\40-UX};
+
+% Fila 2
+\node[subactivity] (a6) at (1.25,-2.5) {6.API\\Gateway\\20-BD};
+\node[subactivity] (a7) at (3.75,-2.5) {7.Auth\\Service\\24-BD};
+\node[subactivity] (a8) at (6.25,-2.5) {8.Users\\API\\24-BD};
+\node[subactivity] (a9) at (8.75,-2.5) {9.Chatbot\\RAG\\32-BD};
+
+% Fila 3
+\node[subactivity] (a10) at (0,-5) {10.Orchards\\API\\24-BD};
+\node[subactivity] (a11) at (2.5,-5) {11.PlantGen\\AG\\24-BD};
+\node[subactivity] (a12) at (5,-5) {12.Base\\Datos\\24-BD};
+\node[subactivity] (a13) at (7.5,-5) {13.Flutter\\Auth\\32-MD};
+
+% Fila 4
+\node[subactivity] (a14) at (10,-5) {14.Flutter\\Chat\\24-MD};
+\node[subactivity] (a15) at (1.25,-7.5) {15.Flutter\\Home\\20-MD};
+\node[subactivity] (a16) at (3.75,-7.5) {16.UI\\System\\16-MD\\8-UX};
+\node[activity] (a17) at (6.25,-7.5) {17.Integr.\\Full\\40-T\\16-AC};
+
+% Fila 5
+\node[activity] (a18) at (8.75,-7.5) {18.Docum.\\24-AC};
+\node[activity] (a19) at (11,-7.5) {19.Deploy\\Final};
+
+% Flechas principales
+\draw[arrow] (a1) -- (a2);
+\draw[arrow] (a2) -- (a3);
+\draw[arrow] (a3) -- (a4);
+\draw[arrow] (a4) -- (a5);
+\draw[arrow] (a4) -- (a6);
+\draw[arrow] (a6) -- (a7);
+\draw[arrow] (a7) -- (a8);
+\draw[arrow] (a8) -- (a9);
+\draw[arrow] (a9) -- (a10);
+\draw[arrow] (a10) -- (a11);
+\draw[arrow] (a11) -- (a12);
+\draw[arrow] (a5) -- (a13);
+\draw[arrow] (a13) -- (a14);
+\draw[arrow] (a14) -- (a15);
+\draw[arrow] (a15) -- (a16);
+\draw[arrow] (a12) -- (a17);
+\draw[arrow] (a16) -- (a17);
+\draw[arrow] (a17) -- (a18);
+\draw[arrow] (a18) -- (a19);
+
+\end{tikzpicture}
+\end{center}
+
+% ============================================
+% TABLA DE ACTIVIDADES - PARTE 1
+% ============================================
+\newpage
+
+\begin{center}
+    {\Large\bfseries TABLA DE ACTIVIDADES PARA EL ALCANCE - PARTE 1}
+\end{center}
+
+\vspace{0.5cm}
+
+\small
+\renewcommand{\arraystretch}{1.6}
+\begin{tabularx}{\textwidth}{|>{\centering\arraybackslash}p{0.8cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}p{2cm}|>{\centering\arraybackslash}p{1.5cm}|}
+\hline
+\rowcolor{darkblue}
+\color{white}\textbf{ID} & \color{white}\textbf{ACTIVIDAD} & \color{white}\textbf{DESCRIPCIÓN} & \color{white}\textbf{RESP.} & \color{white}\textbf{TIEMPO} \\
+\hline
+\rowcolor{yellow!30}
+1 & Investigación del mercado & Análisis de competidores (ToastPOS, Square) y necesidades de sistemas agrícolas & AC & 56h \\
+\hline
+\rowcolor{yellow!30}
+2 & Especificación req. Backend & Definir 6 microservicios, arquitectura, comunicación entre servicios, IA & AC & 56h \\
+\hline
+\rowcolor{yellow!30}
+3 & Especificación req. Frontend & Definir pantallas Flutter, navegación, integraciones con backend & AC, UX/UI & 56h \\
+\hline
+\rowcolor{greentable!40}
+4 & Diseño de arquitectura & Clean Architecture backend + frontend, patrones DDD, MVVM & AC & 56h \\
+\hline
+\rowcolor{greentable!40}
+5 & Diseño UI/UX & Wireframes, mockups, design system neumórfico, flujos de usuario & UX/UI & 56h \\
+\hline
+\rowcolor{bluetable!40}
+6 & Desarrollo API Gateway & Enrutador centralizado, proxy, JWT validation, rate limiting & BD & 56h \\
+\hline
+\rowcolor{bluetable!40}
+7 & Desarrollo Auth Service & JWT generation, bcrypt, login, register, token validation & BD & 56h \\
+\hline
+\rowcolor{bluetable!40}
+8 & Desarrollo Users API & CRUD usuarios, relación con orchards, perfiles, experiencia & BD & 56h \\
+\hline
+\rowcolor{bluetable!40}
+9 & Desarrollo Chatbot RAG & PDFs processing, embeddings Ollama, ChromaDB, chat con IA & BD & 56h \\
+\hline
+\rowcolor{bluetable!40}
+10 & Desarrollo Orchards API & CRUD huertos, gestión plantas, métricas, activación/desactivación & BD & 56h \\
+\hline
+\end{tabularx}
+
+% ============================================
+% TABLA DE ACTIVIDADES - PARTE 2
+% ============================================
+\newpage
+
+\begin{center}
+    {\Large\bfseries TABLA DE ACTIVIDADES PARA EL ALCANCE - PARTE 2}
+\end{center}
+
+\vspace{0.5cm}
+
+\small
+\renewcommand{\arraystretch}{1.6}
+\begin{tabularx}{\textwidth}{|>{\centering\arraybackslash}p{0.8cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}p{2cm}|>{\centering\arraybackslash}p{1.5cm}|}
+\hline
+\rowcolor{darkblue}
+\color{white}\textbf{ID} & \color{white}\textbf{ACTIVIDAD} & \color{white}\textbf{DESCRIPCIÓN} & \color{white}\textbf{RESP.} & \color{white}\textbf{TIEMPO} \\
+\hline
+\rowcolor{bluetable!40}
+11 & Desarrollo PlantGen & Algoritmo genético multi-objetivo Python, FastAPI, 50 plantas & BD & 56h \\
+\hline
+\rowcolor{bluetable!40}
+12 & Diseño bases de datos & MongoDB (users\_db, orchards, plants), ChromaDB vectores & BD & 56h \\
+\hline
+\rowcolor{orangetable!40}
+13 & Flutter Auth Module & Login, Register, JWT storage, sesión persistente, validaciones & MD & 56h \\
+\hline
+\rowcolor{orangetable!40}
+14 & Flutter Chatbot Module & Chat UI, mensajes, typing indicator, integración API chatbot & MD & 56h \\
+\hline
+\rowcolor{orangetable!40}
+15 & Flutter Home Module & Dashboard, cards, navegación, logout, welcome header & MD & 56h \\
+\hline
+\rowcolor{orangetable!40}
+16 & Flutter UI System & Atomic Design (atoms, molecules, organisms), theme system & MD, UX/UI & 56h \\
+\hline
+\rowcolor{greentable!40}
+17 & Integración Full-Stack & Tests E2E, comunicación backend-frontend, Docker, deploy & T, AC & 56h \\
+\hline
+\rowcolor{yellow!30}
+18 & Documentación & APIs, arquitectura, guías de deploy, casos de uso, SDKs & AC & 56h \\
+\hline
+\rowcolor{greentable!40}
+19 & Finalización y Deploy & Cierre, builds Android/iOS/Web, entrega sistema completo & & 56h \\
+\hline
+\end{tabularx}
+
+% ============================================
+% CRONOGRAMA
+% ============================================
+\newpage
+
+\begin{center}
+    {\huge\bfseries CRONOGRAMA DE ACTIVIDADES - 3 MESES}
+\end{center}
+
+\vspace{0.5cm}
+
+\tiny
+\begin{tabular}{|p{3cm}|*{12}{>{\centering\arraybackslash}p{0.6cm}|}}
+\hline
+\rowcolor{gray!20}
+\textbf{Actividades} & \multicolumn{4}{c|}{\textbf{Mes 1}} & \multicolumn{4}{c|}{\textbf{Mes 2}} & \multicolumn{4}{c|}{\textbf{Mes 3}} \\
+\hline
+\rowcolor{gray!20}
+& S1 & S2 & S3 & S4 & S1 & S2 & S3 & S4 & S1 & S2 & S3 & S4 \\
+\hline
+1.Investigación & \cellcolor{yellow} & \cellcolor{yellow} & & & & & & & & & & \\
+\hline
+2.Req. Backend & & \cellcolor{yellow} & \cellcolor{yellow} & & & & & & & & & \\
+\hline
+3.Req. Frontend & & & \cellcolor{yellow} & \cellcolor{yellow} & & & & & & & & \\
+\hline
+4.Diseño Arq. & & & & \cellcolor{gray!50} & \cellcolor{gray!50} & & & & & & & \\
+\hline
+5.Diseño UI/UX & & & & \cellcolor{gray!50} & \cellcolor{gray!50} & & & & & & & \\
+\hline
+6.API Gateway & & & & & \cellcolor{gray!50} & \cellcolor{gray!50} & & & & & & \\
+\hline
+7.Auth Service & & & & & & \cellcolor{gray!50} & \cellcolor{gray!50} & & & & & \\
+\hline
+8.Users API & & & & & & & \cellcolor{gray!50} & \cellcolor{gray!50} & & & & \\
+\hline
+9.Chatbot RAG & & & & & & & & \cellcolor{gray!50} & \cellcolor{gray!50} & & & \\
+\hline
+10.Orchards API & & & & & & & & & \cellcolor{gray!50} & \cellcolor{gray!50} & & \\
+\hline
+11.PlantGen & & & & & & & & & & \cellcolor{gray!50} & \cellcolor{gray!50} & \\
+\hline
+12.Bases Datos & & & & & \cellcolor{gray!50} & \cellcolor{gray!50} & & & & & & \\
+\hline
+13.Flutter Auth & & & & & & \cellcolor{orangetable} & \cellcolor{orangetable} & & & & & \\
+\hline
+14.Flutter Chat & & & & & & & \cellcolor{orangetable} & \cellcolor{orangetable} & & & & \\
+\hline
+15.Flutter Home & & & & & & & & \cellcolor{orangetable} & \cellcolor{orangetable} & & & \\
+\hline
+16.UI System & & & & & & & & & \cellcolor{orangetable} & \cellcolor{orangetable} & & \\
+\hline
+17.Integración & & & & & & & & & & & \cellcolor{gray!50} & \cellcolor{gray!50} \\
+\hline
+18.Documentación & & & & & & & & & & & & \cellcolor{yellow} \\
+\hline
+19.Deploy Final & & & & & & & & & & & & \cellcolor{yellow} \\
+\hline
+\end{tabular}
+
+% ============================================
+% TABLA DE COSTOS
+% ============================================
+\newpage
+
+\begin{center}
+    {\huge\bfseries TABLA DE COSTOS}
+\end{center}
+
+\vspace{1cm}
+
+\begin{minipage}[t]{0.48\textwidth}
+\renewcommand{\arraystretch}{1.8}
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}p{2.5cm}|}
+\hline
+\rowcolor{darkblue}
+\color{white}\textbf{CONCEPTO} & \color{white}\textbf{COSTO} \\
+\hline
+\rowcolor{bluetable!30}
+Investigación mercado & \$1,000.68 \\
+\hline
+\rowcolor{bluetable!30}
+Req. Backend & \$833.40 \\
+\hline
+\rowcolor{bluetable!30}
+Req. Frontend & \$1,716.76 \\
+\hline
+\rowcolor{bluetable!30}
+Diseño Arquitectura & \$2,333.52 \\
+\hline
+\rowcolor{bluetable!30}
+Diseño UI/UX & \$2,450 \\
+\hline
+\rowcolor{bluetable!30}
+API Gateway & \$2,800 \\
+\hline
+\rowcolor{bluetable!30}
+Auth Service & \$2,800 \\
+\hline
+\rowcolor{bluetable!30}
+Users API & \$2,800 \\
+\hline
+\rowcolor{bluetable!30}
+Chatbot RAG & \$2,800 \\
+\hline
+\rowcolor{bluetable!30}
+Orchards API & \$2,800 \\
+\hline
+\end{tabularx}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\renewcommand{\arraystretch}{1.8}
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}p{2.5cm}|}
+\hline
+\rowcolor{darkblue}
+\color{white}\textbf{CONCEPTO} & \color{white}\textbf{COSTO} \\
+\hline
+\rowcolor{bluetable!30}
+PlantGen (Python) & \$2,800 \\
+\hline
+\rowcolor{bluetable!30}
+Bases de Datos & \$2,800 \\
+\hline
+\rowcolor{orangetable!30}
+Flutter Auth & \$3,033.52 \\
+\hline
+\rowcolor{orangetable!30}
+Flutter Chatbot & \$3,033.52 \\
+\hline
+\rowcolor{orangetable!30}
+Flutter Home & \$3,033.52 \\
+\hline
+\rowcolor{orangetable!30}
+Flutter UI System & \$3,483.52 \\
+\hline
+\rowcolor{greentable!30}
+Integración Full & \$3,900.16 \\
+\hline
+\rowcolor{bluetable!30}
+Documentación & \$1,000.08 \\
+\hline
+\rowcolor{greentable!30}
+Deploy Final & \$933.36 \\
+\hline
+\rowcolor{darkblue}
+\color{white}\textbf{TOTAL} & \color{white}\textbf{\$52,352.54} \\
+\hline
+\end{tabularx}
+\end{minipage}
+
+% ============================================
+% PRESUPUESTO
+% ============================================
+\newpage
+
+\begin{center}
+    {\huge\bfseries PRESUPUESTO FINAL}
+\end{center}
+
+\vspace{1cm}
+
+\begin{minipage}[t]{0.5\textwidth}
+\renewcommand{\arraystretch}{2.2}
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}p{3.5cm}|}
+\hline
+\rowcolor{darkblue}
+\color{white}\textbf{CONCEPTO} & \color{white}\textbf{COSTO} \\
+\hline
+\rowcolor{bluetable!30}
+Costo por actividades & \$52,352.54 \\
+\hline
+\rowcolor{bluetable!30}
+Recursos e infraestructura & \$7,800 \\
+\hline
+\rowcolor{bluetable!40}
+\textbf{Subtotal} & \$60,152.54 \\
+\hline
+\rowcolor{bluetable!30}
+Ganancias (10\%) & \$6,015.25 \\
+\hline
+\rowcolor{bluetable!40}
+\textbf{Subtotal} & \$66,167.79 \\
+\hline
+\rowcolor{bluetable!30}
+Impuestos (16\%) & \$10,586.85 \\
+\hline
+\end{tabularx}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+    \vspace{4cm}
+
+    \begin{center}
+    {\Huge\bfseries Total: \$76,754.64}
+    \end{center}
+\end{minipage}
+
+% ============================================
+% PUNTO DE EQUILIBRIO
+% ============================================
+\newpage
+
+\begin{center}
+    {\Large\bfseries ANÁLISIS DE PUNTO DE EQUILIBRIO}
+\end{center}
+
+\vspace{1cm}
+
+\begin{minipage}[t]{0.45\textwidth}
+\renewcommand{\arraystretch}{2}
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}p{3cm}|}
+\hline
+\rowcolor{darkblue}
+\color{white}\textbf{CONCEPTO} & \color{white}\textbf{COSTO} \\
+\hline
+\rowcolor{bluetable!30}
+Dominio & \$200 \\
+\hline
+\rowcolor{bluetable!30}
+Servidores AWS (3 meses) & \$3,600 \\
+\hline
+\rowcolor{bluetable!30}
+MongoDB Atlas & \$2,000 \\
+\hline
+\rowcolor{bluetable!30}
+ChromaDB Cloud & \$800 \\
+\hline
+\rowcolor{bluetable!30}
+Certificados SSL & \$500 \\
+\hline
+\rowcolor{bluetable!30}
+Google Play Developer & \$700 \\
+\hline
+\rowcolor{bluetable!40}
+\textbf{Total} & \$7,800 \\
+\hline
+\end{tabularx}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.5\textwidth}
+    \colorbox{creamcolor}{
+        \parbox{0.95\textwidth}{
+            \textbf{Costos fijos}
+
+            \vspace{0.3cm}
+
+            \textbf{PE} = Costos Fijos / (Precio - Costo)\\
+            \textbf{PE} = \$7,800 / (\$76,754.64 - \$52,352.54)\\
+            \textbf{PE} = \$7,800 / \$24,402.10\\
+            \textbf{PE} = 0.32
+
+            \vspace{0.5cm}
+
+            \textbf{Punto de equilibrio}
+
+            \vspace{0.3cm}
+
+            \textbf{PE} = Costos Fijos / (1 - Costo/Precio)\\
+            \textbf{PE} = \$7,800 / (1 - \$52,352.54 / \$76,754.64)\\
+            \textbf{PE} = \$7,800 / (1 - 0.68)\\
+            \textbf{PE} = \$7,800 / 0.32\\
+            \textbf{PE} = \$24,375
+        }
+    }
+\end{minipage}
+
+% ============================================
+% COMPETIDORES
+% ============================================
+\newpage
+
+\begin{center}
+    {\Large\bfseries PRECIO EN MERCADO - ANÁLISIS COMPETITIVO}
+\end{center}
+
+\vspace{0.5cm}
+
+\tiny
+\renewcommand{\arraystretch}{1.4}
+\begin{tabularx}{\textwidth}{|>{\centering\arraybackslash}p{2.2cm}|>{\centering\arraybackslash}p{1.8cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|}
+\hline
+\rowcolor{darkblue}
+\color{white}\textbf{COMPETIDOR} & \color{white}\textbf{POSIC.} & \color{white}\textbf{COSTO} & \color{white}\textbf{PROS} & \color{white}\textbf{CONTRAS} \\
+\hline
+\rowcolor{gray!10}
+Toast POS & Alto & \$69 USD/mes + \$1,024 HW & Integral. Avanzado & Costo alto. Solo restaurant \\
+\hline
+\rowcolor{gray!10}
+Square Restaurant & Medio & \$69 USD/mes + \$799 HW & Flexible. Integrado & Limitado para grandes \\
+\hline
+\rowcolor{gray!10}
+Lightspeed & Medio-Alto & \$69 USD/mes & Personalizable & Complejo. Entrenamiento \\
+\hline
+\rowcolor{gray!10}
+Soft Restaurant & Alto & \$10,000 MXN licencia & Popular México & Costo alto. UI anticuada \\
+\hline
+\rowcolor{yellow!20}
+\textbf{PLANTY Full-Stack} & \textbf{Premium} & \textbf{\$76,754.64 MXN único} & \textbf{IA local. Backend + Frontend. Multiplataforma (5). Sin costos recurrentes. Algoritmos genéticos. Escalable} & \textbf{Requiere cloud. Setup complejo} \\
+\hline
+\end{tabularx}
+
+% ============================================
+% PÁGINA FINAL
+% ============================================
+\newpage
+
+\pagecolor{darkblue}
+
+\vspace*{8cm}
+
+\begin{center}
+    \vspace{1cm}
+
+    {\Huge\color{white}\bfseries Gracias}
+
+    \vspace{1cm}
+
+    {\Large\color{white} Sistema Full-Stack Completo}\\
+    {\Large\color{white} Backend (6 microservicios) + Frontend Flutter}\\
+    {\Large\color{white} \textbf{\$76,754.64 MXN}}
+\end{center}
+
+\end{document}

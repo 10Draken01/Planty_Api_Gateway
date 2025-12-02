@@ -1,0 +1,1034 @@
+[
+  {
+    "species": "Cilantro",
+    "scientificName": "Coriandrum sativum",
+    "type": [
+      "vegetable",
+      "aromatic",
+      "medicinal"
+    ],
+    "sunRequirement": "medium",
+    "weeklyWatering": 11,
+    "harvestDays": 38,
+    "soilType": "Suelo fértil, bien drenado, pH 6.0-7.0",
+    "waterPerKg": 250,
+    "benefits": [
+      "Alto en vitaminas A, C, K",
+      "Antioxidantes",
+      "Ayuda digestión",
+      "Propiedades antiinflamatorias"
+    ],
+    "size": 0.15
+  },
+  {
+    "species": "Epazote",
+    "scientificName": "Dysphania ambrosioides",
+    "type": [
+      "vegetable",
+      "medicinal",
+      "aromatic"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 9,
+    "harvestDays": 73,
+    "soilType": "Suelo bien drenado, promedio; tolerante sequía",
+    "waterPerKg": 600,
+    "benefits": [
+      "Reduce gases intestinales",
+      "Vitaminas C y B",
+      "Propiedades antiparasitarias",
+      "Ayuda digestiva"
+    ],
+    "size": 0.15
+  },
+  {
+    "species": "Verdolaga",
+    "scientificName": "Portulaca oleracea",
+    "type": [
+      "vegetable",
+      "medicinal"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 6,
+    "harvestDays": 25,
+    "soilType": "Suelo arenoso, bien drenado; tolera suelos pobres",
+    "waterPerKg": 100,
+    "benefits": [
+      "Mayor contenido omega-3 de vegetales verdes",
+      "Vitaminas A, C, E",
+      "Minerales",
+      "Antioxidantes"
+    ],
+    "size": 0.10
+  },
+  {
+    "species": "Bok Choy",
+    "scientificName": "Brassica rapa subsp. chinensis",
+    "type": [
+      "vegetable"
+    ],
+    "sunRequirement": "medium",
+    "weeklyWatering": 18,
+    "harvestDays": 53,
+    "soilType": "Suelo rico, húmedo, bien drenado, pH 6.0-7.0",
+    "waterPerKg": 250,
+    "benefits": [
+      "Vitaminas A, C, K",
+      "Calcio",
+      "Hierro",
+      "Potasio",
+      "Bajas calorías",
+      "Antiinflamatorio"
+    ],
+    "size": 0.18
+  },
+  {
+    "species": "Amaranto",
+    "scientificName": "Amaranthus species",
+    "type": [
+      "vegetable",
+      "medicinal"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 13,
+    "harvestDays": 75,
+    "soilType": "Suelo fértil, bien drenado; tolerante calor",
+    "waterPerKg": 150,
+    "benefits": [
+      "Proteína completa",
+      "Vitaminas A, C",
+      "Hierro",
+      "Calcio",
+      "Fibra",
+      "Antioxidantes"
+    ],
+    "size": 0.15
+  },
+  {
+    "species": "Rábano",
+    "scientificName": "Raphanus sativus",
+    "type": [
+      "vegetable"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 13,
+    "harvestDays": 25,
+    "soilType": "Suelo suelto, bien drenado; pH 6.0-7.0",
+    "waterPerKg": 175,
+    "benefits": [
+      "Vitamina C",
+      "Fibra",
+      "Ayuda digestión",
+      "Propiedades desintoxicantes",
+      "Bajas calorías"
+    ],
+    "size": 0.08
+  },
+  {
+    "species": "Camote",
+    "scientificName": "Ipomoea batatas",
+    "type": [
+      "vegetable"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 18,
+    "harvestDays": 105,
+    "soilType": "Suelo arenoso, bien drenado; pH 5.8-6.2",
+    "waterPerKg": 400,
+    "benefits": [
+      "Alto en vitamina A, C",
+      "Fibra",
+      "Potasio",
+      "Antioxidantes",
+      "Carbohidratos complejos"
+    ],
+    "size": 0.25
+  },
+  {
+    "species": "Tomate Cherry",
+    "scientificName": "Solanum lycopersicum",
+    "type": [
+      "vegetable"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 20,
+    "harvestDays": 70,
+    "soilType": "Suelo fértil, bien drenado; pH 6.0-6.8",
+    "waterPerKg": 250,
+    "benefits": [
+      "Vitaminas A, C",
+      "Licopeno",
+      "Potasio",
+      "Antioxidantes",
+      "Bajas calorías"
+    ],
+    "size": 0.25
+  },
+  {
+    "species": "Pipicha",
+    "scientificName": "Porophyllum linaria",
+    "type": [
+      "vegetable",
+      "aromatic",
+      "medicinal"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 9,
+    "harvestDays": 78,
+    "soilType": "Suelo bien drenado; tolerante sequía",
+    "waterPerKg": 125,
+    "benefits": [
+      "Vitaminas C, B",
+      "Calcio",
+      "Hierro",
+      "Antioxidantes",
+      "Ayuda digestiva",
+      "Desintoxicante hepático"
+    ],
+    "size": 0.12
+  },
+  {
+    "species": "Berenjena",
+    "scientificName": "Solanum melongena",
+    "type": [
+      "vegetable"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 18,
+    "harvestDays": 78,
+    "soilType": "Suelo fértil, bien drenado; pH 6.0-6.8",
+    "waterPerKg": 300,
+    "benefits": [
+      "Fibra",
+      "Antioxidantes",
+      "Vitaminas C, K",
+      "Potasio",
+      "Apoya salud cardíaca"
+    ],
+    "size": 0.25
+  },
+  {
+    "species": "Albahaca",
+    "scientificName": "Ocimum basilicum",
+    "type": [
+      "medicinal",
+      "aromatic"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 18,
+    "harvestDays": 26,
+    "soilType": "Suelo ligero, bien drenado con compost",
+    "waterPerKg": 900,
+    "benefits": [
+      "Antibacteriano",
+      "Antifúngico",
+      "Digestivo",
+      "Antiinflamatorio",
+      "Apoyo respiratorio",
+      "Analgésico"
+    ],
+    "size": 0.18
+  },
+  {
+    "species": "Hierbabuena",
+    "scientificName": "Mentha spicata",
+    "type": [
+      "medicinal",
+      "aromatic"
+    ],
+    "sunRequirement": "medium",
+    "weeklyWatering": 25,
+    "harvestDays": 38,
+    "soilType": "Suelo rico, húmedo, bien drenado",
+    "waterPerKg": 1350,
+    "benefits": [
+      "Digestivo",
+      "Antiespasmódico",
+      "Antiinflamatorio",
+      "Descongestionante respiratorio",
+      "Refrescante"
+    ],
+    "size": 0.12
+  },
+  {
+    "species": "Orégano",
+    "scientificName": "Origanum vulgare",
+    "type": [
+      "medicinal",
+      "aromatic"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 9,
+    "harvestDays": 70,
+    "soilType": "Suelo bien drenado, pobre",
+    "waterPerKg": 500,
+    "benefits": [
+      "Antimicrobiano",
+      "Antioxidante",
+      "Antiinflamatorio",
+      "Digestivo",
+      "Apoyo respiratorio",
+      "Antifúngico"
+    ],
+    "size": 0.22
+  },
+  {
+    "species": "Tomillo",
+    "scientificName": "Thymus vulgaris",
+    "type": [
+      "medicinal",
+      "aromatic"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 6,
+    "harvestDays": 83,
+    "soilType": "Suelo bien drenado, rocoso o arenoso",
+    "waterPerKg": 350,
+    "benefits": [
+      "Antiséptico",
+      "Expectorante",
+      "Antimicrobiano",
+      "Antiinflamatorio",
+      "Digestivo",
+      "Apoyo bronquial"
+    ],
+    "size": 0.12
+  },
+  {
+    "species": "Romero",
+    "scientificName": "Rosmarinus officinalis",
+    "type": [
+      "medicinal",
+      "aromatic"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 6,
+    "harvestDays": 105,
+    "soilType": "Suelo bien drenado, pobre",
+    "waterPerKg": 400,
+    "benefits": [
+      "Estimulante circulatorio",
+      "Antioxidante",
+      "Mejora memoria",
+      "Antiinflamatorio",
+      "Antimicrobiano"
+    ],
+    "size": 0.18
+  },
+  {
+    "species": "Salvia",
+    "scientificName": "Salvia officinalis",
+    "type": [
+      "medicinal",
+      "aromatic"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 9,
+    "harvestDays": 83,
+    "soilType": "Suelo bien drenado, alcalino",
+    "waterPerKg": 500,
+    "benefits": [
+      "Antiséptico",
+      "Antiinflamatorio",
+      "Astringente",
+      "Digestivo",
+      "Equilibrio hormonal",
+      "Antimicrobiano"
+    ],
+    "size": 0.17
+  },
+  {
+    "species": "Toronjil Morado",
+    "scientificName": "Agastache mexicana",
+    "type": [
+      "medicinal",
+      "aromatic"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 13,
+    "harvestDays": 68,
+    "soilType": "Suelo fértil, bien drenado",
+    "waterPerKg": 150,
+    "benefits": [
+      "Digestivo",
+      "Sedante",
+      "Antiinflamatorio",
+      "Apoyo respiratorio",
+      "Calmante",
+      "Antiespasmódico"
+    ],
+    "size": 0.23
+  },
+  {
+    "species": "Estafiate",
+    "scientificName": "Artemisia ludoviciana",
+    "type": [
+      "medicinal",
+      "aromatic"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 7,
+    "harvestDays": 105,
+    "soilType": "Suelo bien drenado, pobre a moderado",
+    "waterPerKg": 100,
+    "benefits": [
+      "Digestivo",
+      "Vermífugo",
+      "Antimicrobiano",
+      "Hepatoprotector",
+      "Regulación menstrual",
+      "Desintoxicante"
+    ],
+    "size": 0.23
+  },
+  {
+    "species": "Espinaca Maya",
+    "scientificName": "Cnidoscolus aconitifolius",
+    "type": [
+      "medicinal",
+      "vegetable"
+    ],
+    "sunRequirement": "medium",
+    "weeklyWatering": 15,
+    "harvestDays": 150,
+    "soilType": "Suelo fértil, bien drenado",
+    "waterPerKg": 375,
+    "benefits": [
+      "Apoyo nutricional",
+      "Antiinflamatorio",
+      "Antioxidante",
+      "Digestivo",
+      "Apoyo sistema inmune"
+    ],
+    "size": 0.25
+  },
+  {
+    "species": "Perejil",
+    "scientificName": "Petroselinum crispum",
+    "type": [
+      "medicinal",
+      "aromatic",
+      "vegetable"
+    ],
+    "sunRequirement": "medium",
+    "weeklyWatering": 18,
+    "harvestDays": 80,
+    "soilType": "Suelo rico, húmedo, bien drenado",
+    "waterPerKg": 300,
+    "benefits": [
+      "Diurético",
+      "Antiinflamatorio",
+      "Antioxidante",
+      "Apoyo renal",
+      "Digestivo",
+      "Rico en vitamina C"
+    ],
+    "size": 0.17
+  },
+  {
+    "species": "Orégano Mexicano",
+    "scientificName": "Lippia graveolens",
+    "type": [
+      "aromatic",
+      "medicinal"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 9,
+    "harvestDays": 75,
+    "soilType": "Suelo arenoso, bien drenado",
+    "waterPerKg": 500,
+    "benefits": [
+      "Especia culinaria",
+      "Antimicrobiano",
+      "Salud respiratoria",
+      "Ayuda digestiva",
+      "Conservante natural"
+    ],
+    "size": 0.22
+  },
+  {
+    "species": "Zacate Limón",
+    "scientificName": "Cymbopogon citratus",
+    "type": [
+      "aromatic",
+      "medicinal"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 18,
+    "harvestDays": 88,
+    "soilType": "Suelo rico, bien drenado",
+    "waterPerKg": 1100,
+    "benefits": [
+      "Saborizante culinario",
+      "Repelente mosquitos natural",
+      "Té digestivo",
+      "Alivio estrés",
+      "Fragancia hogar"
+    ],
+    "size": 0.22
+  },
+  {
+    "species": "Hoja Santa",
+    "scientificName": "Piper auritum",
+    "type": [
+      "aromatic",
+      "medicinal",
+      "vegetable"
+    ],
+    "sunRequirement": "medium",
+    "weeklyWatering": 25,
+    "harvestDays": 105,
+    "soilType": "Suelo rico, húmedo, bien drenado",
+    "waterPerKg": 1750,
+    "benefits": [
+      "Envoltorio culinario",
+      "Ingrediente mole verde",
+      "Salud respiratoria",
+      "Medicina tradicional"
+    ],
+    "size": 0.25
+  },
+  {
+    "species": "Albahaca Morada",
+    "scientificName": "Ocimum basilicum var. purpurascens",
+    "type": [
+      "aromatic",
+      "ornamental"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 18,
+    "harvestDays": 25,
+    "soilType": "Suelo fértil, bien drenado",
+    "waterPerKg": 900,
+    "benefits": [
+      "Guarnición culinaria",
+      "Colorante natural",
+      "Belleza ornamental",
+      "Repelente plagas"
+    ],
+    "size": 0.18
+  },
+  {
+    "species": "Orégano Cubano",
+    "scientificName": "Coleus amboinicus",
+    "type": [
+      "aromatic",
+      "medicinal"
+    ],
+    "sunRequirement": "medium",
+    "weeklyWatering": 12,
+    "harvestDays": 53,
+    "soilType": "Suelo fértil, bien drenado",
+    "waterPerKg": 700,
+    "benefits": [
+      "Condimento culinario",
+      "Salud respiratoria",
+      "Cicatrización heridas",
+      "Ambientador natural"
+    ],
+    "size": 0.22
+  },
+  {
+    "species": "Papalo",
+    "scientificName": "Porophyllum ruderale",
+    "type": [
+      "aromatic",
+      "medicinal",
+      "vegetable"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 13,
+    "harvestDays": 75,
+    "soilType": "Suelo promedio, bien drenado; tolerante calor",
+    "waterPerKg": 150,
+    "benefits": [
+      "Ayuda digestiva",
+      "Antiinflamatorio",
+      "Ayuda procesar alimentos grasos",
+      "Uso medicina tradicional"
+    ],
+    "size": 0.17
+  },
+  {
+    "species": "Lavanda",
+    "scientificName": "Lavandula angustifolia",
+    "type": [
+      "aromatic",
+      "medicinal"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 4,
+    "harvestDays": 105,
+    "soilType": "Suelo bien drenado, alcalino",
+    "waterPerKg": 250,
+    "benefits": [
+      "Relajante",
+      "Aromaterapia",
+      "Repelente insectos",
+      "Antiséptico",
+      "Mejora sueño"
+    ],
+    "size": 0.20
+  },
+  {
+    "species": "Citronela",
+    "scientificName": "Cymbopogon winterianus",
+    "type": [
+      "aromatic",
+      "medicinal"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 13,
+    "harvestDays": 105,
+    "soilType": "Suelo bien drenado, fértil",
+    "waterPerKg": 900,
+    "benefits": [
+      "Repelente mosquitos",
+      "Aromaterapia",
+      "Propiedades antisépticas",
+      "Fragancia natural"
+    ],
+    "size": 0.25
+  },
+  {
+    "species": "Ruda",
+    "scientificName": "Ruta graveolens",
+    "type": [
+      "aromatic",
+      "medicinal"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 4,
+    "harvestDays": 105,
+    "soilType": "Suelo bien drenado, pobre",
+    "waterPerKg": 175,
+    "benefits": [
+      "Repelente insectos",
+      "Antiespasmódico",
+      "Antiinflamatorio",
+      "Uso tradicional"
+    ],
+    "size": 0.15
+  },
+  {
+    "species": "Jengibre",
+    "scientificName": "Zingiber officinale",
+    "type": [
+      "aromatic",
+      "medicinal"
+    ],
+    "sunRequirement": "medium",
+    "weeklyWatering": 18,
+    "harvestDays": 270,
+    "soilType": "Suelo rico, húmedo, bien drenado",
+    "waterPerKg": 1750,
+    "benefits": [
+      "Antiinflamatorio",
+      "Digestivo",
+      "Náuseas",
+      "Circulación",
+      "Antioxidante",
+      "Saborizante"
+    ],
+    "size": 0.25
+  },
+  {
+    "species": "Estrella Egipcia",
+    "scientificName": "Pentas lanceolata",
+    "type": [
+      "ornamental"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 18,
+    "harvestDays": 75,
+    "soilType": "Suelo bien drenado, ligeramente ácido",
+    "waterPerKg": 18,
+    "benefits": [
+      "Flores continuas forma estrella",
+      "Atrae mariposas y colibríes",
+      "Tolerante calor",
+      "Largo período floración"
+    ],
+    "size": 0.20
+  },
+  {
+    "species": "Cóleo",
+    "scientificName": "Coleus scutellarioides",
+    "type": [
+      "ornamental"
+    ],
+    "sunRequirement": "medium",
+    "weeklyWatering": 13,
+    "harvestDays": 53,
+    "soilType": "Suelo húmedo, bien drenado",
+    "waterPerKg": 15,
+    "benefits": [
+      "Follaje colorido anual",
+      "Tolerante sombra",
+      "Fácil propagación",
+      "Resistente plagas"
+    ],
+    "size": 0.15
+  },
+  {
+    "species": "Corazón de Jesús",
+    "scientificName": "Caladium bicolor",
+    "type": [
+      "ornamental"
+    ],
+    "sunRequirement": "low",
+    "weeklyWatering": 13,
+    "harvestDays": 83,
+    "soilType": "Suelo rico, bien drenado",
+    "waterPerKg": 23,
+    "benefits": [
+      "Hojas coloridas forma corazón",
+      "Prospera en sombra",
+      "Apariencia tropical",
+      "Tolerante calor"
+    ],
+    "size": 0.20
+  },
+  {
+    "species": "Llama del Bosque",
+    "scientificName": "Ixora coccinea",
+    "type": [
+      "ornamental"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 18,
+    "harvestDays": 105,
+    "soilType": "Suelo bien drenado, ligeramente ácido",
+    "waterPerKg": 20,
+    "benefits": [
+      "Flores anuales",
+      "Grupos compactos flores",
+      "Follaje perenne brillante",
+      "Atrae mariposas"
+    ],
+    "size": 0.23
+  },
+  {
+    "species": "Alegría",
+    "scientificName": "Impatiens walleriana",
+    "type": [
+      "ornamental"
+    ],
+    "sunRequirement": "low",
+    "weeklyWatering": 18,
+    "harvestDays": 68,
+    "soilType": "Suelo húmedo, bien drenado",
+    "waterPerKg": 28,
+    "benefits": [
+      "Flores continuas",
+      "Amante sombra",
+      "Flores autolimpiantes",
+      "Atrae colibríes"
+    ],
+    "size": 0.15
+  },
+  {
+    "species": "Bromelia",
+    "scientificName": "Guzmania lingulata",
+    "type": [
+      "ornamental"
+    ],
+    "sunRequirement": "medium",
+    "weeklyWatering": 8,
+    "harvestDays": 730,
+    "soilType": "Mezcla bien drenante, base corteza",
+    "waterPerKg": 10,
+    "benefits": [
+      "Forma arquitectónica",
+      "Brácteas coloridas",
+      "Bajo mantenimiento",
+      "Naturaleza epífita"
+    ],
+    "size": 0.20
+  },
+  {
+    "species": "Vicaria",
+    "scientificName": "Catharanthus roseus",
+    "type": [
+      "ornamental",
+      "medicinal"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 13,
+    "harvestDays": 70,
+    "soilType": "Suelo arenoso, bien drenado",
+    "waterPerKg": 13,
+    "benefits": [
+      "Tolerante calor y sequía",
+      "Flores continuas",
+      "Follaje brillante",
+      "Resistente plagas"
+    ],
+    "size": 0.18
+  },
+  {
+    "species": "Begonia",
+    "scientificName": "Begonia semperflorens",
+    "type": [
+      "ornamental"
+    ],
+    "sunRequirement": "medium",
+    "weeklyWatering": 13,
+    "harvestDays": 83,
+    "soilType": "Suelo rico orgánico, bien drenado",
+    "waterPerKg": 23,
+    "benefits": [
+      "Colores flores diversos",
+      "Follaje atractivo",
+      "Tolerante sombra",
+      "Amigable contenedores"
+    ],
+    "size": 0.20
+  },
+  {
+    "species": "Lantana Enana",
+    "scientificName": "Lantana camara",
+    "type": [
+      "ornamental"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 13,
+    "harvestDays": 105,
+    "soilType": "Suelo bien drenado, tolera suelos pobres",
+    "waterPerKg": 10,
+    "benefits": [
+      "Tolerante sequía",
+      "Atrae mariposas",
+      "Resistente calor",
+      "Flores continuas",
+      "Resistente plagas"
+    ],
+    "size": 0.23
+  },
+  {
+    "species": "Torenia",
+    "scientificName": "Torenia fournieri",
+    "type": [
+      "ornamental"
+    ],
+    "sunRequirement": "medium",
+    "weeklyWatering": 18,
+    "harvestDays": 73,
+    "soilType": "Suelo húmedo, bien drenado",
+    "waterPerKg": 20,
+    "benefits": [
+      "Flores forma única",
+      "Tolerante sombra",
+      "Tolerante calor",
+      "Flores continuas",
+      "Crecimiento compacto"
+    ],
+    "size": 0.18
+  },
+  {
+    "species": "Flor de Muerto",
+    "scientificName": "Tagetes patula",
+    "type": [
+      "ornamental"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 13,
+    "harvestDays": 53,
+    "soilType": "Suelo bien drenado, promedio",
+    "waterPerKg": 350,
+    "benefits": [
+      "Repelente plagas natural",
+      "Flores vibrantes",
+      "Tolerante sequía",
+      "Fácil cultivo"
+    ],
+    "size": 0.15
+  },
+  {
+    "species": "Albahaca Limón",
+    "scientificName": "Ocimum x citriodorum",
+    "type": [
+      "aromatic",
+      "medicinal"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 18,
+    "harvestDays": 26,
+    "soilType": "Suelo fértil, bien drenado",
+    "waterPerKg": 900,
+    "benefits": [
+      "Aroma cítrico",
+      "Repelente mosquitos",
+      "Uso culinario",
+      "Propiedades calmantes"
+    ],
+    "size": 0.18
+  },
+  {
+    "species": "Acelga",
+    "scientificName": "Beta vulgaris var. cicla",
+    "type": [
+      "vegetable"
+    ],
+    "sunRequirement": "medium",
+    "weeklyWatering": 18,
+    "harvestDays": 55,
+    "soilType": "Suelo rico, bien drenado",
+    "waterPerKg": 450,
+    "benefits": [
+      "Alto hierro",
+      "Vitaminas A, C, K",
+      "Magnesio",
+      "Antioxidantes",
+      "Fibra"
+    ],
+    "size": 0.20
+  },
+  {
+    "species": "Flor de Jamaica",
+    "scientificName": "Hibiscus sabdariffa",
+    "type": [
+      "medicinal",
+      "ornamental"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 18,
+    "harvestDays": 105,
+    "soilType": "Suelo bien drenado, fértil",
+    "waterPerKg": 2500,
+    "benefits": [
+      "Antioxidante",
+      "Reduce presión arterial",
+      "Vitamina C",
+      "Diurético natural",
+      "Flores ornamentales"
+    ],
+    "size": 0.25
+  },
+  {
+    "species": "Cedrón",
+    "scientificName": "Aloysia citriodora",
+    "type": [
+      "aromatic",
+      "medicinal"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 9,
+    "harvestDays": 75,
+    "soilType": "Suelo bien drenado, promedio",
+    "waterPerKg": 500,
+    "benefits": [
+      "Té relajante",
+      "Digestivo",
+      "Aroma limón",
+      "Repelente insectos",
+      "Antiespasmódico"
+    ],
+    "size": 0.20
+  },
+  {
+    "species": "Manzanilla",
+    "scientificName": "Matricaria chamomilla",
+    "type": [
+      "medicinal",
+      "aromatic"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 9,
+    "harvestDays": 70,
+    "soilType": "Suelo bien drenado, pobre",
+    "waterPerKg": 500,
+    "benefits": [
+      "Calmante",
+      "Digestivo",
+      "Antiinflamatorio",
+      "Mejora sueño",
+      "Cuidado piel"
+    ],
+    "size": 0.15
+  },
+  {
+    "species": "Zinnia",
+    "scientificName": "Zinnia elegans",
+    "type": [
+      "ornamental"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 13,
+    "harvestDays": 68,
+    "soilType": "Suelo bien drenado, fértil",
+    "waterPerKg": 500,
+    "benefits": [
+      "Flores coloridas",
+      "Fácil cultivo",
+      "Tolerante calor",
+      "Atrae mariposas",
+      "Larga duración"
+    ],
+    "size": 0.18
+  },
+  {
+    "species": "Apio",
+    "scientificName": "Apium graveolens",
+    "type": [
+      "vegetable",
+      "medicinal"
+    ],
+    "sunRequirement": "medium",
+    "weeklyWatering": 23,
+    "harvestDays": 105,
+    "soilType": "Suelo rico, húmedo, bien drenado",
+    "waterPerKg": 1250,
+    "benefits": [
+      "Bajo calorías",
+      "Vitaminas K, C",
+      "Folato",
+      "Potasio",
+      "Antioxidantes",
+      "Diurético"
+    ],
+    "size": 0.20
+  },
+  {
+    "species": "Caléndula",
+    "scientificName": "Calendula officinalis",
+    "type": [
+      "medicinal",
+      "ornamental"
+    ],
+    "sunRequirement": "high",
+    "weeklyWatering": 13,
+    "harvestDays": 60,
+    "soilType": "Suelo bien drenado, promedio",
+    "waterPerKg": 500,
+    "benefits": [
+      "Cicatrizante",
+      "Antiinflamatorio",
+      "Cuidado piel",
+      "Flores comestibles",
+      "Repelente plagas"
+    ],
+    "size": 0.15
+  },
+  {
+    "species": "Espinaca de Nueva Zelanda",
+    "scientificName": "Tetragonia tetragonioides",
+    "type": [
+      "vegetable"
+    ],
+    "sunRequirement": "medium",
+    "weeklyWatering": 18,
+    "harvestDays": 63,
+    "soilType": "Suelo bien drenado, tolera salinidad",
+    "waterPerKg": 700,
+    "benefits": [
+      "Tolerante calor",
+      "Vitaminas A, C",
+      "Hierro",
+      "Calcio",
+      "Oxalatos bajos",
+      "Resistente sequía"
+    ],
+    "size": 0.22
+  }
+]
