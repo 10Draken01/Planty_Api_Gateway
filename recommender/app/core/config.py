@@ -7,8 +7,8 @@ class Settings(BaseSettings):
     """Configuración global del servicio."""
 
     # MongoDB
-    MONGO_URI: str = "mongodb://admin:password123@localhost:27017/plantgen?authSource=admin"
-    MONGO_DB_NAME: str = "plantgen"
+    MONGO_URI: str
+    MONGO_DB_NAME: str = "users_db"
 
     # External Services
     AG_SERVICE_URL: str = "http://localhost:3005/v1"
@@ -33,13 +33,13 @@ class Settings(BaseSettings):
     MODEL_VERSION: str = "v1"
 
     # Security
-    JWT_SECRET_KEY: str = "your-secret-key-change-this-in-production"
+    JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRE_MINUTES: int = 30
 
     # API
     API_PORT: int = 8000
-    API_HOST: str = "0.0.0.0"
+    API_HOST: str = "127.0.0.1"
     WORKERS: int = 4
 
     # Logging

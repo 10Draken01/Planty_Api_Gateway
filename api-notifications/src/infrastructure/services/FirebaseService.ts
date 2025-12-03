@@ -151,7 +151,7 @@ export class FirebaseService {
       );
 
       // Procesar resultados individuales
-      const results: SendNotificationResult[] = response.responses.map((res, index) => {
+      const results: SendNotificationResult[] = response.responses.map((res) => {
         if (res.success) {
           return {
             success: true,

@@ -38,8 +38,8 @@ Microservicio de recomendaciones de huertos mediante **Clustering No Supervisado
 
 ```bash
 cd recommender
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+python -m .venv .venv
+source .venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 

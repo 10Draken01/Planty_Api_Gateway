@@ -7,6 +7,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.services.feature_pipeline import FeaturePipeline
+from app.services.notifications_client import notifications_client
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +81,25 @@ async def handle_user_registered(db: AsyncIOMotorDatabase, user_id: str):
     # Obtener recomendaciones inmediatas
     recommendations = await get_recommendations_for_user(db, user_id, limit=3)
 
-    # Enviar notificación (implementar con HTTP client a notifications service)
+    # Enviar notificación al usuario
+    if recommendations['recommendations']:
+        try:
+            top_recommendations = recommendations['recommendations'][:3]
+            orchard_names = ", ".join([r['name'] for r in top_recommendations])
+
+            await notifications_client.send_to_user(
+                user_id=user_id,
+                title="¡Bienvenido a PlantGen! 🌱",
+                body=f"Descubre estos huertos recomendados para ti: {orchard_names}",
+                data={
+                    "type": "new_user_recommendations",
+                    "recommendations": top_recommendations
+                }
+            )
+            logger.info(f"Notification sent to new user {user_id}")
+        except Exception as e:
+            logger.error(f"Failed to send notification to user {user_id}: {e}")
+
     logger.info(f"Generated {len(recommendations['recommendations'])} recommendations for new user {user_id}")
 
     return recommendations
@@ -92,15 +111,38 @@ async def notify_cluster(db: AsyncIOMotorDatabase, cluster_id: int) -> Dict[str,
     users = await users_cursor.to_list(length=None)
 
     notified = 0
+    failed = 0
+
     for user in users:
         try:
-            await handle_user_registered(db, str(user['_id']))
-            notified += 1
+            user_id = str(user['_id'])
+            # Generar recomendaciones para este usuario
+            recommendations = await get_recommendations_for_user(db, user_id, limit=5)
+
+            if recommendations['recommendations']:
+                top_recommendations = recommendations['recommendations'][:3]
+                orchard_names = ", ".join([r['name'] for r in top_recommendations])
+
+                # Enviar notificación
+                await notifications_client.send_to_user(
+                    user_id=user_id,
+                    title="Nuevas recomendaciones de huertos 🌿",
+                    body=f"Descubre estos huertos: {orchard_names}",
+                    data={
+                        "type": "cluster_recommendations",
+                        "cluster_id": cluster_id,
+                        "recommendations": top_recommendations
+                    }
+                )
+                notified += 1
+                logger.info(f"Notified user {user_id} in cluster {cluster_id}")
         except Exception as e:
-            logger.error(f"Failed to notify user {user['_id']}: {e}")
+            failed += 1
+            logger.error(f"Failed to notify user {user.get('_id')}: {e}")
 
     return {
         "cluster_id": cluster_id,
         "users_notified": notified,
+        "users_failed": failed,
         "total_users": len(users)
     }

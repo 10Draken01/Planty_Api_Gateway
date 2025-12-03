@@ -52,7 +52,7 @@ export class UsersServiceClient {
    */
   async getUserById(userId: string): Promise<UserDTO | null> {
     try {
-      const response = await this.axiosInstance.get(`/${userId}`);
+      const response = await this.axiosInstance.get(`/api/${userId}`);
 
       if (response.data && response.data.data) {
         return response.data.data;
@@ -131,7 +131,7 @@ export class UsersServiceClient {
   async healthCheck(): Promise<boolean> {
     try {
       // Intentar hacer un ping al Users Service
-      const response = await this.axiosInstance.get('/health', {
+      const response = await this.axiosInstance.get('/api/health', {
         timeout: 3000,
       });
 
