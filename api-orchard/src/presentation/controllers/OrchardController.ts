@@ -7,6 +7,7 @@ import { Request, Response } from 'express';
 import { CreateOrchardUseCase } from '@application/use-cases/CreateOrchardUseCase';
 import { GetOrchardUseCase } from '@application/use-cases/GetOrchardUseCase';
 import { ListOrchardsUseCase } from '@application/use-cases/ListOrchardsUseCase';
+import { GetOrchardsByUserUseCase } from '@application/use-cases/GetOrchardsByUserUseCase';
 import { UpdateOrchardUseCase } from '@application/use-cases/UpdateOrchardUseCase';
 import { DeleteOrchardUseCase } from '@application/use-cases/DeleteOrchardUseCase';
 import { ToggleOrchardStateUseCase } from '@application/use-cases/ToggleOrchardStateUseCase';
@@ -17,6 +18,7 @@ export class OrchardController {
     private createOrchardUseCase: CreateOrchardUseCase,
     private getOrchardUseCase: GetOrchardUseCase,
     private listOrchardsUseCase: ListOrchardsUseCase,
+    private getOrchardsByUserUseCase: GetOrchardsByUserUseCase,
     private updateOrchardUseCase: UpdateOrchardUseCase,
     private deleteOrchardUseCase: DeleteOrchardUseCase,
     private toggleOrchardStateUseCase: ToggleOrchardStateUseCase,
@@ -96,6 +98,28 @@ export class OrchardController {
       res.status(400).json({
         success: false,
         error: error instanceof Error ? error.message : 'Error al listar huertos'
+      });
+    }
+  }
+
+  /**
+   * GET /orchards/user/:userId
+   * Obtener todos los huertos de un usuario específico
+   */
+  async getByUserId(req: Request, res: Response): Promise<void> {
+    try {
+      const { userId } = req.params;
+      const result = await this.getOrchardsByUserUseCase.execute(userId);
+
+      res.status(200).json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      console.error('Error al obtener huertos del usuario:', error);
+      res.status(400).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Error al obtener huertos del usuario'
       });
     }
   }

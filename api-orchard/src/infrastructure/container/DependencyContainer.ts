@@ -9,6 +9,7 @@ import { MongoOrchardRepository } from '../repositories/MongoOrchardRepository';
 import { CreateOrchardUseCase } from '@application/use-cases/CreateOrchardUseCase';
 import { GetOrchardUseCase } from '@application/use-cases/GetOrchardUseCase';
 import { ListOrchardsUseCase } from '@application/use-cases/ListOrchardsUseCase';
+import { GetOrchardsByUserUseCase } from '@application/use-cases/GetOrchardsByUserUseCase';
 import { UpdateOrchardUseCase } from '@application/use-cases/UpdateOrchardUseCase';
 import { DeleteOrchardUseCase } from '@application/use-cases/DeleteOrchardUseCase';
 import { ToggleOrchardStateUseCase } from '@application/use-cases/ToggleOrchardStateUseCase';
@@ -27,6 +28,7 @@ export class DependencyContainer {
   private createOrchardUseCase!: CreateOrchardUseCase;
   private getOrchardUseCase!: GetOrchardUseCase;
   private listOrchardsUseCase!: ListOrchardsUseCase;
+  private getOrchardsByUserUseCase!: GetOrchardsByUserUseCase;
   private updateOrchardUseCase!: UpdateOrchardUseCase;
   private deleteOrchardUseCase!: DeleteOrchardUseCase;
   private toggleOrchardStateUseCase!: ToggleOrchardStateUseCase;
@@ -57,6 +59,7 @@ export class DependencyContainer {
       this.createOrchardUseCase = new CreateOrchardUseCase(this.orchardRepository);
       this.getOrchardUseCase = new GetOrchardUseCase(this.orchardRepository);
       this.listOrchardsUseCase = new ListOrchardsUseCase(this.orchardRepository);
+      this.getOrchardsByUserUseCase = new GetOrchardsByUserUseCase(this.orchardRepository);
       this.updateOrchardUseCase = new UpdateOrchardUseCase(this.orchardRepository);
       this.deleteOrchardUseCase = new DeleteOrchardUseCase(this.orchardRepository);
       this.toggleOrchardStateUseCase = new ToggleOrchardStateUseCase(this.orchardRepository);
@@ -68,6 +71,7 @@ export class DependencyContainer {
         this.createOrchardUseCase,
         this.getOrchardUseCase,
         this.listOrchardsUseCase,
+        this.getOrchardsByUserUseCase,
         this.updateOrchardUseCase,
         this.deleteOrchardUseCase,
         this.toggleOrchardStateUseCase,
@@ -104,6 +108,7 @@ export class DependencyContainer {
         health: '/orchards/health',
         create: 'POST /orchards',
         list: 'GET /orchards',
+        getByUserId: 'GET /orchards/user/:userId',
         getById: 'GET /orchards/:id',
         update: 'PUT /orchards/:id',
         delete: 'DELETE /orchards/:id',

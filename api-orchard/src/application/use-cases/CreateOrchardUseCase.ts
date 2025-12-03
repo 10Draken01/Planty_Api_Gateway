@@ -11,6 +11,10 @@ export class CreateOrchardUseCase {
 
   async execute(dto: CreateOrchardDTO): Promise<OrchardInfoDTO> {
     // Validaciones
+    if (!dto.userId || dto.userId.trim().length === 0) {
+      throw new Error('El ID del usuario es requerido');
+    }
+
     if (!dto.name || dto.name.trim().length === 0) {
       throw new Error('El nombre del huerto es requerido');
     }
@@ -31,6 +35,7 @@ export class CreateOrchardUseCase {
 
     // Crear la entidad
     const orchard = Orchard.create({
+      userId: dto.userId,
       name: dto.name,
       description: dto.description,
       plants_id: dto.plants_id || [],
@@ -49,6 +54,7 @@ export class CreateOrchardUseCase {
   private toDTO(orchard: Orchard): OrchardInfoDTO {
     return {
       _id: orchard.id,
+      userId: orchard.userId,
       name: orchard.name,
       description: orchard.description,
       plants_id: orchard.plants_id,

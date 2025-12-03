@@ -16,6 +16,7 @@ export class OrchardRoutes {
     // CRUD básico
     router.post('/', (req, res) => orchardController.create(req, res));
     router.get('/', (req, res) => orchardController.list(req, res));
+    router.get('/user/:userId', (req, res) => orchardController.getByUserId(req, res));
     router.get('/:id', (req, res) => orchardController.getById(req, res));
     router.put('/:id', (req, res) => orchardController.update(req, res));
     router.delete('/:id', (req, res) => orchardController.delete(req, res));

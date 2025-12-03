@@ -30,6 +30,7 @@ export class GetOrchardUseCase {
   private toDTO(orchard: Orchard): OrchardInfoDTO {
     return {
       _id: orchard.id,
+      userId: orchard.userId,
       name: orchard.name,
       description: orchard.description,
       plants_id: orchard.plants_id,

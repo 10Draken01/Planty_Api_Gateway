@@ -2,18 +2,67 @@
  * Implementación del Repositorio de Orchards con MongoDB
  */
 
-import { Collection, ObjectId } from 'mongodb';
+import { Collection } from 'mongodb';
 import { Orchard, OrchardProps } from '@domain/entities/Orchard';
 import { OrchardRepository } from '@domain/repositories/OrchardRepository';
 import { MongoDBConnection } from '../database/MongoDBConnection';
 
 export class MongoOrchardRepository implements OrchardRepository {
-  private collection: Collection;
+  private collection: Collection<any>;
   private readonly COLLECTION_NAME = 'orchards';
+  private indexesCreated: boolean = false;
 
   constructor(dbConnection: MongoDBConnection) {
     const db = dbConnection.getDatabase();
     this.collection = db.collection(this.COLLECTION_NAME);
+    this.ensureIndexes();
+  }
+
+  /**
+   * Crea los índices necesarios en la colección
+   */
+  private async ensureIndexes(): Promise<void> {
+    if (this.indexesCreated) {
+      return;
+    }
+
+    try {
+      // Índice único en _id (MongoDB lo crea automáticamente, pero lo documentamos)
+      // await this.collection.createIndex({ _id: 1 }, { unique: true });
+
+      // Índice en userId para búsquedas por usuario
+      await this.collection.createIndex(
+        { userId: 1 },
+        {
+          name: 'idx_userId',
+          background: true
+        }
+      );
+
+      // Índice compuesto: userId + state (para filtrar huertos activos/inactivos de un usuario)
+      await this.collection.createIndex(
+        { userId: 1, state: 1 },
+        {
+          name: 'idx_userId_state',
+          background: true
+        }
+      );
+
+      // Índice en createAt para ordenamiento
+      await this.collection.createIndex(
+        { createAt: -1 },
+        {
+          name: 'idx_createAt',
+          background: true
+        }
+      );
+
+      this.indexesCreated = true;
+      console.log('✓ Índices de MongoDB creados para la colección orchards');
+    } catch (error) {
+      console.error('⚠ Error al crear índices (puede que ya existan):', error);
+      // No lanzamos error para no interrumpir la ejecución
+    }
   }
 
   async save(orchard: Orchard): Promise<Orchard> {
@@ -98,6 +147,20 @@ export class MongoOrchardRepository implements OrchardRepository {
     } catch (error) {
       console.error('Error al buscar huertos inactivos:', error);
       throw new Error('No se pudo buscar los huertos inactivos');
+    }
+  }
+
+  async findByUserId(userId: string): Promise<Orchard[]> {
+    try {
+      const docs = await this.collection
+        .find({ userId: userId })
+        .sort({ createAt: -1 })
+        .toArray();
+
+      return docs.map(doc => Orchard.fromPersistence(doc as OrchardProps));
+    } catch (error) {
+      console.error('Error al buscar huertos por userId:', error);
+      throw new Error('No se pudo buscar los huertos del usuario');
     }
   }
 

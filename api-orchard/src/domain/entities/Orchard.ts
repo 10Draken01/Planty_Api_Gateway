@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export interface OrchardProps {
   _id: string;
+  userId: string;
   name: string;
   description: string;
   plants_id: string[];
@@ -28,6 +29,10 @@ export class Orchard {
    */
   static create(data: Omit<OrchardProps, '_id' | 'createAt' | 'updateAt' | 'timeOfLife' | 'streakOfDays' | 'countPlants'>): Orchard {
     // Validaciones de negocio
+    if (!data.userId || data.userId.trim().length === 0) {
+      throw new Error('El ID del usuario es requerido');
+    }
+
     if (!data.name || data.name.trim().length === 0) {
       throw new Error('El nombre del huerto es requerido');
     }
@@ -40,6 +45,7 @@ export class Orchard {
 
     return new Orchard({
       _id: uuidv4(),
+      userId: data.userId.trim(),
       name: data.name.trim(),
       description: data.description.trim(),
       plants_id: data.plants_id || [],
@@ -64,6 +70,10 @@ export class Orchard {
   // Getters
   get id(): string {
     return this.props._id;
+  }
+
+  get userId(): string {
+    return this.props.userId;
   }
 
   get name(): string {
@@ -244,6 +254,7 @@ export class Orchard {
   toJSON(): OrchardProps {
     return {
       _id: this.props._id,
+      userId: this.props.userId,
       name: this.props.name,
       description: this.props.description,
       plants_id: [...this.props.plants_id],

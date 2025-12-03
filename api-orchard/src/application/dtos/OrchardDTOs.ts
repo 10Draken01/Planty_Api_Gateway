@@ -4,6 +4,7 @@
 
 // DTO para crear un nuevo huerto
 export interface CreateOrchardDTO {
+  userId: string;
   name: string;
   description: string;
   plants_id?: string[];
@@ -28,6 +29,7 @@ export interface AddPlantDTO {
 // DTO de respuesta con información del huerto
 export interface OrchardInfoDTO {
   _id: string;
+  userId: string;
   name: string;
   description: string;
   plants_id: string[];

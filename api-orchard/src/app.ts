@@ -170,7 +170,7 @@ class OrchardApp {
   private async checkExternalServices(): Promise<void> {
     console.log('🔍 Verificando servicios externos...');
 
-    const services = await this.container.checkServices();
+    const services = await this.container.checkServices() as { mongodb: boolean };
 
     console.log(`  - MongoDB: ${services.mongodb ? '✓' : '✗'}`);
 

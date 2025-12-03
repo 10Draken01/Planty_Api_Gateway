@@ -1,27 +1,23 @@
 /**
- * Caso de Uso: Listar Huertos
+ * Caso de Uso: Obtener Huertos por Usuario
  */
 
 import { Orchard } from '@domain/entities/Orchard';
 import { OrchardRepository } from '@domain/repositories/OrchardRepository';
 import { OrchardListDTO, OrchardInfoDTO } from '../dtos/OrchardDTOs';
 
-export class ListOrchardsUseCase {
+export class GetOrchardsByUserUseCase {
   constructor(private orchardRepository: OrchardRepository) {}
 
-  async execute(activeOnly?: boolean): Promise<OrchardListDTO> {
-    let orchards: Orchard[];
-
-    if (activeOnly === true) {
-      orchards = await this.orchardRepository.findActive();
-    } else if (activeOnly === false) {
-      orchards = await this.orchardRepository.findInactive();
-    } else {
-      orchards = await this.orchardRepository.findAll();
+  async execute(userId: string): Promise<OrchardListDTO> {
+    if (!userId || userId.trim().length === 0) {
+      throw new Error('El ID del usuario es requerido');
     }
 
-    const total = await this.orchardRepository.count();
-    const active = await this.orchardRepository.countActive();
+    const orchards = await this.orchardRepository.findByUserId(userId);
+
+    const total = orchards.length;
+    const active = orchards.filter(o => o.state).length;
 
     return {
       orchards: orchards.map(o => this.toDTO(o)),

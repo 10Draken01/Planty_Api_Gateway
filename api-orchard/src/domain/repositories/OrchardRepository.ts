@@ -37,6 +37,11 @@ export interface OrchardRepository {
   findInactive(): Promise<Orchard[]>;
 
   /**
+   * Obtiene todos los huertos de un usuario específico
+   */
+  findByUserId(userId: string): Promise<Orchard[]>;
+
+  /**
    * Actualiza un huerto existente
    */
   update(orchard: Orchard): Promise<Orchard>;
