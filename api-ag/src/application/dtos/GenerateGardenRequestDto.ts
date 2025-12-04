@@ -2,34 +2,34 @@ import Joi from 'joi';
 
 export interface GenerateGardenRequestDto {
   userId?: string;
-  desiredPlants?: string[]; // Lista de plantas deseadas por el usuario
-  maxPlantSpecies?: 3 | 5; // NUEVO: Máximo de especies simultáneas (3 o 5)
+  desiredPlantIds?: number[]; // MEJORADO: IDs de plantas deseadas (se consultan en BD)
+  maxPlantSpecies?: 3 | 5; // Máximo de especies simultáneas (default: 5)
   dimensions?: {
-    width: number;
-    height: number;
+    width: number;  // Ancho en metros
+    height: number; // Alto en metros
   };
-  waterLimit?: number;
-  userExperience?: 1 | 2 | 3;
+  waterLimit?: number; // Litros de agua disponibles por semana
+  userExperience?: 1 | 2 | 3; // 1=Principiante, 2=Intermedio, 3=Avanzado
   season?: 'auto' | 'spring' | 'summer' | 'autumn' | 'winter';
   location?: {
-    lat: number;
-    lon: number;
+    lat: number;  // Latitud
+    lon: number;  // Longitud
   };
   categoryDistribution?: {
-    vegetable?: number;
-    medicinal?: number;
-    ornamental?: number;
-    aromatic?: number;
+    vegetable?: number;   // Porcentaje deseado (0-100)
+    medicinal?: number;   // Porcentaje deseado (0-100)
+    ornamental?: number;  // Porcentaje deseado (0-100)
+    aromatic?: number;    // Porcentaje deseado (0-100)
   };
-  budget?: number;
+  budget?: number; // Presupuesto en MXN
   objective?: 'alimenticio' | 'medicinal' | 'sostenible' | 'ornamental';
-  maintenanceMinutes?: number;
+  maintenanceMinutes?: number; // Minutos disponibles por semana para mantenimiento
 }
 
 export const generateGardenRequestSchema = Joi.object({
   userId: Joi.string().optional(),
-  desiredPlants: Joi.array().items(Joi.string()).optional(),
-  maxPlantSpecies: Joi.number().valid(3, 5).optional(), // NUEVO
+  desiredPlantIds: Joi.array().items(Joi.number().integer().positive()).optional(), // MEJORADO
+  maxPlantSpecies: Joi.number().valid(3, 5).optional(),
   dimensions: Joi.object({
     width: Joi.number().min(0.5).max(10),
     height: Joi.number().min(0.5).max(10),

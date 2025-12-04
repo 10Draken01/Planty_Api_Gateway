@@ -1,27 +1,42 @@
 // Repositories
 import { MongoUserRepository } from '../../infrastructure/repositories/MongoUserRepository';
+import { MongoConversationRepository } from '../../infrastructure/repositories/MongoConversationRepository';
+import { MongoUserMemoryRepository } from '../../infrastructure/repositories/MongoUserMemoryRepository';
 
 // Use Cases
 import { CreateUserUseCase } from '../../application/use-cases/CreateUserUseCase';
 import { GetUserByIdUseCase } from '../../application/use-cases/GetUserByIdUseCase';
 import { GetUserByEmailUseCase } from '../../application/use-cases/GetUserByEmailUseCase';
 import { UpdateUserByIdUseCase } from '../../application/use-cases/UpdateUserByIdUseCase';
-import { DeleteUserByIdUseCase } from '../../application/use-cases/DeleteUserByIdUseCase'; 
+import { DeleteUserByIdUseCase } from '../../application/use-cases/DeleteUserByIdUseCase';
+
+// Services
+import { MemoryService } from '../../application/services/MemoryService';
 
 // Controllers
 import { UserController } from '../../presentation/controllers/UserController';
+import { MemoryController } from '../../presentation/controllers/MemoryController';
 
 // Routes
 import { UserRoutes } from '../../presentation/routes/UserRoutes';
+import { MemoryRoutes } from '../../presentation/routes/MemoryRoutes';
 import { DatabaseConnection } from '../database/DatabaseConnection';
+import { Router } from 'express';
 export class DependencyContainer {
+  // Repositories
   private userRepository: MongoUserRepository;
+  private conversationRepository: MongoConversationRepository;
+  private userMemoryRepository: MongoUserMemoryRepository;
 
+  // Use Cases
   private createUserUseCase: CreateUserUseCase
   private getUserByIdUseCase: GetUserByIdUseCase
   private getUserByEmailUseCase: GetUserByEmailUseCase
   private updateUserByIdUseCase: UpdateUserByIdUseCase
   private deleteUserByIdUseCase: DeleteUserByIdUseCase
+
+  // Services
+  private memoryService: MemoryService;
 
 
   constructor(
@@ -37,7 +52,16 @@ export class DependencyContainer {
     );
 
     this.userRepository = new MongoUserRepository();
-    
+    this.conversationRepository = new MongoConversationRepository();
+    this.userMemoryRepository = new MongoUserMemoryRepository();
+
+    // Services
+    this.memoryService = new MemoryService(
+      this.conversationRepository,
+      this.userMemoryRepository,
+      this.userRepository
+    );
+
     // Use Cases
     this.createUserUseCase = new CreateUserUseCase(
       this.userRepository
@@ -78,8 +102,16 @@ export class DependencyContainer {
       this.updateUserByIdUseCase,
       this.deleteUserByIdUseCase
     );
-    
+
     // Routes
     return new UserRoutes(userController);
+  }
+
+  createMemoryRoutes(): Router {
+    // Controller con el servicio de memoria
+    const memoryController = new MemoryController(this.memoryService);
+
+    // Routes
+    return MemoryRoutes.create(memoryController);
   }
 }

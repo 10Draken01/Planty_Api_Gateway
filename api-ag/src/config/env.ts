@@ -32,6 +32,8 @@ interface EnvironmentConfig {
     maxGenerations: number;
     crossoverProbability: number;
     mutationRate: number;
+    insertionRate: number;
+    deletionRate: number;
     tournamentK: number;
     eliteCount: number;
     patience: number;
@@ -91,6 +93,8 @@ export const env: EnvironmentConfig = {
     maxGenerations: getNumberEnvVar('AG_MAX_GENERATIONS', 150),
     crossoverProbability: getNumberEnvVar('AG_CROSSOVER_PROBABILITY', 0.85),
     mutationRate: getNumberEnvVar('AG_MUTATION_RATE', 0.08),
+    insertionRate: parseFloat(process.env.AG_INSERTION_RATE || '0.1'), 
+    deletionRate: parseFloat(process.env.AG_DELETION_RATE || '0.05'), 
     tournamentK: getNumberEnvVar('AG_TOURNAMENT_K', 3),
     eliteCount: getNumberEnvVar('AG_ELITE_COUNT', 3),
     patience: getNumberEnvVar('AG_PATIENCE', 20),

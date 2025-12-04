@@ -37,12 +37,17 @@ export class App {
       res.json({ message: 'Users Microservice funcionando' });
     });
 
-    // User routes
-    const userRoutes = this.dependencyContainer.createUserRoutes();
     this.app.get('/health', (req, res) => {
       res.json({ status: 'ok', service: 'users' });
     });
+
+    // User routes
+    const userRoutes = this.dependencyContainer.createUserRoutes();
     this.app.use('/api', userRoutes.getRouter());
+
+    // Memory routes (for chatbot integration)
+    const memoryRoutes = this.dependencyContainer.createMemoryRoutes();
+    this.app.use('/api/memory', memoryRoutes);
   }
 
   async start(): Promise<void> {

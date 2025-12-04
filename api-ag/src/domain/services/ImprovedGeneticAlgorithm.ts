@@ -29,7 +29,7 @@ export interface ImprovedGAConstraints {
   maxWaterWeekly: number;
   maxBudget?: number;
   desiredCategoryDistribution?: CategoryDistribution;
-  desiredPlantSpecies?: string[]; // NUEVO: lista de plantas deseadas por usuario
+  desiredPlantIds?: number[]; // MEJORADO: IDs de plantas deseadas por usuario
 }
 
 export interface ImprovedGAResult {
@@ -254,7 +254,7 @@ export class ImprovedGeneticAlgorithm {
     objective: Objective
   ): Plant[] {
     const selector = new PlantSelectorService({
-      desiredPlantSpecies: constraints.desiredPlantSpecies,
+      desiredPlantIds: constraints.desiredPlantIds, // MEJORADO: usar IDs
       maxSpecies: this.config.maxSpecies,
       objective,
       compatibilityMatrix: this.fitnessCalculator['config'].compatibilityMatrix,

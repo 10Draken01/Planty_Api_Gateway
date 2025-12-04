@@ -1,7 +1,5 @@
 import { Individual } from '../entities/Individual';
-import { Plant } from '../entities/Plant';
-import { Metrics, MetricsData } from '../value-objects/Metrics';
-import { Position } from '../value-objects/Position';
+import { Metrics } from '../value-objects/Metrics';
 import { CategoryDistribution } from '../value-objects/CategoryDistribution';
 
 export type Objective = 'alimenticio' | 'medicinal' | 'sostenible' | 'ornamental';
@@ -47,21 +45,13 @@ export class ImprovedFitnessCalculator {
     const PSRNT = this.calculatePSRNT(individual);
     const EH = this.calculateEH(individual);
     const UE = this.calculateUE(individual);
-    const CS = this.calculateCS(individual);
-    const BSN = this.calculateBSN(individual);
+    // Nota: CS y BSN se calculan pero no se usan por compatibilidad con Metrics original
+    // const CS = this.calculateCS(individual);
+    // const BSN = this.calculateBSN(individual);
 
     const weights = OBJECTIVE_WEIGHTS[this.config.objective];
 
-    // Calcular fitness ponderado
-    const fitness =
-      CEE * weights.CEE +
-      PSRNT * weights.PSRNT +
-      EH * weights.EH +
-      UE * weights.UE +
-      CS * weights.CS +
-      BSN * weights.BSN;
-
-    return new Metrics({ CEE, PSRNT, EH, UE }, weights, fitness);
+    return new Metrics({ CEE, PSRNT, EH, UE }, weights);
   }
 
   /**

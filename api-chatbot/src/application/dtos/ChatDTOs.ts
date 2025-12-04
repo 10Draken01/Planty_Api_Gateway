@@ -1,5 +1,6 @@
-
 export interface SendMessageDTO {
+  userId: string; // 🆕 REQUERIDO: ID del usuario
+  sessionId?: string; // 🆕 OPCIONAL: ID de sesión (se crea si no existe)
   message: string;
   includeContext?: boolean;
   maxContextChunks?: number;
@@ -14,6 +15,20 @@ export interface ChatResponseDTO {
     score: number;
     metadata?: Record<string, any>;
   }>;
+
+  // 🆕 NUEVOS CAMPOS
+  userContext?: {
+    name: string;
+    experienceLevel: number;
+    activePlants: string[];
+  };
+  conversationContext?: {
+    messageCount: number;
+    tags: string[];
+  };
+  cached?: boolean; // Indica si el embedding vino del cache
+  latencyMs?: number;
+
   timestamp: Date;
 }
 

@@ -1,6 +1,6 @@
 /**
- * Contenedor de Inyección de Dependencias CON MEMORIA
- * Versión mejorada que incluye servicios de memoria e integración con api-users
+ * Contenedor de Inyección de Dependencias
+ * Ensambla todas las dependencias del sistema
  */
 
 import { Router } from 'express';
@@ -13,21 +13,16 @@ import { ChromaVectorRepository } from '../database/ChromaVectorRepository';
 // Services
 import { PDFService } from '../services/PDFService';
 import { TextSplitterService } from '../services/TextSplitterService';
+import { OllamaEmbeddingService } from '../services/OllamaEmbeddingService';
 import { OllamaChatService } from '../services/OllamaChatService';
-
-// 🆕 NUEVOS SERVICIOS CON MEMORIA
-import { CachedOllamaEmbeddingService } from '../services/CachedOllamaEmbeddingService';
-import { UsersServiceClient } from '../external/UsersServiceClient';
 
 // Use Cases
 import { UploadDocumentUseCase } from '@application/use-cases/UploadDocumentUseCase';
 import { ProcessDocumentUseCase } from '@application/use-cases/ProcessDocumentUseCase';
 import { GetDocumentsUseCase } from '@application/use-cases/GetDocumentsUseCase';
 import { DeleteDocumentUseCase } from '@application/use-cases/DeleteDocumentUseCase';
+import { SendMessageUseCase } from '@application/use-cases/SendMessageUseCase';
 import { GetChatHistoryUseCase } from '@application/use-cases/GetChatHistoryUseCase';
-
-// 🆕 NUEVO USE CASE CON MEMORIA
-import { SendMessageWithMemoryUseCase } from '@application/use-cases/SendMessageWithMemoryUseCase';
 
 // Controllers
 import { DocumentController } from '@presentation/controllers/DocumentController';
@@ -46,9 +41,8 @@ export class DependencyContainer {
   // Services
   private pdfService: PDFService;
   private textSplitterService: TextSplitterService;
-  private embeddingService: CachedOllamaEmbeddingService; // 🆕 Con cache
+  private embeddingService: OllamaEmbeddingService;
   private chatService: OllamaChatService;
-  private usersServiceClient: UsersServiceClient; // 🆕 Cliente para api-users
 
   // Use Cases - Documents
   private uploadDocumentUseCase: UploadDocumentUseCase;
@@ -57,7 +51,7 @@ export class DependencyContainer {
   private deleteDocumentUseCase: DeleteDocumentUseCase;
 
   // Use Cases - Chat
-  private sendMessageUseCase: SendMessageWithMemoryUseCase; // 🆕 Con memoria
+  private sendMessageUseCase: SendMessageUseCase;
   private getChatHistoryUseCase: GetChatHistoryUseCase;
 
   // Controllers
@@ -65,8 +59,6 @@ export class DependencyContainer {
   private chatController: ChatController;
 
   constructor() {
-    console.log('🚀 Inicializando DependencyContainer CON MEMORIA...');
-
     // 1. Inicializar Repositories
     this.documentRepository = new InMemoryDocumentRepository();
     this.chatRepository = new InMemoryChatRepository();
@@ -75,16 +67,8 @@ export class DependencyContainer {
     // 2. Inicializar Services
     this.pdfService = new PDFService();
     this.textSplitterService = new TextSplitterService();
-
-    // 🆕 Embedding service con cache
-    this.embeddingService = new CachedOllamaEmbeddingService();
-    console.log('  ✓ Embedding service con cache inicializado');
-
+    this.embeddingService = new OllamaEmbeddingService();
     this.chatService = new OllamaChatService();
-
-    // 🆕 Cliente para comunicación con api-users
-    this.usersServiceClient = new UsersServiceClient();
-    console.log('  ✓ Users service client inicializado');
 
     // 3. Inicializar Use Cases - Documents
     this.uploadDocumentUseCase = new UploadDocumentUseCase(this.documentRepository);
@@ -105,14 +89,11 @@ export class DependencyContainer {
     );
 
     // 4. Inicializar Use Cases - Chat
-    // 🆕 Usar el nuevo use case con memoria
-    this.sendMessageUseCase = new SendMessageWithMemoryUseCase(
+    this.sendMessageUseCase = new SendMessageUseCase(
       this.vectorRepository,
       this.chatService,
-      this.embeddingService,
-      this.usersServiceClient
+      this.embeddingService
     );
-    console.log('  ✓ SendMessageWithMemoryUseCase inicializado');
 
     this.getChatHistoryUseCase = new GetChatHistoryUseCase(this.chatRepository);
 
@@ -128,57 +109,15 @@ export class DependencyContainer {
       this.sendMessageUseCase,
       this.getChatHistoryUseCase
     );
-
-    console.log('✅ DependencyContainer CON MEMORIA listo\n');
   }
 
   /**
-   * Inicializa la conexión con ChromaDB y verifica servicios externos
+   * Inicializa la conexión con ChromaDB
    */
   async initialize(): Promise<void> {
-    console.log('🔧 Inicializando servicios externos...\n');
-
-    // 1. ChromaDB
-    console.log('📦 Inicializando ChromaDB...');
-    try {
-      await this.vectorRepository.initialize();
-      console.log('  ✅ ChromaDB conectado\n');
-    } catch (error: any) {
-      console.error('  ❌ Error conectando ChromaDB:', error.message);
-      throw error;
-    }
-
-    // 2. Verificar Ollama
-    console.log('🤖 Verificando Ollama...');
-    const embeddingAvailable = await this.embeddingService.checkModelAvailability();
-    const chatAvailable = await this.chatService.checkModelAvailability();
-
-    if (!embeddingAvailable) {
-      console.warn('  ⚠️  Modelo de embeddings no disponible');
-    } else {
-      console.log('  ✅ Modelo de embeddings disponible');
-    }
-
-    if (!chatAvailable) {
-      console.warn('  ⚠️  Modelo de chat no disponible');
-    } else {
-      console.log('  ✅ Modelo de chat disponible');
-    }
-
-    console.log();
-
-    // 3. Verificar api-users
-    console.log('👥 Verificando api-users...');
-    const usersServiceAvailable = await this.usersServiceClient.healthCheck();
-
-    if (!usersServiceAvailable) {
-      console.warn('  ⚠️  api-users no está disponible. Algunas funciones de memoria no funcionarán.');
-      console.warn('  💡 Asegúrate de que api-users esté corriendo en el puerto configurado.');
-    } else {
-      console.log('  ✅ api-users conectado');
-    }
-
-    console.log('\n🎉 Inicialización completada\n');
+    console.log('Inicializando ChromaDB...');
+    await this.vectorRepository.initialize();
+    console.log('ChromaDB inicializado correctamente');
   }
 
   /**
@@ -203,51 +142,29 @@ export class DependencyContainer {
   }
 
   /**
-   * Obtiene estadísticas del cache de embeddings
-   */
-  async getCacheStats() {
-    return await this.embeddingService.getCacheStats();
-  }
-
-  /**
-   * Limpiar cache de embeddings
-   */
-  async clearEmbeddingCache() {
-    await this.embeddingService.clearCache();
-  }
-
-  /**
    * Obtiene información del sistema
    */
-  async getSystemInfo() {
-    const cacheStats = await this.getCacheStats();
-
+  getSystemInfo() {
     return {
-      embeddingModel: this.embeddingService.getInfo(),
+      embeddingModel: this.embeddingService.getModelInfo(),
       chatModel: this.chatService.getModelInfo(),
       documentsCount: this.documentRepository.size(),
-      chatMessagesCount: this.chatRepository.size(),
-      cache: {
-        totalCached: cacheStats.totalCached,
-        hitRate: `${cacheStats.hitRate}%`
-      }
+      chatMessagesCount: this.chatRepository.size()
     };
   }
 
   /**
-   * Verifica que todos los servicios externos estén disponibles
+   * Verifica que los servicios externos estén disponibles
    */
   async checkServices(): Promise<{
     chromadb: boolean;
     ollamaEmbedding: boolean;
     ollamaChat: boolean;
-    usersService: boolean;
   }> {
     const results = {
       chromadb: false,
       ollamaEmbedding: false,
-      ollamaChat: false,
-      usersService: false
+      ollamaChat: false
     };
 
     try {
@@ -269,19 +186,6 @@ export class DependencyContainer {
       console.error('Ollama Chat no disponible:', error);
     }
 
-    try {
-      results.usersService = await this.usersServiceClient.healthCheck();
-    } catch (error) {
-      console.error('Users Service no disponible:', error);
-    }
-
     return results;
-  }
-
-  /**
-   * Obtener cliente de users service (para uso directo si es necesario)
-   */
-  getUsersServiceClient(): UsersServiceClient {
-    return this.usersServiceClient;
   }
 }

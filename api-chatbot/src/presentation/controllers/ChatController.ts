@@ -14,13 +14,27 @@ export class ChatController {
 
   /**
    * POST /chat/message
-   * Envía un mensaje al chatbot
+   * Envía un mensaje al chatbot con memoria híbrida
    */
   async sendMessage(req: Request, res: Response): Promise<void> {
     try {
-      const { message, includeContext = true, maxContextChunks = 5 } = req.body;
+      const {
+        userId,
+        sessionId,
+        message,
+        includeContext = true,
+        maxContextChunks = 5
+      } = req.body;
 
       // Validaciones
+      if (!userId || typeof userId !== 'string' || userId.trim().length === 0) {
+        res.status(400).json({
+          success: false,
+          error: 'El campo "userId" es requerido y debe ser un texto válido'
+        });
+        return;
+      }
+
       if (!message || typeof message !== 'string' || message.trim().length === 0) {
         res.status(400).json({
           success: false,
@@ -29,17 +43,20 @@ export class ChatController {
         return;
       }
 
-      // Ejecutar use case - retorna solo el mensaje de respuesta
+      // Ejecutar use case con memoria - ahora incluye userId y sessionId
       const response = await this.sendMessageUseCase.execute({
+        userId: userId.trim(),
+        sessionId: sessionId?.trim(), // Opcional
         message: message.trim(),
         includeContext,
         maxContextChunks
       });
 
-      // Retornar solo la respuesta generada
+      // Retornar respuesta con sessionId para continuar conversación
       res.status(200).json({
         success: true,
-        response: response
+        response: response.response,
+        sessionId: response.sessionId
       });
     } catch (error) {
       console.error('Error en sendMessage:', error);

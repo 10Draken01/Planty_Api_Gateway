@@ -1,9 +1,8 @@
-import { Plant } from '../../domain/entities/Plant';
 import { Individual } from '../../domain/entities/Individual';
 import { PlantRepository } from '../../domain/repositories/PlantRepository';
 import { CompatibilityMatrixRepository } from '../../domain/repositories/CompatibilityMatrixRepository';
-import { GeneticAlgorithmService, GAConfig, GAConstraints } from '../../domain/services/GeneticAlgorithmService';
-import { FitnessCalculatorService, Objective } from '../../domain/services/FitnessCalculatorService';
+import { ImprovedGeneticAlgorithm, ImprovedGAConfig, ImprovedGAConstraints } from '../../domain/services/ImprovedGeneticAlgorithm';
+import { ImprovedFitnessCalculator } from '../../domain/services/ImprovedFitnessCalculator';
 import { CalendarGeneratorService } from '../../domain/services/CalendarGeneratorService';
 import { CategoryDistribution } from '../../domain/value-objects/CategoryDistribution';
 import { GenerateGardenRequestDto } from '../dtos/GenerateGardenRequestDto';
@@ -11,6 +10,34 @@ import { GenerateGardenResponseDto, SolutionDto } from '../dtos/GenerateGardenRe
 import { env } from '../../config/env';
 import { logger } from '../../config/logger';
 
+/**
+ * Tipo normalizado del request con valores por defecto aplicados
+ */
+interface NormalizedRequest {
+  userId?: string;
+  desiredPlantIds: number[];
+  maxPlantSpecies: 3 | 5;
+  dimensions: { width: number; height: number };
+  waterLimit: number;
+  userExperience: 1 | 2 | 3;
+  season: 'auto' | 'spring' | 'summer' | 'autumn' | 'winter';
+  location: { lat: number; lon: number };
+  categoryDistribution: CategoryDistribution;
+  budget: number;
+  objective: 'alimenticio' | 'medicinal' | 'sostenible' | 'ornamental';
+  maintenanceMinutes: number;
+}
+
+/**
+ * Use Case MEJORADO para generación de huertos.
+ *
+ * FUNCIONALIDADES:
+ * 1. Selección inteligente de plantas desde lista del usuario (por IDs)
+ * 2. Límite de especies simultáneas (3 o 5)
+ * 3. Fitness mejorado con 6 métricas (CEE, PSRNT, EH, UE, CS, BSN)
+ * 4. Operadores genéticos avanzados (5 operadores)
+ * 5. Representación cromosómica eficiente
+ */
 export class GenerateGardenUseCase {
   constructor(
     private plantRepository: PlantRepository,
@@ -22,41 +49,46 @@ export class GenerateGardenUseCase {
       // 1. Normalizar y validar request
       const normalizedRequest = this.normalizeRequest(request);
 
-      logger.info('Generando huerto', { request: normalizedRequest });
+      logger.info('Generando huerto con algoritmo mejorado', { request: normalizedRequest });
 
       // 2. Cargar plantas y matriz de compatibilidad
       const plants = await this.plantRepository.findAll();
       const compatibilityMatrix = await this.compatibilityMatrixRepository.getAllCompatibilities();
 
-      // 3. Configurar calculador de fitness
-      const fitnessCalculator = new FitnessCalculatorService({
+      // 3. Configurar calculador de fitness MEJORADO
+      const fitnessCalculator = new ImprovedFitnessCalculator({
         compatibilityMatrix,
         objective: normalizedRequest.objective,
         desiredCategoryDistribution: normalizedRequest.categoryDistribution,
         maxWaterWeekly: normalizedRequest.waterLimit,
+        season: normalizedRequest.season === 'auto' ? undefined : normalizedRequest.season,
       });
 
-      // 4. Configurar AG
-      const agConfig: GAConfig = {
+      // 4. Configurar AG MEJORADO
+      const agConfig: ImprovedGAConfig = {
         populationSize: env.ag.populationSize,
         maxGenerations: env.ag.maxGenerations,
         crossoverProbability: env.ag.crossoverProbability,
         mutationRate: env.ag.mutationRate,
+        insertionRate: env.ag.insertionRate || 0.1, // NUEVO: 10% probabilidad de inserción
+        deletionRate: env.ag.deletionRate || 0.05, // NUEVO: 5% probabilidad de eliminación
         tournamentK: env.ag.tournamentK,
         eliteCount: env.ag.eliteCount,
         patience: env.ag.patience,
         convergenceThreshold: env.ag.convergenceThreshold,
         timeout: env.timeouts.agExecutionMs,
+        maxSpecies: normalizedRequest.maxPlantSpecies, // NUEVO: límite de especies
       };
 
-      const ga = new GeneticAlgorithmService(plants, fitnessCalculator, agConfig);
+      const ga = new ImprovedGeneticAlgorithm(plants, fitnessCalculator, agConfig);
 
-      // 5. Ejecutar AG
-      const constraints: GAConstraints = {
+      // 5. Ejecutar AG MEJORADO
+      const constraints: ImprovedGAConstraints = {
         maxArea: normalizedRequest.dimensions.width * normalizedRequest.dimensions.height,
         maxWaterWeekly: normalizedRequest.waterLimit,
         maxBudget: normalizedRequest.budget,
         desiredCategoryDistribution: normalizedRequest.categoryDistribution,
+        desiredPlantIds: normalizedRequest.desiredPlantIds, // NUEVO: IDs de plantas deseadas
       };
 
       const result = await ga.run(constraints, normalizedRequest.objective);
@@ -66,7 +98,10 @@ export class GenerateGardenUseCase {
 
       // 7. Transformar a DTOs (Top 3 soluciones)
       const solutions: SolutionDto[] = result.topSolutions.slice(0, 3).map((individual, index) => {
-        const calendar = calendarGenerator.generateCalendar(individual, normalizedRequest.location);
+        const calendar = calendarGenerator.generateCalendar(individual, {
+          latitude: normalizedRequest.location.lat,
+          longitude: normalizedRequest.location.lon,
+        });
         return this.transformToSolutionDto(individual, index + 1, calendar, compatibilityMatrix);
       });
 
@@ -82,6 +117,12 @@ export class GenerateGardenUseCase {
           stoppingReason: result.stoppingReason,
           inputParameters: normalizedRequest,
           weightsApplied: fitnessCalculator.getWeights(),
+          selectedPlants: result.selectedPlants.map(p => ({ // NUEVO: plantas seleccionadas
+            id: p.id,
+            species: p.species,
+            scientificName: p.scientificName,
+            type: p.type,
+          })),
         },
       };
     } catch (error: any) {
@@ -93,14 +134,15 @@ export class GenerateGardenUseCase {
   /**
    * Normaliza el request, aplicando defaults cuando sea necesario.
    */
-  private normalizeRequest(request: GenerateGardenRequestDto): Required<GenerateGardenRequestDto> {
+  private normalizeRequest(request: GenerateGardenRequestDto): NormalizedRequest {
     const randomArea = 1 + Math.random() * 4; // 1-5 m²
     const randomWidth = Math.sqrt(randomArea * (0.5 + Math.random()));
     const randomHeight = randomArea / randomWidth;
 
     return {
-      userId: request.userId || undefined,
-      desiredPlants: request.desiredPlants || [],
+      userId: request.userId,
+      desiredPlantIds: request.desiredPlantIds || [], // IDs de plantas deseadas
+      maxPlantSpecies: request.maxPlantSpecies || 5, // Default 5 especies
       dimensions: request.dimensions || {
         width: randomWidth,
         height: randomHeight,
@@ -180,20 +222,13 @@ export class GenerateGardenUseCase {
    * Calcula estimaciones de producción, agua, costo y mantenimiento.
    */
   private calculateEstimations(individual: Individual) {
-    // Producción mensual estimada (kg)
-    // Asumiendo ~2 kg/m²/mes para vegetales
     const vegetableArea = individual.plants
       .filter(p => p.plant.hasType('vegetable'))
       .reduce((sum, p) => sum + p.totalArea, 0);
     const monthlyProductionKg = vegetableArea * 2;
 
-    // Agua semanal
     const weeklyWaterLiters = individual.totalWeeklyWater;
-
-    // Costo de implementación
     const implementationCostMXN = individual.totalCost;
-
-    // Mantenimiento semanal (15 min por planta)
     const maintenanceMinutesPerWeek = individual.totalPlants * 15;
 
     return {

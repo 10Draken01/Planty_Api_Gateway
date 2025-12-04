@@ -1,8 +1,8 @@
 import { Plant } from '../entities/Plant';
-import { Objective } from './FitnessCalculatorService';
+import { Objective } from './ImprovedFitnessCalculator';
 
 export interface PlantSelectionConfig {
-  desiredPlantSpecies?: string[]; // Lista de especies deseadas por el usuario
+  desiredPlantIds?: number[]; // MEJORADO: IDs de plantas deseadas por el usuario
   maxSpecies: number; // Máximo de especies simultáneas (3 o 5)
   objective: Objective; // Objetivo del huerto
   season?: 'spring' | 'summer' | 'autumn' | 'winter' | 'auto';
@@ -55,22 +55,16 @@ export class PlantSelectorService {
   }
 
   /**
-   * Filtra plantas según preferencias del usuario
+   * Filtra plantas según preferencias del usuario (por IDs)
    */
   private filterByUserPreferences(plants: Plant[]): Plant[] {
-    if (!this.config.desiredPlantSpecies || this.config.desiredPlantSpecies.length === 0) {
+    if (!this.config.desiredPlantIds || this.config.desiredPlantIds.length === 0) {
       return plants; // Sin restricción
     }
 
-    const desiredSet = new Set(
-      this.config.desiredPlantSpecies.map(s => s.toLowerCase().trim())
-    );
+    const desiredSet = new Set(this.config.desiredPlantIds);
 
-    return plants.filter(
-      plant =>
-        desiredSet.has(plant.species.toLowerCase()) ||
-        desiredSet.has(plant.scientificName.toLowerCase())
-    );
+    return plants.filter(plant => desiredSet.has(plant.id));
   }
 
   /**

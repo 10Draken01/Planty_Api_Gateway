@@ -67,5 +67,11 @@ export interface GenerateGardenResponseDto {
     stoppingReason: string;
     inputParameters: any;
     weightsApplied: Record<string, number>;
+    selectedPlants?: Array<{ // NUEVO: plantas seleccionadas inteligentemente
+      id: number;
+      species: string;
+      scientificName: string;
+      type: string[];
+    }>;
   };
 }
