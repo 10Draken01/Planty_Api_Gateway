@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { userServiceProxy, authServiceProxy, protectedChatbotProxy, orchardServiceProxy, algorithmGenServiceProxy } from '../services/proxy';
+import { userServiceProxy, authServiceProxy, protectedChatbotProxy, orchardServiceProxy, algorithmGenServiceProxy, plantServiceProxy } from '../services/proxy';
 import { validateTokenWithAuthService } from '../middleware/validateTokenWithAuthService';
 
 const router = Router();
@@ -28,5 +28,10 @@ router.use('/orchards', validateTokenWithAuthService, orchardServiceProxy);
 // Sin autenticación por defecto
 router.use('/algorithm-gen', validateTokenWithAuthService, algorithmGenServiceProxy);
 // router.use('/algorithm-gen', validateTokenWithAuthService, algorithmGenServiceProxy); // Con autenticación
+
+// Ruta para el servicio de Plants (Catálogo de plantas)
+// Sin autenticación - endpoint público para consultar plantas
+router.use('/plants', plantServiceProxy);
+// router.use('/plants', validateTokenWithAuthService, plantServiceProxy); // Con autenticación
 
 export default router;
