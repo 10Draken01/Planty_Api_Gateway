@@ -84,9 +84,11 @@ export class SendMessageWithMemoryUseCase {
       console.log('💬 Recuperando historial conversacional...');
       const conversationContext = await this.usersServiceClient.getConversationContext(sessionId);
 
-      if (conversationContext) {
+      if (conversationContext && conversationContext.recentMessages.length > 0) {
         console.log(`  ✓ Mensajes previos: ${conversationContext.recentMessages.length}`);
         console.log(`  ✓ Tags: ${conversationContext.tags.join(', ') || 'ninguno'}`);
+      } else {
+        console.log(`  ℹ️  Primera interacción en esta sesión - sin historial previo`);
       }
 
       // ============================================
@@ -286,20 +288,17 @@ export class SendMessageWithMemoryUseCase {
 
     // 2. Historial conversacional
     if (conversationContext && conversationContext.recentMessages.length > 0) {
-      context += `💬 CONVERSACIÓN RECIENTE (${conversationContext.recentMessages.length} mensajes):\n`;
+      context += `💬 HISTORIAL COMPLETO DE LA CONVERSACIÓN (${conversationContext.recentMessages.length} mensajes):\n`;
+      context += `="= ESTOS SON LOS ÚNICOS MENSAJES QUE HAN OCURRIDO - NO HAY MÁS ===\n\n`;
 
-      // CORRECCIÓN: Tomar TODOS los mensajes disponibles (hasta 10) en lugar de solo 3
+      // Mostrar TODOS los mensajes completos sin truncar
       const lastMessages = conversationContext.recentMessages;
       lastMessages.forEach((msg: any, index: number) => {
         const role = msg.role === 'user' ? 'Usuario' : 'Asistente';
-        // Mostrar mensaje completo si es corto, truncar si es muy largo
-        const content = msg.content.length > 150
-          ? msg.content.substring(0, 150) + '...'
-          : msg.content;
-        context += `[Mensaje ${index + 1}] ${role}: "${content}"\n`;
+        context += `[${index + 1}] ${role}: ${msg.content}\n\n`;
       });
 
-      context += '\n';
+      context += `=== FIN DEL HISTORIAL COMPLETO - NO INVENTES MÁS MENSAJES ===\n\n`;
     }
 
     // 3. Contexto RAG (base de conocimiento)
@@ -314,12 +313,48 @@ export class SendMessageWithMemoryUseCase {
     context += `"${message}"\n\n`;
 
     // Instrucciones mejoradas para el LLM
-    context += `INSTRUCCIONES IMPORTANTES:
-1. Analiza TODA la conversación previa antes de responder
-2. Si el usuario pregunta sobre qué temas han hablado, menciona EXPLÍCITAMENTE los temas de los mensajes anteriores
-3. Sé específico al recordar lo que se discutió (nombres de plantas, problemas mencionados, etc.)
-4. Responde de manera coherente, amigable y personalizada
-5. Si no estás seguro de algo mencionado anteriormente, di "No recuerdo haber hablado de eso en esta conversación"`;
+    const hasConversationHistory = conversationContext && conversationContext.recentMessages.length > 0;
+
+    if (hasConversationHistory) {
+      context += `⚠️ INSTRUCCIONES CRÍTICAS - SIGUE ESTO EXACTAMENTE:
+
+1. SOLO puedes hacer referencia a mensajes que aparecen en el "HISTORIAL COMPLETO" arriba
+2. NO inventes conversaciones que no están en el historial
+3. NO digas cosas como "hablamos sobre X" si X no aparece textualmente en el historial
+4. Si el usuario pregunta algo nuevo que NO está en el historial, responde como si fuera una pregunta nueva
+5. NO saludes de nuevo si ya saludaste en mensajes anteriores del historial
+6. PROHIBIDO inventar temas o conversaciones - solo usa lo que está explícitamente en el historial
+7. Si no estás 100% seguro de que algo se mencionó, NO lo menciones
+
+EJEMPLO DE LO QUE NO DEBES HACER:
+❌ "Recuerdo que hablamos sobre pH del suelo" (si no está en el historial)
+❌ "Como mencionaste antes sobre tus tomates" (si el usuario solo dijo "tomates" sin contexto)
+❌ "¡Hola! Me alegra verte de nuevo" (si ya saludaste en el historial)
+
+EJEMPLO DE LO QUE SÍ DEBES HACER:
+✅ Responder directamente a la pregunta actual
+✅ Usar SOLO la información que aparece literalmente en el historial
+✅ Ser conciso y directo sin inventar contexto`;
+    } else {
+      context += `⚠️ INSTRUCCIONES CRÍTICAS - PRIMERA INTERACCIÓN:
+
+1. Esta es la PRIMERA interacción - NO hay mensajes previos
+2. NO saludes diciendo "me alegra verte de nuevo" o similar
+3. NO menciones conversaciones anteriores - no existen
+4. Responde DIRECTAMENTE a la pregunta sin saludos innecesarios
+5. Si el usuario dice "hola", saluda brevemente y pregunta cómo ayudar
+6. Si el usuario pregunta algo específico (ej: "tomates"), responde DIRECTAMENTE sin saludar de nuevo
+
+PROHIBIDO:
+❌ "¡Hola! Me alegra verte aquí por primera vez"
+❌ "Recuerdo que..."
+❌ "Anteriormente hablamos..."
+
+CORRECTO:
+✅ Respuesta directa sin saludos innecesarios
+✅ "Los tomates necesitan..." (respuesta directa)
+✅ Si pregunta "hola" → "¡Hola! ¿En qué puedo ayudarte?"`;
+    }
 
     return context;
   }

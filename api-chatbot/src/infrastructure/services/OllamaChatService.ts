@@ -2,7 +2,7 @@
  * Servicio de Chat usando Ollama
  */
 
-import { IChatService } from '@application/use-cases/SendMessageUseCase';
+import { IChatService } from '@application/use-cases/SendMessageWithMemoryUseCase';
 import { Ollama } from 'ollama';
 
 export class OllamaChatService implements IChatService {

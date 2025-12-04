@@ -3,12 +3,12 @@
  */
 
 import { Request, Response } from 'express';
-import { SendMessageUseCase } from '@application/use-cases/SendMessageUseCase';
+import { SendMessageWithMemoryUseCase } from '@application/use-cases/SendMessageWithMemoryUseCase';
 import { GetChatHistoryUseCase } from '@application/use-cases/GetChatHistoryUseCase';
 
 export class ChatController {
   constructor(
-    private sendMessageUseCase: SendMessageUseCase,
+    private sendMessageUseCase: SendMessageWithMemoryUseCase,
     private getChatHistoryUseCase: GetChatHistoryUseCase
   ) {}
 
