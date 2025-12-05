@@ -8,6 +8,8 @@ export interface UpdateUserByIdRequest {
   password?: string;
   experience_level?: number;
   profile_image?: string;
+  preferred_plant_category?: 'aromatic' | 'medicinal' | 'vegetable' | 'ornamental';
+  favorite_plants?: number[];
 }
 
 export class UpdateUserByIdUseCase {
@@ -58,6 +60,14 @@ export class UpdateUserByIdUseCase {
       }
     }
 
+    // Validar preferred_plant_category si se está actualizando
+    if (request.preferred_plant_category !== undefined) {
+      const validCategories = ['aromatic', 'medicinal', 'vegetable', 'ornamental'];
+      if (!validCategories.includes(request.preferred_plant_category)) {
+        throw new Error('Categoría de planta no válida. Debe ser: aromatic, medicinal, vegetable u ornamental');
+      }
+    }
+
     // Crear usuario actualizado
     const updatedUser = new User({
       id: existingUser.id,
@@ -67,7 +77,9 @@ export class UpdateUserByIdUseCase {
       experience_level: request.experience_level !== undefined ? request.experience_level : existingUser.experience_level,
       profile_image: request.profile_image !== undefined ? request.profile_image : existingUser.profile_image,
       createdAt: existingUser.createdAt,
-      historyTimeUse_ids: existingUser.historyTimeUse_ids // Mantener historial original (no actualizable)
+      historyTimeUse_ids: existingUser.historyTimeUse_ids, // Mantener historial original (no actualizable)
+      preferred_plant_category: request.preferred_plant_category !== undefined ? request.preferred_plant_category : existingUser.preferred_plant_category,
+      favorite_plants: request.favorite_plants !== undefined ? request.favorite_plants : existingUser.favorite_plants
     });
 
     // Guardar cambios

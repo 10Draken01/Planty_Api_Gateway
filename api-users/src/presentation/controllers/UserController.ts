@@ -193,12 +193,14 @@ export class UserController {
   async updateUserById(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const { 
-        name, 
-        email, 
-        password, 
-        experience_level, 
-        profile_image 
+      const {
+        name,
+        email,
+        password,
+        experience_level,
+        profile_image,
+        preferred_plant_category,
+        favorite_plants
       } = req.body;
 
       // Ejecutar caso de uso
@@ -208,7 +210,9 @@ export class UserController {
         email,
         password,
         experience_level,
-        profile_image
+        profile_image,
+        preferred_plant_category,
+        favorite_plants
       });
 
       // Respuesta exitosa

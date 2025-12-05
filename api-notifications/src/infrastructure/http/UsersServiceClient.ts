@@ -131,7 +131,7 @@ export class UsersServiceClient {
   async healthCheck(): Promise<boolean> {
     try {
       // Intentar hacer un ping al Users Service
-      const response = await this.axiosInstance.get('/api/health', {
+      const response = await this.axiosInstance.get('/health', {
         timeout: 3000,
       });
 

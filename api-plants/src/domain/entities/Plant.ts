@@ -154,11 +154,11 @@ export class Plant {
   }
 
   /**
-   * Convierte la entidad a un objeto plano para persistencia
+   * Convierte la entidad a un objeto plano para respuesta API
    */
-  toJSON(): PlantProps {
+  toJSON() {
     return {
-      _id: this.props._id,
+      id: this.props._id,
       species: this.props.species,
       scientificName: this.props.scientificName,
       type: [...this.props.type],

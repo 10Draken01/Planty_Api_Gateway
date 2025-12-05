@@ -1,5 +1,5 @@
 export interface PlantInLayoutDto {
-  plantId: number;
+  id: number;
   name: string;
   scientificName: string;
   quantity: number;
@@ -35,7 +35,7 @@ export interface SolutionDto {
     currentSeason: string;
     hemisphere: 'north' | 'south';
     plantingSchedule: Array<{
-      plantId: number;
+      id: number;
       plant: string;
       plantingWeek: number;
       harvestWeek: number;

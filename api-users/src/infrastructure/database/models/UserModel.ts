@@ -28,6 +28,10 @@ export interface UserDocument extends Document {
   tokenFCM?: string; // Token de Firebase Cloud Messaging
   historyTimeUse_ids: Date[];
 
+  // 🆕 PREFERENCIAS DE USUARIO
+  preferred_plant_category?: 'aromatic' | 'medicinal' | 'vegetable' | 'ornamental';
+  favorite_plants?: number[]; // IDs de plantas favoritas
+
   // 🆕 NUEVOS CAMPOS PARA CHATBOT
   chatPreferences?: ChatPreferences;
   chatMetrics?: ChatMetrics;
@@ -76,6 +80,18 @@ const UserSchema = new Schema<UserDocument>({
   historyTimeUse_ids: {
     type: [Date],
     default: []
+  },
+
+  // 🆕 PREFERENCIAS DE USUARIO
+  preferred_plant_category: {
+    type: String,
+    enum: ['aromatic', 'medicinal', 'vegetable', 'ornamental'],
+    required: false
+  },
+  favorite_plants: {
+    type: [Number],
+    default: [],
+    required: false
   },
 
   // 🆕 NUEVOS CAMPOS PARA CHATBOT

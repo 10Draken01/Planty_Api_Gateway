@@ -25,7 +25,7 @@ export class CalendarGeneratorService {
       const weekOffset = Math.floor(index / 3); // Escalonar plantación cada 3 plantas
 
       return {
-        plantId: plant.id,
+        id: plant.id,
         plant: plant.species,
         plantingWeek: 1 + weekOffset,
         harvestWeek: 1 + weekOffset + Math.ceil(plant.harvestDays / 7),

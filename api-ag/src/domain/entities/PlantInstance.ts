@@ -42,7 +42,7 @@ export class PlantInstance {
 
   toJSON() {
     return {
-      plantId: this.plant.id,
+      id: this.plant.id,
       name: this.plant.species,
       scientificName: this.plant.scientificName,
       quantity: this.quantity,
