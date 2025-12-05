@@ -9,6 +9,8 @@ import { GetUserByIdUseCase } from '../../application/use-cases/GetUserByIdUseCa
 import { GetUserByEmailUseCase } from '../../application/use-cases/GetUserByEmailUseCase';
 import { UpdateUserByIdUseCase } from '../../application/use-cases/UpdateUserByIdUseCase';
 import { DeleteUserByIdUseCase } from '../../application/use-cases/DeleteUserByIdUseCase';
+import { UpdateTokenFCMUseCase } from '../../application/use-cases/UpdateTokenFCMUseCase';
+import { VerifyUserUseCase } from '../../application/use-cases/VerifyUserUseCase';
 
 // Services
 import { MemoryService } from '../../application/services/MemoryService';
@@ -34,6 +36,8 @@ export class DependencyContainer {
   private getUserByEmailUseCase: GetUserByEmailUseCase
   private updateUserByIdUseCase: UpdateUserByIdUseCase
   private deleteUserByIdUseCase: DeleteUserByIdUseCase
+  private updateTokenFCMUseCase: UpdateTokenFCMUseCase
+  private verifyUserUseCase: VerifyUserUseCase
 
   // Services
   private memoryService: MemoryService;
@@ -83,6 +87,14 @@ export class DependencyContainer {
       this.userRepository
     );
 
+    this.updateTokenFCMUseCase = new UpdateTokenFCMUseCase(
+      this.userRepository
+    );
+
+    this.verifyUserUseCase = new VerifyUserUseCase(
+      this.userRepository
+    );
+
   }
   private async initDatabaseConnection(
     mongoRootUser: string,
@@ -100,7 +112,9 @@ export class DependencyContainer {
       this.getUserByIdUseCase,
       this.getUserByEmailUseCase,
       this.updateUserByIdUseCase,
-      this.deleteUserByIdUseCase
+      this.deleteUserByIdUseCase,
+      this.updateTokenFCMUseCase,
+      this.verifyUserUseCase
     );
 
     // Routes

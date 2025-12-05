@@ -1,9 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+dotenv.config();
 import authRoutes from './src/presentation/routes/AuthRoutes';
 
-dotenv.config();
+console.log("SMTP_USER:", process.env.SMTP_USER);
+console.log("SMTP_PASSWORD:", process.env.SMTP_PASSWORD);
 
 const app = express();
 const PORT = process.env.PORT || 3002;

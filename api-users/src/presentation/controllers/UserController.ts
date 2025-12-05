@@ -5,6 +5,7 @@ import { GetUserByEmailUseCase } from '../../application/use-cases/GetUserByEmai
 import { UpdateUserByIdUseCase } from '../../application/use-cases/UpdateUserByIdUseCase';
 import { DeleteUserByIdUseCase } from '../../application/use-cases/DeleteUserByIdUseCase';
 import { UpdateTokenFCMUseCase } from '../../application/use-cases/UpdateTokenFCMUseCase';
+import { VerifyUserUseCase } from '../../application/use-cases/VerifyUserUseCase';
 
 
 export class UserController {
@@ -14,7 +15,8 @@ export class UserController {
     private getUserByEmailUseCase: GetUserByEmailUseCase,
     private updateUserByIdUseCase: UpdateUserByIdUseCase,
     private deleteUserByIdUseCase: DeleteUserByIdUseCase,
-    private updateTokenFCMUseCase: UpdateTokenFCMUseCase
+    private updateTokenFCMUseCase: UpdateTokenFCMUseCase,
+    private verifyUserUseCase: VerifyUserUseCase
   ) {}
 
   async createUser(req: Request, res: Response): Promise<void> {
@@ -382,8 +384,45 @@ export class UserController {
       });
     }
   }
+
+  /**
+   * Verifica un usuario (is_verified = true)
+   * Endpoint usado por el servicio de autenticación después de validar el OTP 2FA
+   */
+  async verifyUser(req: Request, res: Response): Promise<void> {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        res.status(400).json({
+          message: 'El email es requerido',
+          status: 400
+        });
+        return;
+      }
+
+      const user = await this.verifyUserUseCase.execute({ email });
+
+      res.status(200).json({
+        message: 'Usuario verificado exitosamente',
+        status: 200,
+        data: user.toJSON()
+      });
+
+    } catch (error: any) {
+      if (error.message === 'Usuario no encontrado') {
+        res.status(404).json({
+          message: error.message,
+          status: 404
+        });
+        return;
+      }
+
+      res.status(500).json({
+        message: 'Error en el servidor',
+        error: error.message,
+        status: 500
+      });
+    }
+  }
 }
-
-
-
-

@@ -10,11 +10,12 @@ export class MongoUserRepository implements UserRepository {
       name: user.name,
       email: user.email,
       password: user.password,
+      is_verified: user.is_verified,
       experience_level: user.experience_level,
       profile_image: user.profile_image,
       historyTimeUse_ids: user.historyTimeUse_ids
     });
-    const savedDocument = await userDocument.save();  
+    const savedDocument = await userDocument.save();
     return this.toDomainEntity(savedDocument);
   }
 
@@ -47,6 +48,7 @@ export class MongoUserRepository implements UserRepository {
       name: user.name,
       email: user.email,
       password: user.password,
+      is_verified: user.is_verified,
       experience_level: user.experience_level,
       profile_image: user.profile_image,
       historyTimeUse_ids: user.historyTimeUse_ids
@@ -99,12 +101,27 @@ export class MongoUserRepository implements UserRepository {
     return user !== null;
   }
 
+  async verifyUser(email: string): Promise<User | null> {
+    const updatedDocument = await UserModel.findOneAndUpdate(
+      { email: email.toLowerCase() },
+      { is_verified: true },
+      { new: true }
+    );
+
+    if (!updatedDocument) {
+      return null;
+    }
+
+    return this.toDomainEntity(updatedDocument);
+  }
+
   private toDomainEntity(userDocument: UserDocument): User {
     return new User({
       id: userDocument._id,
       name: userDocument.name,
       email: userDocument.email,
       password: userDocument.password,
+      is_verified: userDocument.is_verified,
       experience_level: userDocument.experience_level,
       profile_image: userDocument.profile_image,
       createdAt: userDocument.createdAt,

@@ -3,8 +3,9 @@ export interface UserProps {
   name: string;
   email: string;
   password: string;
+  is_verified?: boolean; // Indica si el usuario ha verificado su cuenta con 2FA
   count_orchards?: number;
-  experience_level?: 1 | 2 | 3;
+  experience_level?: 1 | 2 | 3 | 4;
   profile_image?: string;
   tokenFCM?: string; // Token de Firebase Cloud Messaging para notificaciones push
   createdAt?: Date;
@@ -18,8 +19,9 @@ export class User {
   private _name: string;
   private _email: string;
   private _password: string;
+  private _is_verified: boolean;
   private _count_orchards: number;
-  private _experience_level: 1 | 2 | 3;
+  private _experience_level: 1 | 2 | 3 | 4;
   private _profile_image: string;
   private _tokenFCM: string | undefined;
   private _createdAt: Date;
@@ -33,6 +35,7 @@ export class User {
     this._name = props.name;
     this._email = props.email;
     this._password = props.password;
+    this._is_verified = props.is_verified !== undefined ? props.is_verified : false;
     this._count_orchards = props.count_orchards || 0;
     this._experience_level = props.experience_level || 1;
     this._profile_image = props.profile_image || 'https://imgs.search.brave.com/4UEc9qL-ya5yCbrX6t3vwBJRKoFVHndy9k0d9DuWMJY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9oaXBz/LmhlYXJzdGFwcHMu/Y29tL2htZy1wcm9k/L2ltYWdlcy9zd2Vl/dC1wb3RhdG8tcGxh/bnQtcm95YWx0eS1m/cmVlLWltYWdlLTE3/NDI0MjMxMDIucGpw/ZWc_Y3JvcD0wLjY2/OHh3OjEuMDB4aDsw/LjAyMDR4dyww';
@@ -57,6 +60,10 @@ export class User {
 
   get password(): string {
     return this._password;
+  }
+
+  get is_verified(): boolean {
+    return this._is_verified;
   }
 
   get count_orchards(): number | undefined {
@@ -105,6 +112,7 @@ export class User {
       name: this._name,
       email: this._email,
       password: this._password,
+      is_verified: this._is_verified,
       count_orchards: this._count_orchards,
       experience_level: this._experience_level,
       profile_image: this._profile_image,

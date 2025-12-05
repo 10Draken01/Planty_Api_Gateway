@@ -7,9 +7,10 @@ export interface CreateUserRequest {
   name: string;
   email: string;
   password: string;
-  experience_level?: number; 
-  profile_image?: string; 
-  historyTimeUse_ids?: string[]; 
+  is_verified?: boolean;
+  experience_level?: number;
+  profile_image?: string;
+  historyTimeUse_ids?: string[];
 }
 
 export class CreateUserUseCase {
@@ -52,6 +53,7 @@ export class CreateUserUseCase {
       name: request.name.trim(),
       email: request.email.toLowerCase(),
       password: request.password,
+      is_verified: request.is_verified !== undefined ? request.is_verified : false,
       experience_level: request.experience_level || 1,
       profile_image: request.profile_image,
       historyTimeUse_ids: request.historyTimeUse_ids || []

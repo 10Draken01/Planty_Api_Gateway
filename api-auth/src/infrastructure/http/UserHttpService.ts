@@ -21,12 +21,27 @@ export class UserHttpService implements IUserService {
     }
   }
 
-  async create(name: string, email: string, hashedPassword: string): Promise<any> {
+  async create(name: string, email: string, hashedPassword: string, isVerified: boolean): Promise<any> {
     const response = await axios.post(`${this.baseURL}/create`, {
       name,
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      is_verified: isVerified
     });
     return response.data;
+  }
+
+  async verifyUser(email: string): Promise<any> {
+    try {
+      const response = await axios.post(`${this.baseURL}/verify`, {
+        email
+      });
+      return response.data;
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        throw new Error('Usuario no encontrado');
+      }
+      throw error;
+    }
   }
 }

@@ -21,6 +21,7 @@ export interface UserDocument extends Document {
   name: string;
   email: string;
   password: string;
+  is_verified: boolean; // Indica si el usuario ha verificado su cuenta con 2FA
   orchards_id: string[];
   count_orchards: number;
   experience_level: 1 | 2 | 3;
@@ -60,6 +61,11 @@ const UserSchema = new Schema<UserDocument>({
   password: {
     type: String,
     required: true
+  },
+  is_verified: {
+    type: Boolean,
+    required: true,
+    default: false
   },
   experience_level: {
     type: Number,
