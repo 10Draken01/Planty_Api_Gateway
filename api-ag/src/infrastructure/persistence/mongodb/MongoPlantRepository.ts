@@ -1,5 +1,5 @@
 import { PlantRepository } from '../../../domain/repositories/PlantRepository';
-import { Plant, PlantProps } from '../../../domain/entities/Plant';
+import { Plant } from '../../../domain/entities/Plant';
 import { PlantModel, PlantDocument } from './schemas/PlantSchema';
 
 export class MongoPlantRepository implements PlantRepository {

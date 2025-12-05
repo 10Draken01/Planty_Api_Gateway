@@ -46,8 +46,8 @@ export class ImprovedFitnessCalculator {
     const EH = this.calculateEH(individual);
     const UE = this.calculateUE(individual);
     // Nota: CS y BSN se calculan pero no se usan por compatibilidad con Metrics original
-    // const CS = this.calculateCS(individual);
-    // const BSN = this.calculateBSN(individual);
+    // const CS = this._calculateCS(individual);
+    // const BSN = this._calculateBSN(individual);
 
     const weights = OBJECTIVE_WEIGHTS[this.config.objective];
 
@@ -199,13 +199,14 @@ export class ImprovedFitnessCalculator {
     }
   }
 
-  /**
+  /*
    * CS: Ciclos Sincronizados (NUEVO).
    *
    * Premia huertos donde las plantas tienen ciclos de cosecha similares.
    * Facilita rotación y mantenimiento.
-   */
-  private calculateCS(individual: Individual): number {
+   * @deprecated Esta métrica no se usa actualmente, pero se mantiene comentada para futuras extensiones
+   *
+  private _calculateCS(individual: Individual): number {
     if (individual.plants.length < 2) {
       return 1.0;
     }
@@ -225,14 +226,16 @@ export class ImprovedFitnessCalculator {
 
     return score;
   }
+  */
 
-  /**
+  /*
    * BSN: Balance de Suelo y Nutrientes (NUEVO).
    *
    * Evalúa diversidad de tipos de suelo requeridos.
    * Huertos balanceados tienen variedad pero no exceso.
-   */
-  private calculateBSN(individual: Individual): number {
+   * @deprecated Esta métrica no se usa actualmente, pero se mantiene comentada para futuras extensiones
+   *
+  private _calculateBSN(individual: Individual): number {
     const soilTypes = new Set(individual.plants.map(p => p.plant.soilType));
     const uniqueSoilCount = soilTypes.size;
 
@@ -246,6 +249,7 @@ export class ImprovedFitnessCalculator {
       return Math.max(0.4, 1 - (uniqueSoilCount - 3) * 0.2);
     }
   }
+  */
 
   /**
    * Bonificación por diversidad balanceada
@@ -297,7 +301,7 @@ export class ImprovedFitnessCalculator {
     individual.plants.forEach(plantInstance => {
       plantInstance.plant.type.forEach(type => {
         if (type in counts) {
-          (counts as any)[type] += plantInstance.quantity;
+          (counts as any)[type] += 1; // Cada instancia = 1 planta
         }
       });
     });

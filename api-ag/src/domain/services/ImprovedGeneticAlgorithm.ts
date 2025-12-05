@@ -144,24 +144,24 @@ export class ImprovedGeneticAlgorithm {
 
       // FASE 4: Mutación múltiple
       offspring.forEach(ind => {
-        // Mutación por intercambio
+        // Mutación por intercambio de posiciones
         if (this.rng() < this.config.mutationRate) {
           this.swapMutation(ind);
         }
 
-        // Mutación por inserción
+        // Mutación por inserción de nueva planta
         if (this.rng() < this.config.insertionRate) {
           this.insertMutation(ind, constraints);
         }
 
-        // Mutación por eliminación
+        // Mutación por eliminación de planta
         if (this.rng() < this.config.deletionRate) {
           this.deleteMutation(ind);
         }
 
-        // Mutación de cantidad
+        // Mutación de posición (mover planta existente)
         if (this.rng() < this.config.mutationRate * 0.5) {
-          this.quantityMutation(ind);
+          this.positionMutation(ind);
         }
       });
 
@@ -284,8 +284,14 @@ export class ImprovedGeneticAlgorithm {
 
   /**
    * Crea un individuo inteligente usando heurísticas.
+   *
+   * NUEVO ENFOQUE:
+   * - Cada PlantInstance = 1 planta en 1 posición
+   * - Genera múltiples instancias de la misma especie si es necesario
+   * - Usa espaciamiento basado en compatibilidad
+   * - Evita colisiones y valida límites
    */
-  private createSmartIndividual(constraints: ImprovedGAConstraints, seed: number): Individual {
+  private createSmartIndividual(constraints: ImprovedGAConstraints, _seed: number): Individual {
     const area = constraints.maxArea;
     const aspectRatio = 0.6 + this.rng() * 0.8; // Ratio 0.6 a 1.4
     const width = Math.sqrt(area * aspectRatio);
@@ -309,44 +315,99 @@ export class ImprovedGeneticAlgorithm {
     let usedWater = 0;
     let usedBudget = 0;
 
-    // Distribuir espacialmente
-    const gridSize = Math.ceil(Math.sqrt(numSpecies));
-    const cellWidth = width / gridSize;
-    const cellHeight = height / gridSize;
-
-    let cellIndex = 0;
-
+    // Estrategia: Distribuir en grid con espaciamiento inteligente
+    // Cada especie puede tener 1-3 plantas individuales
     for (const plant of chosenPlants) {
-      const row = Math.floor(cellIndex / gridSize);
-      const col = cellIndex % gridSize;
+      const plantsOfThisSpecies = 1 + Math.floor(this.rng() * 2); // 1-2 plantas por especie
 
-      const x = col * cellWidth + this.rng() * cellWidth * 0.5;
-      const y = row * cellHeight + this.rng() * cellHeight * 0.5;
+      for (let i = 0; i < plantsOfThisSpecies; i++) {
+        // Intentar encontrar una posición válida
+        let attempts = 0;
+        let validPosition = false;
 
-      const quantity = 1 + Math.floor(this.rng() * 2); // 1-2 plantas por especie
-      const plantArea = plant.size * quantity;
-      const plantWater = plant.weeklyWatering * quantity;
-      const plantCost = plant.estimatedCost() * quantity;
+        while (attempts < 50 && !validPosition) {
+          // Generar posición aleatoria con margen
+          const margin = Math.sqrt(plant.size); // Margen basado en tamaño de planta
+          const x = margin + this.rng() * (width - 2 * margin);
+          const y = margin + this.rng() * (height - 2 * margin);
+          const position = new Position(x, y);
 
-      // Verificar restricciones
-      if (
-        usedArea + plantArea <= constraints.maxArea * 0.85 &&
-        usedWater + plantWater <= constraints.maxWaterWeekly &&
-        (!constraints.maxBudget || usedBudget + plantCost <= constraints.maxBudget)
-      ) {
-        const position = new Position(x, y);
-        const instance = new PlantInstance({ plant, quantity, position });
+          // Crear instancia temporal para validar
+          const tempInstance = new PlantInstance({
+            plant,
+            position,
+          });
 
-        plantInstances.push(instance);
-        usedArea += plantArea;
-        usedWater += plantWater;
-        usedBudget += plantCost;
+          // Verificar que no haya colisiones
+          const hasCollision = plantInstances.some(existing => {
+            return tempInstance.overlaps(existing) ||
+                   !this.hasAdequateSpacing(tempInstance, existing);
+          });
 
-        cellIndex++;
+          // Verificar que esté dentro de los límites
+          const withinBounds =
+            x + tempInstance.width <= width &&
+            y + tempInstance.height <= height &&
+            x >= 0 && y >= 0;
+
+          // Verificar restricciones de recursos
+          const plantArea = tempInstance.totalArea;
+          const plantWater = tempInstance.totalWeeklyWater;
+          const plantCost = tempInstance.totalCost;
+
+          const withinConstraints =
+            usedArea + plantArea <= constraints.maxArea * 0.85 &&
+            usedWater + plantWater <= constraints.maxWaterWeekly &&
+            (!constraints.maxBudget || usedBudget + plantCost <= constraints.maxBudget);
+
+          if (!hasCollision && withinBounds && withinConstraints) {
+            plantInstances.push(tempInstance);
+            usedArea += plantArea;
+            usedWater += plantWater;
+            usedBudget += plantCost;
+            validPosition = true;
+          }
+
+          attempts++;
+        }
       }
     }
 
     return new Individual(dimensions, [], plantInstances);
+  }
+
+  /**
+   * Verifica que dos plantas tengan espaciamiento adecuado según compatibilidad
+   */
+  private hasAdequateSpacing(plant1: PlantInstance, plant2: PlantInstance): boolean {
+    const distance = plant1.distanceTo(plant2);
+    const compatibility = this.getCompatibilityScore(plant1.plant.species, plant2.plant.species);
+
+    // Distancia mínima según compatibilidad
+    let minDistance: number;
+    if (compatibility < -0.5) {
+      minDistance = 2.0; // Incompatibles: 2m mínimo
+    } else if (compatibility > 0.5) {
+      minDistance = 0.8; // Compatibles: 0.8m mínimo
+    } else {
+      minDistance = 1.2; // Neutras: 1.2m mínimo
+    }
+
+    // Agregar radios de las plantas
+    const radius1 = Math.sqrt(plant1.plant.size) / 2;
+    const radius2 = Math.sqrt(plant2.plant.size) / 2;
+
+    return distance >= minDistance + radius1 + radius2;
+  }
+
+  /**
+   * Obtiene score de compatibilidad entre dos especies
+   */
+  private getCompatibilityScore(species1: string, species2: string): number {
+    const matrix = this.fitnessCalculator['config'].compatibilityMatrix;
+    const species1Map = matrix?.get(species1);
+    if (!species1Map) return 0;
+    return species1Map.get(species2) ?? 0;
   }
 
   /**
@@ -424,42 +485,57 @@ export class ImprovedGeneticAlgorithm {
   }
 
   /**
-   * FASE 4: Mutación por inserción (NUEVO).
+   * FASE 4: Mutación por inserción (ACTUALIZADO).
    *
-   * Inserta una nueva planta del pool.
+   * Inserta una nueva planta del pool con validación de espaciamiento.
    */
   private insertMutation(individual: Individual, constraints: ImprovedGAConstraints): void {
-    if (individual.plants.length >= this.config.maxSpecies) return;
+    // Límite: no exceder maxSpecies * 3 plantas totales (permitir duplicados)
+    if (individual.plants.length >= this.config.maxSpecies * 3) return;
 
-    // Seleccionar planta del pool que no esté en el individuo
-    const currentSpecies = new Set(individual.plants.map(p => p.plant.species));
-    const candidates = this.selectedPlants.filter(p => !currentSpecies.has(p.species));
+    // Seleccionar planta aleatoria del pool
+    const newPlant = this.selectedPlants[Math.floor(this.rng() * this.selectedPlants.length)];
 
-    if (candidates.length === 0) return;
+    // Intentar encontrar posición válida
+    let attempts = 0;
+    while (attempts < 30) {
+      const margin = Math.sqrt(newPlant.size);
+      const x = margin + this.rng() * (individual.dimensions.width - 2 * margin);
+      const y = margin + this.rng() * (individual.dimensions.height - 2 * margin);
+      const position = new Position(x, y);
 
-    const newPlant = candidates[Math.floor(this.rng() * candidates.length)];
-    const quantity = 1;
+      const instance = new PlantInstance({
+        plant: newPlant,
+        position,
+      });
 
-    // Posición aleatoria
-    const x = this.rng() * individual.dimensions.width;
-    const y = this.rng() * individual.dimensions.height;
+      // Verificar colisiones y espaciamiento
+      const hasCollision = individual.plants.some(existing => {
+        return instance.overlaps(existing) || !this.hasAdequateSpacing(instance, existing);
+      });
 
-    const instance = new PlantInstance({
-      plant: newPlant,
-      quantity,
-      position: new Position(x, y),
-    });
+      // Verificar límites
+      const withinBounds =
+        x + instance.width <= individual.dimensions.width &&
+        y + instance.height <= individual.dimensions.height;
 
-    // Verificar restricciones antes de insertar
-    const newUsedArea = individual.usedArea + instance.totalArea;
-    const newWater = individual.totalWeeklyWater + instance.totalWeeklyWater;
+      // Verificar restricciones de recursos
+      const newUsedArea = individual.usedArea + instance.totalArea;
+      const newWater = individual.totalWeeklyWater + instance.totalWeeklyWater;
 
-    if (
-      newUsedArea <= constraints.maxArea * 0.85 &&
-      newWater <= constraints.maxWaterWeekly
-    ) {
-      individual.plants.push(instance);
+      if (
+        !hasCollision &&
+        withinBounds &&
+        newUsedArea <= constraints.maxArea * 0.85 &&
+        newWater <= constraints.maxWaterWeekly
+      ) {
+        individual.plants.push(instance);
+        return; // Éxito
+      }
+
+      attempts++;
     }
+    // Si no encuentra posición válida después de 30 intentos, no inserta nada
   }
 
   /**
@@ -475,24 +551,51 @@ export class ImprovedGeneticAlgorithm {
   }
 
   /**
-   * FASE 4: Mutación de cantidad (NUEVO).
+   * FASE 4: Mutación de posición (ACTUALIZADO).
    *
-   * Modifica la cantidad de una planta.
+   * Mueve una planta a una nueva posición válida.
    */
-  private quantityMutation(individual: Individual): void {
+  private positionMutation(individual: Individual): void {
     if (individual.plants.length === 0) return;
 
     const idx = Math.floor(this.rng() * individual.plants.length);
-    const plant = individual.plants[idx];
+    const plantToMove = individual.plants[idx];
 
-    const delta = this.rng() < 0.5 ? -1 : 1;
-    const newQuantity = Math.max(1, Math.min(5, plant.quantity + delta));
+    // Intentar encontrar nueva posición válida
+    let attempts = 0;
+    while (attempts < 20) {
+      const margin = Math.sqrt(plantToMove.plant.size);
+      const newX = margin + this.rng() * (individual.dimensions.width - 2 * margin);
+      const newY = margin + this.rng() * (individual.dimensions.height - 2 * margin);
+      const newPosition = new Position(newX, newY);
 
-    individual.plants[idx] = new PlantInstance({
-      plant: plant.plant,
-      quantity: newQuantity,
-      position: plant.position,
-    });
+      const movedPlant = new PlantInstance({
+        plant: plantToMove.plant,
+        position: newPosition,
+        width: plantToMove.width,
+        height: plantToMove.height,
+        rotation: plantToMove.rotation,
+      });
+
+      // Verificar colisiones con otras plantas (excluyendo la actual)
+      const otherPlants = individual.plants.filter((_, i) => i !== idx);
+      const hasCollision = otherPlants.some(existing => {
+        return movedPlant.overlaps(existing) || !this.hasAdequateSpacing(movedPlant, existing);
+      });
+
+      // Verificar límites
+      const withinBounds =
+        newX + movedPlant.width <= individual.dimensions.width &&
+        newY + movedPlant.height <= individual.dimensions.height;
+
+      if (!hasCollision && withinBounds) {
+        individual.plants[idx] = movedPlant;
+        return; // Éxito
+      }
+
+      attempts++;
+    }
+    // Si no encuentra posición válida, mantiene la posición original
   }
 
   /**

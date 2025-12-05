@@ -1,5 +1,8 @@
 /**
  * Caso de Uso: Gestionar Plantas del Huerto
+ *
+ * @deprecated Este caso de uso está obsoleto.
+ * Use AddPlantToOrchardLayoutUseCase, MovePlantInLayoutUseCase, y RemovePlantFromLayoutUseCase en su lugar.
  */
 
 import { OrchardRepository } from '@domain/repositories/OrchardRepository';
@@ -10,51 +13,11 @@ export class ManagePlantsUseCase {
   constructor(private orchardRepository: OrchardRepository) {}
 
   async addPlant(orchardId: string, plantId: string): Promise<OrchardInfoDTO> {
-    if (!orchardId || orchardId.trim().length === 0) {
-      throw new Error('El ID del huerto es requerido');
-    }
-
-    if (!plantId || plantId.trim().length === 0) {
-      throw new Error('El ID de la planta es requerido');
-    }
-
-    const orchard = await this.orchardRepository.findById(orchardId);
-
-    if (!orchard) {
-      throw new Error('Huerto no encontrado');
-    }
-
-    // Agregar planta
-    orchard.addPlant(plantId);
-
-    // Guardar cambios
-    const updatedOrchard = await this.orchardRepository.update(orchard);
-
-    return this.toDTO(updatedOrchard);
+    throw new Error('Este método está obsoleto. Use AddPlantToOrchardLayoutUseCase en su lugar.');
   }
 
   async removePlant(orchardId: string, plantId: string): Promise<OrchardInfoDTO> {
-    if (!orchardId || orchardId.trim().length === 0) {
-      throw new Error('El ID del huerto es requerido');
-    }
-
-    if (!plantId || plantId.trim().length === 0) {
-      throw new Error('El ID de la planta es requerido');
-    }
-
-    const orchard = await this.orchardRepository.findById(orchardId);
-
-    if (!orchard) {
-      throw new Error('Huerto no encontrado');
-    }
-
-    // Remover planta
-    orchard.removePlant(plantId);
-
-    // Guardar cambios
-    const updatedOrchard = await this.orchardRepository.update(orchard);
-
-    return this.toDTO(updatedOrchard);
+    throw new Error('Este método está obsoleto. Use RemovePlantFromLayoutUseCase en su lugar.');
   }
 
   private toDTO(orchard: Orchard): OrchardInfoDTO {
@@ -63,10 +26,11 @@ export class ManagePlantsUseCase {
       userId: orchard.userId,
       name: orchard.name,
       description: orchard.description,
-      plants_id: orchard.plants_id,
-      width: orchard.width,
-      height: orchard.height,
+      width: orchard.dimensions.width,
+      height: orchard.dimensions.height,
       area: orchard.area,
+      availableArea: orchard.availableArea,
+      plants: orchard.plants.map(p => p.toJSON()),
       state: orchard.state,
       createAt: orchard.createAt,
       updateAt: orchard.updateAt,

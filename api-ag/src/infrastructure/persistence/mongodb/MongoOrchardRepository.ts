@@ -1,8 +1,6 @@
 import { OrchardRepository } from '../../../domain/repositories/OrchardRepository';
 import { Orchard } from '../../../domain/entities/Orchard';
-import { OrchardModel, OrchardDocument } from './schemas/OrchardSchema';
-import { Dimensions } from '../../../domain/value-objects/Dimensions';
-import { Metrics } from '../../../domain/value-objects/Metrics';
+import { OrchardModel } from './schemas/OrchardSchema';
 
 export class MongoOrchardRepository implements OrchardRepository {
   async save(orchard: Orchard): Promise<string> {

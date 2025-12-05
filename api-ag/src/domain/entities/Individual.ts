@@ -29,7 +29,7 @@ export class Individual {
   }
 
   get totalPlants(): number {
-    return this.plants.reduce((sum, p) => sum + p.quantity, 0);
+    return this.plants.length; // Ahora cada PlantInstance = 1 planta
   }
 
   get usedArea(): number {

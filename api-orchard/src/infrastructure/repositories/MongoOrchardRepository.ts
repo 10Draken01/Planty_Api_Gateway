@@ -1,9 +1,17 @@
 /**
  * Implementación del Repositorio de Orchards con MongoDB
+ *
+ * ACTUALIZADO para soportar:
+ * - Dimensions como Value Object
+ * - Plants array con posiciones (PlantInLayout[])
+ * - Serialización/Deserialización correcta
  */
 
 import { Collection } from 'mongodb';
 import { Orchard, OrchardProps } from '@domain/entities/Orchard';
+import { PlantInLayout, PlantInLayoutProps } from '@domain/entities/PlantInLayout';
+import { Position } from '@domain/value-objects/Position';
+import { Dimensions } from '@domain/value-objects/Dimensions';
 import { OrchardRepository } from '@domain/repositories/OrchardRepository';
 import { MongoDBConnection } from '../database/MongoDBConnection';
 
@@ -27,9 +35,6 @@ export class MongoOrchardRepository implements OrchardRepository {
     }
 
     try {
-      // Índice único en _id (MongoDB lo crea automáticamente, pero lo documentamos)
-      // await this.collection.createIndex({ _id: 1 }, { unique: true });
-
       // Índice en userId para búsquedas por usuario
       await this.collection.createIndex(
         { userId: 1 },
@@ -39,7 +44,16 @@ export class MongoOrchardRepository implements OrchardRepository {
         }
       );
 
-      // Índice compuesto: userId + state (para filtrar huertos activos/inactivos de un usuario)
+      // Índice compuesto: userId + name (para verificar nombres únicos por usuario)
+      await this.collection.createIndex(
+        { userId: 1, name: 1 },
+        {
+          name: 'idx_userId_name',
+          background: true
+        }
+      );
+
+      // Índice compuesto: userId + state
       await this.collection.createIndex(
         { userId: 1, state: 1 },
         {
@@ -61,14 +75,78 @@ export class MongoOrchardRepository implements OrchardRepository {
       console.log('✓ Índices de MongoDB creados para la colección orchards');
     } catch (error) {
       console.error('⚠ Error al crear índices (puede que ya existan):', error);
-      // No lanzamos error para no interrumpir la ejecución
     }
+  }
+
+  /**
+   * ✅ NUEVO: Convierte un documento de MongoDB a la entidad Orchard
+   * Reconstruye los Value Objects y Entities correctamente
+   */
+  private toDomain(doc: any): Orchard {
+    // Reconstruir Dimensions
+    const dimensions = new Dimensions(doc.width || doc.dimensions?.width, doc.height || doc.dimensions?.height);
+
+    // Reconstruir PlantInLayout[]
+    const plants = (doc.plants || []).map((plantData: any) => {
+      const position = new Position(
+        plantData.position?.x || 0,
+        plantData.position?.y || 0
+      );
+
+      return PlantInLayout.fromPersistence({
+        id: plantData.id,
+        plantId: plantData.plantId,
+        position,
+        width: plantData.width || 1,
+        height: plantData.height || 1,
+        rotation: plantData.rotation || 0,
+        status: plantData.status || 'planned',
+        plantedAt: plantData.plantedAt ? new Date(plantData.plantedAt) : undefined
+      });
+    });
+
+    // Reconstruir Orchard
+    return Orchard.fromPersistence({
+      _id: doc._id,
+      userId: doc.userId,
+      name: doc.name,
+      description: doc.description,
+      dimensions,
+      plants,
+      state: doc.state,
+      createAt: new Date(doc.createAt),
+      updateAt: new Date(doc.updateAt),
+      timeOfLife: doc.timeOfLife || 0,
+      streakOfDays: doc.streakOfDays || 0
+    });
+  }
+
+  /**
+   * ✅ NUEVO: Convierte la entidad Orchard a documento de MongoDB
+   */
+  private toDocument(orchard: Orchard): any {
+    const json = orchard.toJSON();
+
+    return {
+      _id: json._id,
+      userId: json.userId,
+      name: json.name,
+      description: json.description,
+      width: json.width,
+      height: json.height,
+      plants: json.plants, // Ya viene serializado correctamente
+      state: json.state,
+      createAt: json.createAt,
+      updateAt: json.updateAt,
+      timeOfLife: json.timeOfLife,
+      streakOfDays: json.streakOfDays
+    };
   }
 
   async save(orchard: Orchard): Promise<Orchard> {
     try {
-      const data = orchard.toJSON();
-      await this.collection.insertOne(data as any);
+      const doc = this.toDocument(orchard);
+      await this.collection.insertOne(doc);
       return orchard;
     } catch (error) {
       console.error('Error al guardar huerto:', error);
@@ -84,7 +162,7 @@ export class MongoOrchardRepository implements OrchardRepository {
         return null;
       }
 
-      return Orchard.fromPersistence(doc as OrchardProps);
+      return this.toDomain(doc);
     } catch (error) {
       console.error('Error al buscar huerto por ID:', error);
       throw new Error('No se pudo buscar el huerto');
@@ -101,7 +179,7 @@ export class MongoOrchardRepository implements OrchardRepository {
         return null;
       }
 
-      return Orchard.fromPersistence(doc as OrchardProps);
+      return this.toDomain(doc);
     } catch (error) {
       console.error('Error al buscar huerto por nombre:', error);
       throw new Error('No se pudo buscar el huerto');
@@ -115,10 +193,10 @@ export class MongoOrchardRepository implements OrchardRepository {
         .sort({ createAt: -1 })
         .toArray();
 
-      return docs.map(doc => Orchard.fromPersistence(doc as OrchardProps));
+      return docs.map(doc => this.toDomain(doc));
     } catch (error) {
-      console.error('Error al listar huertos:', error);
-      throw new Error('No se pudo listar los huertos');
+      console.error('Error al obtener todos los huertos:', error);
+      throw new Error('No se pudieron obtener los huertos');
     }
   }
 
@@ -129,10 +207,10 @@ export class MongoOrchardRepository implements OrchardRepository {
         .sort({ createAt: -1 })
         .toArray();
 
-      return docs.map(doc => Orchard.fromPersistence(doc as OrchardProps));
+      return docs.map(doc => this.toDomain(doc));
     } catch (error) {
-      console.error('Error al buscar huertos activos:', error);
-      throw new Error('No se pudo buscar los huertos activos');
+      console.error('Error al obtener huertos activos:', error);
+      throw new Error('No se pudieron obtener los huertos activos');
     }
   }
 
@@ -143,34 +221,34 @@ export class MongoOrchardRepository implements OrchardRepository {
         .sort({ createAt: -1 })
         .toArray();
 
-      return docs.map(doc => Orchard.fromPersistence(doc as OrchardProps));
+      return docs.map(doc => this.toDomain(doc));
     } catch (error) {
-      console.error('Error al buscar huertos inactivos:', error);
-      throw new Error('No se pudo buscar los huertos inactivos');
+      console.error('Error al obtener huertos inactivos:', error);
+      throw new Error('No se pudieron obtener los huertos inactivos');
     }
   }
 
   async findByUserId(userId: string): Promise<Orchard[]> {
     try {
       const docs = await this.collection
-        .find({ userId: userId })
+        .find({ userId })
         .sort({ createAt: -1 })
         .toArray();
 
-      return docs.map(doc => Orchard.fromPersistence(doc as OrchardProps));
+      return docs.map(doc => this.toDomain(doc));
     } catch (error) {
       console.error('Error al buscar huertos por userId:', error);
-      throw new Error('No se pudo buscar los huertos del usuario');
+      throw new Error('No se pudieron obtener los huertos del usuario');
     }
   }
 
   async update(orchard: Orchard): Promise<Orchard> {
     try {
-      const data = orchard.toJSON();
-      const { _id, ...updateData } = data;
+      const doc = this.toDocument(orchard);
+      const { _id, ...updateData } = doc;
 
       const result = await this.collection.updateOne(
-        { _id: _id },
+        { _id },
         { $set: updateData }
       );
 
@@ -200,9 +278,27 @@ export class MongoOrchardRepository implements OrchardRepository {
       const count = await this.collection.countDocuments({
         name: { $regex: new RegExp(`^${name}$`, 'i') }
       });
+
       return count > 0;
     } catch (error) {
-      console.error('Error al verificar existencia de huerto:', error);
+      console.error('Error al verificar existencia del huerto:', error);
+      throw new Error('No se pudo verificar la existencia del huerto');
+    }
+  }
+
+  /**
+   * ✅ NUEVO: Verifica si existe un huerto con el nombre dado para un usuario específico
+   */
+  async existsByUserAndName(userId: string, name: string): Promise<boolean> {
+    try {
+      const count = await this.collection.countDocuments({
+        userId,
+        name: { $regex: new RegExp(`^${name}$`, 'i') }
+      });
+
+      return count > 0;
+    } catch (error) {
+      console.error('Error al verificar existencia del huerto por usuario y nombre:', error);
       throw new Error('No se pudo verificar la existencia del huerto');
     }
   }

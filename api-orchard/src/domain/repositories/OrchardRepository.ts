@@ -1,6 +1,8 @@
 /**
  * Interfaz del Repositorio de Orchards
  * Define el contrato para la persistencia de huertos
+ *
+ * ACTUALIZADO para soportar consultas adicionales
  */
 
 import { Orchard } from '../entities/Orchard';
@@ -55,6 +57,11 @@ export interface OrchardRepository {
    * Verifica si existe un huerto con el nombre dado
    */
   exists(name: string): Promise<boolean>;
+
+  /**
+   * ✅ NUEVO: Verifica si existe un huerto con el nombre dado para un usuario específico
+   */
+  existsByUserAndName(userId: string, name: string): Promise<boolean>;
 
   /**
    * Cuenta el total de huertos

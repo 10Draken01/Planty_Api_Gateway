@@ -1,6 +1,11 @@
 /**
- * Controlador de Orchards
+ * Controlador de Orchards (ACTUALIZADO)
  * Maneja las peticiones HTTP relacionadas con huertos
+ *
+ * NUEVOS ENDPOINTS:
+ * - POST /orchards/:id/plants/layout - Agregar planta con posición al layout
+ * - PATCH /orchards/:id/plants/layout/:plantInstanceId/move - Mover planta
+ * - DELETE /orchards/:id/plants/layout/:plantInstanceId - Remover planta del layout
  */
 
 import { Request, Response } from 'express';
@@ -11,7 +16,9 @@ import { GetOrchardsByUserUseCase } from '@application/use-cases/GetOrchardsByUs
 import { UpdateOrchardUseCase } from '@application/use-cases/UpdateOrchardUseCase';
 import { DeleteOrchardUseCase } from '@application/use-cases/DeleteOrchardUseCase';
 import { ToggleOrchardStateUseCase } from '@application/use-cases/ToggleOrchardStateUseCase';
-import { ManagePlantsUseCase } from '@application/use-cases/ManagePlantsUseCase';
+import { AddPlantToOrchardLayoutUseCase } from '@application/use-cases/AddPlantToOrchardLayoutUseCase';
+import { MovePlantInLayoutUseCase } from '@application/use-cases/MovePlantInLayoutUseCase';
+import { RemovePlantFromLayoutUseCase } from '@application/use-cases/RemovePlantFromLayoutUseCase';
 
 export class OrchardController {
   constructor(
@@ -22,7 +29,9 @@ export class OrchardController {
     private updateOrchardUseCase: UpdateOrchardUseCase,
     private deleteOrchardUseCase: DeleteOrchardUseCase,
     private toggleOrchardStateUseCase: ToggleOrchardStateUseCase,
-    private managePlantsUseCase: ManagePlantsUseCase
+    private addPlantToLayoutUseCase: AddPlantToOrchardLayoutUseCase,
+    private movePlantInLayoutUseCase: MovePlantInLayoutUseCase,
+    private removePlantFromLayoutUseCase: RemovePlantFromLayoutUseCase
   ) {}
 
   /**
@@ -126,7 +135,7 @@ export class OrchardController {
 
   /**
    * PUT /orchards/:id
-   * Actualizar un huerto
+   * Actualizar un huerto (solo name y description)
    */
   async update(req: Request, res: Response): Promise<void> {
     try {
@@ -223,58 +232,178 @@ export class OrchardController {
     }
   }
 
+  // ==================== ✅ NUEVOS MÉTODOS PARA LAYOUT ====================
+
   /**
-   * POST /orchards/:id/plants
-   * Agregar una planta al huerto
+   * POST /orchards/:id/plants/layout
+   * Agregar una planta con posición al layout del huerto
+   *
+   * Body: {
+   *   plantId: number,
+   *   x: number,
+   *   y: number,
+   *   width?: number,
+   *   height?: number,
+   *   rotation?: number
+   * }
    */
-  async addPlant(req: Request, res: Response): Promise<void> {
+  async addPlantToLayout(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const { plantId } = req.body;
+      const { plantId, x, y, width, height, rotation } = req.body;
 
-      const result = await this.managePlantsUseCase.addPlant(id, plantId);
+      // Validaciones de entrada
+      if (!plantId) {
+        res.status(400).json({
+          success: false,
+          error: 'El campo plantId es requerido'
+        });
+        return;
+      }
 
-      res.status(200).json({
+      if (x === undefined || y === undefined) {
+        res.status(400).json({
+          success: false,
+          error: 'Los campos x e y son requeridos'
+        });
+        return;
+      }
+
+      const result = await this.addPlantToLayoutUseCase.execute({
+        orchardId: id,
+        plantId,
+        x,
+        y,
+        width,
+        height,
+        rotation
+      });
+
+      res.status(201).json({
         success: true,
-        message: 'Planta agregada exitosamente',
-        data: result
+        message: result.message,
+        data: result.plantInstance
       });
     } catch (error) {
-      console.error('Error al agregar planta:', error);
-      const statusCode = error instanceof Error && error.message === 'Huerto no encontrado' ? 404 : 400;
+      console.error('Error al agregar planta al layout:', error);
+
+      // Determinar código de estado según el tipo de error
+      let statusCode = 400;
+      if (error instanceof Error) {
+        if (error.message.includes('no encontrado')) {
+          statusCode = 404;
+        } else if (
+          error.message.includes('colisiona') ||
+          error.message.includes('fuera de los límites')
+        ) {
+          statusCode = 409; // Conflict
+        }
+      }
 
       res.status(statusCode).json({
         success: false,
-        error: error instanceof Error ? error.message : 'Error al agregar planta'
+        error: error instanceof Error ? error.message : 'Error al agregar planta al layout'
       });
     }
   }
 
   /**
-   * DELETE /orchards/:id/plants/:plantId
-   * Remover una planta del huerto
+   * PATCH /orchards/:id/plants/layout/:plantInstanceId/move
+   * Mover una planta a una nueva posición en el layout
+   *
+   * Body: {
+   *   newX: number,
+   *   newY: number
+   * }
    */
-  async removePlant(req: Request, res: Response): Promise<void> {
+  async movePlantInLayout(req: Request, res: Response): Promise<void> {
     try {
-      const { id, plantId } = req.params;
+      const { id, plantInstanceId } = req.params;
+      const { newX, newY } = req.body;
 
-      const result = await this.managePlantsUseCase.removePlant(id, plantId);
+      // Validaciones de entrada
+      if (newX === undefined || newY === undefined) {
+        res.status(400).json({
+          success: false,
+          error: 'Los campos newX y newY son requeridos'
+        });
+        return;
+      }
+
+      const result = await this.movePlantInLayoutUseCase.execute({
+        orchardId: id,
+        plantInstanceId,
+        newX,
+        newY
+      });
 
       res.status(200).json({
         success: true,
-        message: 'Planta removida exitosamente',
-        data: result
+        message: result.message,
+        data: {
+          plantInstanceId: result.plantInstanceId,
+          newPosition: result.newPosition
+        }
       });
     } catch (error) {
-      console.error('Error al remover planta:', error);
-      const statusCode = error instanceof Error && error.message === 'Huerto no encontrado' ? 404 : 400;
+      console.error('Error al mover planta en layout:', error);
+
+      let statusCode = 400;
+      if (error instanceof Error) {
+        if (error.message.includes('no encontrado') || error.message.includes('no existe')) {
+          statusCode = 404;
+        } else if (
+          error.message.includes('colisiona') ||
+          error.message.includes('fuera de los límites')
+        ) {
+          statusCode = 409; // Conflict
+        }
+      }
 
       res.status(statusCode).json({
         success: false,
-        error: error instanceof Error ? error.message : 'Error al remover planta'
+        error: error instanceof Error ? error.message : 'Error al mover planta en layout'
       });
     }
   }
+
+  /**
+   * DELETE /orchards/:id/plants/layout/:plantInstanceId
+   * Remover una planta del layout del huerto
+   */
+  async removePlantFromLayout(req: Request, res: Response): Promise<void> {
+    try {
+      const { id, plantInstanceId } = req.params;
+
+      const result = await this.removePlantFromLayoutUseCase.execute({
+        orchardId: id,
+        plantInstanceId
+      });
+
+      res.status(200).json({
+        success: true,
+        message: result.message,
+        data: {
+          plantInstanceId: result.plantInstanceId,
+          countPlants: result.countPlants
+        }
+      });
+    } catch (error) {
+      console.error('Error al remover planta del layout:', error);
+
+      const statusCode = error instanceof Error &&
+        (error.message.includes('no encontrado') || error.message.includes('no existe'))
+        ? 404
+        : 400;
+
+      res.status(statusCode).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Error al remover planta del layout'
+      });
+    }
+  }
+
+  // ==================== HEALTH CHECK ====================
 
   /**
    * GET /orchards/health

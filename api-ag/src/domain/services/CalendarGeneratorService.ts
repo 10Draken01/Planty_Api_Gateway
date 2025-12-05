@@ -20,18 +20,39 @@ export class CalendarGeneratorService {
     const hemisphere = this.determineHemisphere(location.latitude);
     const season = this.detectCurrentSeason(location.latitude);
 
-    const plantingSchedule = individual.plants.map((plantInstance, index) => {
-      const plant = plantInstance.plant;
-      const weekOffset = Math.floor(index / 3); // Escalonar plantación cada 3 plantas
+    // Agrupar plantas por especie para generar un schedule más ordenado
+    const plantsBySpecies = new Map<string, typeof individual.plants>();
+    individual.plants.forEach(plantInstance => {
+      const species = plantInstance.plant.species;
+      if (!plantsBySpecies.has(species)) {
+        plantsBySpecies.set(species, []);
+      }
+      plantsBySpecies.get(species)!.push(plantInstance);
+    });
 
-      return {
-        id: plant.id,
+    const plantingSchedule: any[] = [];
+    let weekOffset = 0;
+
+    // Generar schedule por especie
+    plantsBySpecies.forEach((instances) => {
+      const plant = instances[0].plant;
+
+      // Una entrada por especie con el conteo de plantas
+      plantingSchedule.push({
+        plantId: plant.id,
         plant: plant.species,
+        count: instances.length, // Cantidad de plantas de esta especie
         plantingWeek: 1 + weekOffset,
         harvestWeek: 1 + weekOffset + Math.ceil(plant.harvestDays / 7),
         daysToHarvest: plant.harvestDays,
         notes: this.generatePlantingNotes(plant.species, season),
-      };
+        positions: instances.map(inst => ({
+          x: inst.position.x,
+          y: inst.position.y
+        }))
+      });
+
+      weekOffset++;
     });
 
     const monthlyTasks = this.generateMonthlyTasks(individual, season);
@@ -98,7 +119,7 @@ export class CalendarGeneratorService {
   /**
    * Genera tareas mensuales de mantenimiento.
    */
-  private generateMonthlyTasks(individual: Individual, season: Season): OrchardCalendar['monthlyTasks'] {
+  private generateMonthlyTasks(_individual: Individual, _season: Season): OrchardCalendar['monthlyTasks'] {
     const now = new Date();
     const monthNames = [
       'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',

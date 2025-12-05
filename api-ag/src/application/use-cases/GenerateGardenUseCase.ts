@@ -189,7 +189,7 @@ export class GenerateGardenUseCase {
     individual.plants.forEach(p => {
       p.plant.type.forEach(type => {
         if (type in categoryBreakdown) {
-          categoryBreakdown[type] += p.quantity;
+          categoryBreakdown[type] += 1; // Cada instancia = 1 planta
         }
       });
     });

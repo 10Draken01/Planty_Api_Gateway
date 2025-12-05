@@ -176,7 +176,7 @@ class OrchardApp {
 
     if (!services.mongodb) {
       console.warn('\n⚠️  ADVERTENCIA: MongoDB no está disponible');
-      console.warn('   Asegúrate de que MongoDB esté corriendo en:', config.mongodb.uri);
+      console.warn(`   Asegúrate de que MongoDB esté corriendo para la BD: ${config.mongodb.dbName}`);
     }
 
     console.log('');

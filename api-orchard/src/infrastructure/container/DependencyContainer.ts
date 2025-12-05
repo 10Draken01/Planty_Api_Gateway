@@ -1,6 +1,11 @@
 /**
- * Contenedor de Dependencias
+ * Contenedor de Dependencias (ACTUALIZADO)
  * Gestiona la inyección de dependencias de toda la aplicación
+ *
+ * NUEVOS CASOS DE USO:
+ * - AddPlantToOrchardLayoutUseCase
+ * - MovePlantInLayoutUseCase
+ * - RemovePlantFromLayoutUseCase
  */
 
 import { Router } from 'express';
@@ -13,7 +18,9 @@ import { GetOrchardsByUserUseCase } from '@application/use-cases/GetOrchardsByUs
 import { UpdateOrchardUseCase } from '@application/use-cases/UpdateOrchardUseCase';
 import { DeleteOrchardUseCase } from '@application/use-cases/DeleteOrchardUseCase';
 import { ToggleOrchardStateUseCase } from '@application/use-cases/ToggleOrchardStateUseCase';
-import { ManagePlantsUseCase } from '@application/use-cases/ManagePlantsUseCase';
+import { AddPlantToOrchardLayoutUseCase } from '@application/use-cases/AddPlantToOrchardLayoutUseCase';
+import { MovePlantInLayoutUseCase } from '@application/use-cases/MovePlantInLayoutUseCase';
+import { RemovePlantFromLayoutUseCase } from '@application/use-cases/RemovePlantFromLayoutUseCase';
 import { OrchardController } from '@presentation/controllers/OrchardController';
 import { OrchardRoutes } from '@presentation/routes/OrchardRoutes';
 
@@ -32,7 +39,9 @@ export class DependencyContainer {
   private updateOrchardUseCase!: UpdateOrchardUseCase;
   private deleteOrchardUseCase!: DeleteOrchardUseCase;
   private toggleOrchardStateUseCase!: ToggleOrchardStateUseCase;
-  private managePlantsUseCase!: ManagePlantsUseCase;
+  private addPlantToLayoutUseCase!: AddPlantToOrchardLayoutUseCase;
+  private movePlantInLayoutUseCase!: MovePlantInLayoutUseCase;
+  private removePlantFromLayoutUseCase!: RemovePlantFromLayoutUseCase;
 
   // Controllers
   private orchardController!: OrchardController;
@@ -63,7 +72,12 @@ export class DependencyContainer {
       this.updateOrchardUseCase = new UpdateOrchardUseCase(this.orchardRepository);
       this.deleteOrchardUseCase = new DeleteOrchardUseCase(this.orchardRepository);
       this.toggleOrchardStateUseCase = new ToggleOrchardStateUseCase(this.orchardRepository);
-      this.managePlantsUseCase = new ManagePlantsUseCase(this.orchardRepository);
+
+      // ✅ NUEVOS CASOS DE USO PARA LAYOUT
+      this.addPlantToLayoutUseCase = new AddPlantToOrchardLayoutUseCase(this.orchardRepository);
+      this.movePlantInLayoutUseCase = new MovePlantInLayoutUseCase(this.orchardRepository);
+      this.removePlantFromLayoutUseCase = new RemovePlantFromLayoutUseCase(this.orchardRepository);
+
       console.log('✓ Casos de uso inicializados');
 
       // 4. Inicializar controladores
@@ -75,7 +89,9 @@ export class DependencyContainer {
         this.updateOrchardUseCase,
         this.deleteOrchardUseCase,
         this.toggleOrchardStateUseCase,
-        this.managePlantsUseCase
+        this.addPlantToLayoutUseCase,      // ✅ NUEVO
+        this.movePlantInLayoutUseCase,     // ✅ NUEVO
+        this.removePlantFromLayoutUseCase  // ✅ NUEVO
       );
       console.log('✓ Controladores inicializados');
 
@@ -102,20 +118,24 @@ export class DependencyContainer {
   getSystemInfo(): object {
     return {
       service: 'api-orchard',
-      version: '1.0.0',
-      description: 'Microservicio de gestión de huertos',
+      version: '2.0.0',  // ✅ Actualizado
+      description: 'Microservicio de gestión de huertos con sistema de layout',
       endpoints: {
         health: '/orchards/health',
+        // CRUD básico
         create: 'POST /orchards',
         list: 'GET /orchards',
         getByUserId: 'GET /orchards/user/:userId',
         getById: 'GET /orchards/:id',
         update: 'PUT /orchards/:id',
         delete: 'DELETE /orchards/:id',
+        // Estado
         activate: 'PATCH /orchards/:id/activate',
         deactivate: 'PATCH /orchards/:id/deactivate',
-        addPlant: 'POST /orchards/:id/plants',
-        removePlant: 'DELETE /orchards/:id/plants/:plantId'
+        // ✅ NUEVOS: Layout management
+        addPlantToLayout: 'POST /orchards/:id/plants/layout',
+        movePlantInLayout: 'PATCH /orchards/:id/plants/layout/:plantInstanceId/move',
+        removePlantFromLayout: 'DELETE /orchards/:id/plants/layout/:plantInstanceId'
       }
     };
   }
