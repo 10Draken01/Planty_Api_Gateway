@@ -6,6 +6,7 @@ import { ValidateTokenUseCase } from '../../application/usecases/ValidateTokenUs
 import { BcryptService } from '../../infrastructure/services/BcryptService';
 import { JwtService } from '../../infrastructure/services/JwtService';
 import { UserHttpService } from '../../infrastructure/http/UserHttpService';
+import { RateLimitMiddleware } from '../middlewares/RateLimitMiddleware';
 
 const hashService = new BcryptService();
 const tokenService = new JwtService();
@@ -19,8 +20,17 @@ const authController = new AuthController(registerUseCase, loginUseCase, validat
 
 const router = Router();
 
-router.post('/register', authController.register);
-router.post('/login', authController.login);
+// Iniciar tarea de limpieza periódica del rate limiter
+// RateLimitMiddleware.startCleanupTask(); // DESACTIVADO TEMPORALMENTE PARA PRUEBAS
+
+// Rutas SIN protección de rate limiting (para pruebas)
+// IMPORTANTE: Descomentar los middlewares de rate limiting en producción
+router.post('/register', authController.register); // Sin rate limit
+router.post('/login', authController.login); // Sin rate limit
 router.post('/validate', authController.validateToken);
+
+// Rutas CON protección de rate limiting (descomentar para producción)
+// router.post('/register', RateLimitMiddleware.byIP(), authController.register);
+// router.post('/login', RateLimitMiddleware.combined(), authController.login);
 
 export default router;

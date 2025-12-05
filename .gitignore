@@ -21,12 +21,18 @@ node_modules/
 # Python virtual environments
 venv/
 env/
+.venv/
+**/.venv/
+**/venv/
+**/env/
 __pycache__/
 **/__pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
+pip-log.txt
+pip-delete-this-directory.txt
 
 # Build outputs
 dist/

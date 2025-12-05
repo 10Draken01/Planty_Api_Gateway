@@ -95,6 +95,13 @@ export class MemoryService {
       return null;
     }
 
+    // CORRECCIÓN CRÍTICA: Si la conversación no tiene mensajes aún,
+    // devolver null para evitar mostrar contexto de conversaciones inexistentes
+    if (!conversation.messages || conversation.messages.length === 0) {
+      console.log(`⚠️  Sesión ${sessionId} encontrada pero sin mensajes. Retornando null.`);
+      return null;
+    }
+
     return {
       sessionId: conversation.sessionId,
       recentMessages: conversation.getRecentMessages(10),
