@@ -15,8 +15,9 @@ export const config = {
 
   // MongoDB
   mongodb: {
-    uri: process.env.MONGO_URI || 'mongodb://localhost:27017/planty_plants',
-    dbName: process.env.MONGO_DB_NAME || 'planty_plants'
+    mongoRootUser: process.env.MONGO_ROOT_USER || 'admin',
+    mongoRootPassword: process.env.MONGO_ROOT_PASSWORD || 'password123',
+    dbName: process.env.DB_NAME || 'planty_plants'
   },
 
   // Rate Limiting
@@ -48,7 +49,7 @@ export function validateEnvironment(): void {
   console.log(`  - Puerto: ${config.port}`);
   console.log(`  - Entorno: ${config.nodeEnv}`);
   console.log(`  - CORS: ${config.corsOrigin}`);
-  console.log(`  - MongoDB URI: ${config.mongodb.uri}`);
+  console.log(`  - MongoDB URI: mongodb://${config.mongodb.mongoRootUser}:******@localhost:27017/${config.mongodb.dbName}?authSource=admin`);
   console.log(`  - MongoDB DB: ${config.mongodb.dbName}`);
   console.log(`  - Rate Limit: ${config.rateLimit.maxRequests} requests / ${config.rateLimit.windowMs}ms\n`);
 }
