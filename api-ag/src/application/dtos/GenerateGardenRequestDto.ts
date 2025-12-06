@@ -1,7 +1,7 @@
 import Joi from 'joi';
 
 export interface GenerateGardenRequestDto {
-  userId?: string;
+  userId: string;
   desiredPlantIds?: number[]; // MEJORADO: IDs de plantas deseadas (se consultan en BD)
   maxPlantSpecies?: 3 | 5; // Máximo de especies simultáneas (default: 5)
   dimensions?: {
@@ -9,7 +9,7 @@ export interface GenerateGardenRequestDto {
     height: number; // Alto en metros
   };
   waterLimit?: number; // Litros de agua disponibles por semana
-  userExperience?: 1 | 2 | 3; // 1=Principiante, 2=Intermedio, 3=Avanzado
+  userExperience: 1 | 2 | 3; // 1=Principiante, 2=Intermedio, 3=Avanzado
   season?: 'auto' | 'spring' | 'summer' | 'autumn' | 'winter';
   location?: {
     lat: number;  // Latitud
@@ -27,7 +27,7 @@ export interface GenerateGardenRequestDto {
 }
 
 export const generateGardenRequestSchema = Joi.object({
-  userId: Joi.string().optional(),
+  userId: Joi.string().required(),
   desiredPlantIds: Joi.array().items(Joi.number().integer().positive()).optional(), // MEJORADO
   maxPlantSpecies: Joi.number().valid(3, 5).optional(),
   dimensions: Joi.object({
@@ -35,7 +35,7 @@ export const generateGardenRequestSchema = Joi.object({
     height: Joi.number().min(0.5).max(10),
   }).optional(),
   waterLimit: Joi.number().min(0).optional(),
-  userExperience: Joi.number().valid(1, 2, 3).optional(),
+  userExperience: Joi.number().valid(1, 2, 3).required(),
   season: Joi.string().valid('auto', 'spring', 'summer', 'autumn', 'winter').optional(),
   location: Joi.object({
     lat: Joi.number().min(-90).max(90),
