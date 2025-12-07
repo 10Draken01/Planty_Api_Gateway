@@ -4,7 +4,7 @@
  */
 
 export interface PlantProps {
-  _id: number;
+  id: number;
   species: string;
   scientificName: string;
   type: string[];
@@ -50,7 +50,7 @@ export class Plant {
     }
 
     return new Plant({
-      _id: data._id,
+      id: data.id,
       species: data.species.trim(),
       scientificName: data.scientificName.trim(),
       type: data.type,
@@ -73,7 +73,7 @@ export class Plant {
 
   // Getters
   get id(): number {
-    return this.props._id;
+    return this.props.id;
   }
 
   get species(): string {
@@ -158,7 +158,7 @@ export class Plant {
    */
   toJSON() {
     return {
-      id: this.props._id,
+      id: this.props.id,
       species: this.props.species,
       scientificName: this.props.scientificName,
       type: [...this.props.type],

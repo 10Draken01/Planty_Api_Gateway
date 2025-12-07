@@ -108,7 +108,7 @@ export const algorithmGenServiceProxy = createProxyMiddleware({
  * Redirige todas las peticiones a /plants al microservicio api-plants
  */
 export const plantServiceProxy = createProxyMiddleware({
-  target: process.env.PLANT_SERVICE_URL || 'http://localhost:3006',
+  target: process.env.PLANT_SERVICE_URL || 'http://localhost:3007',
   changeOrigin: true,
   pathRewrite: { '^/api/plants': '/plants' },
   logLevel: 'debug',
