@@ -3,10 +3,19 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 export const userServiceProxy = createProxyMiddleware({
   target: 'http://localhost:3001',
   changeOrigin: true,
-  pathRewrite: { '^/users': '/api' },
-  timeout: 30000, // 30 segundos
+  pathRewrite: { '^/api/users': '/api' },
+  timeout: 30000,
   proxyTimeout: 30000,
   logLevel: 'debug',
+
+  onProxyReq: (proxyReq, req) => {
+    if (req.body && Object.keys(req.body).length) {
+      const bodyData = JSON.stringify(req.body);
+      proxyReq.setHeader('Content-Type', 'application/json');
+      proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+      proxyReq.write(bodyData);
+    }
+  },
 });
 
 export const authServiceProxy = createProxyMiddleware({

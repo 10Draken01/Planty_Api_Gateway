@@ -10,7 +10,8 @@ export interface UserProps {
   tokenFCM?: string; // Token de Firebase Cloud Messaging para notificaciones push
   createdAt?: Date;
   historyTimeUse_ids?: Date[];
-  preferred_plant_category?: 'aromatic' | 'medicinal' | 'vegetable' | 'ornamental';
+  // Preferencias del usuario puede elegir todas o ninguna
+  preferred_plant_category?: ('aromatic' | 'medicinal' | 'vegetable' | 'ornamental')[];
   favorite_plants?: number[];
 }
 
@@ -26,7 +27,7 @@ export class User {
   private _tokenFCM: string | undefined;
   private _createdAt: Date;
   private _historyTimeUse_ids: Date[];
-  private _preferred_plant_category?: 'aromatic' | 'medicinal' | 'vegetable' | 'ornamental';
+  private _preferred_plant_category?: ('aromatic' | 'medicinal' | 'vegetable' | 'ornamental')[];
   private _favorite_plants: number[];
 
 
@@ -94,7 +95,8 @@ export class User {
     this._tokenFCM = token;
   }
 
-  get preferred_plant_category(): 'aromatic' | 'medicinal' | 'vegetable' | 'ornamental' | undefined {
+  
+  get preferred_plant_category(): ('aromatic' | 'medicinal' | 'vegetable' | 'ornamental')[] | undefined {
     return this._preferred_plant_category;
   }
 

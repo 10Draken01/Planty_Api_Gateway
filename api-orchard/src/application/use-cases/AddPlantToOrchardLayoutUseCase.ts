@@ -74,7 +74,8 @@ export class AddPlantToOrchardLayoutUseCase {
       position,
       width: dto.width ?? 1,
       height: dto.height ?? 1,
-      rotation: dto.rotation ?? 0
+      rotation: dto.rotation ?? 0,
+      status: 'planned'
     });
 
     // Persistir cambios

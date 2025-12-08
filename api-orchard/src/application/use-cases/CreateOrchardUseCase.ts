@@ -10,6 +10,8 @@
 import { Orchard } from '@domain/entities/Orchard';
 import { OrchardRepository } from '@domain/repositories/OrchardRepository';
 import { Dimensions } from '@domain/value-objects/Dimensions';
+import { PlantInLayout } from '@domain/entities/PlantInLayout';
+import { Position } from '@domain/value-objects/Position';
 import { CreateOrchardDTO, OrchardInfoDTO } from '../dtos/OrchardDTOs';
 
 export class CreateOrchardUseCase {
@@ -17,6 +19,8 @@ export class CreateOrchardUseCase {
 
   async execute(dto: CreateOrchardDTO): Promise<OrchardInfoDTO> {
     // Validaciones
+
+    console.log('CreateOrchardUseCase: Validating input DTO', dto);
     if (!dto.userId || dto.userId.trim().length === 0) {
       throw new Error('El ID del usuario es requerido');
     }
@@ -56,14 +60,26 @@ export class CreateOrchardUseCase {
     // Crear dimensiones
     const dimensions = new Dimensions(dto.width, dto.height);
 
+    // Convertir las plantas del DTO a instancias de PlantInLayout
+    const plants: PlantInLayout[] = dto.plants ? dto.plants.map((plantData: any) => {
+      return PlantInLayout.create({
+        plantId: plantData.plantId,
+        position: new Position(plantData.position.x, plantData.position.y),
+        width: plantData.width,
+        height: plantData.height,
+        rotation: plantData.rotation || 0,
+        status: plantData.status
+      });
+    }) : [];
+
     // Crear la entidad
     const orchard = Orchard.create({
       userId: dto.userId,
       name: dto.name,
       description: dto.description,
-      plants: dto.plants,
+      plants,
       dimensions,
-      state: dto.state !== undefined ? dto.state : true
+      state: dto.state || false
     });
 
     // Guardar en el repositorio

@@ -13,6 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { PlantInLayout, PlantInLayoutProps } from './PlantInLayout';
 import { Position } from '../value-objects/Position';
 import { Dimensions } from '../value-objects/Dimensions';
+import { AddPlantToOrchardLayoutUseCase } from '@application/use-cases/AddPlantToOrchardLayoutUseCase';
 
 export interface OrchardProps {
   _id: string;
@@ -52,6 +53,7 @@ export class Orchard {
       throw new Error('Las dimensiones del huerto son requeridas');
     }
 
+
     const now = new Date();
 
     return new Orchard({
@@ -61,7 +63,7 @@ export class Orchard {
       description: data.description.trim(),
       dimensions: data.dimensions,
       plants: data.plants || [],
-      state: data.state !== undefined ? data.state : true,
+      state: data.state !== undefined ? data.state : false,
       createAt: now,
       updateAt: now,
       timeOfLife: 0,
@@ -143,7 +145,7 @@ export class Orchard {
    * @throws Error si la planta está fuera de límites o hay colisión
    */
   addPlantToLayout(
-    plantData: Omit<PlantInLayoutProps, 'id' | 'status' | 'plantedAt'>
+    plantData: Omit<PlantInLayoutProps, 'id' | 'plantedAt'>
   ): PlantInLayout {
     const newPlant = PlantInLayout.create(plantData);
 
@@ -344,6 +346,7 @@ export class Orchard {
    */
   getAvailableArea(): number {
     const usedArea = this.props.plants.reduce((sum, plant) => {
+      console.log('Calculating area for plant:', plant.constructor.name);
       return sum + plant.getArea();
     }, 0);
 

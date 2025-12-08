@@ -25,7 +25,7 @@ export class PlantInLayout {
    * Factory method para crear una nueva instancia
    */
   static create(
-    data: Omit<PlantInLayoutProps, 'id' | 'status' | 'plantedAt'> & {
+    data: Omit<PlantInLayoutProps, 'id' | 'plantedAt'> & {
       width?: number;
       height?: number;
       rotation?: number;

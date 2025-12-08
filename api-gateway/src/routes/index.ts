@@ -21,7 +21,7 @@ router.use('/chat/message', validateTokenWithAuthService, protectedChatbotProxy)
 
 // Ruta para el servicio de Orchards
 // Puedes descomentar validateTokenWithAuthService si quieres que requiera autenticación
-router.use('/orchards', validateTokenWithAuthService, orchardServiceProxy);
+router.use('/orchards', orchardServiceProxy);
 // router.use('/orchards', validateTokenWithAuthService, orchardServiceProxy); // Con autenticación
 
 // Ruta para el servicio de Algoritmo Genético (PlantGen)

@@ -8,7 +8,7 @@ export interface UpdateUserByIdRequest {
   password?: string;
   experience_level?: number;
   profile_image?: string;
-  preferred_plant_category?: 'aromatic' | 'medicinal' | 'vegetable' | 'ornamental';
+  preferred_plant_category?: ('aromatic' | 'medicinal' | 'vegetable' | 'ornamental')[];
   favorite_plants?: number[];
 }
 
@@ -63,7 +63,7 @@ export class UpdateUserByIdUseCase {
     // Validar preferred_plant_category si se está actualizando
     if (request.preferred_plant_category !== undefined) {
       const validCategories = ['aromatic', 'medicinal', 'vegetable', 'ornamental'];
-      if (!validCategories.includes(request.preferred_plant_category)) {
+      if (!request.preferred_plant_category.every(category => validCategories.includes(category))) {
         throw new Error('Categoría de planta no válida. Debe ser: aromatic, medicinal, vegetable u ornamental');
       }
     }
@@ -83,6 +83,10 @@ export class UpdateUserByIdUseCase {
     });
 
     // Guardar cambios
-    return await this.userRepository.update(updatedUser);
+    try {
+      return await this.userRepository.update(updatedUser);
+    } catch (error) {
+      throw new Error('Error al actualizar el usuario: ' + (error as Error).message);
+    }
   }
 }

@@ -51,6 +51,8 @@ export class MongoUserRepository implements UserRepository {
       is_verified: user.is_verified,
       experience_level: user.experience_level,
       profile_image: user.profile_image,
+      preferred_plant_category: user.preferred_plant_category,
+      favorite_plants: user.favorite_plants,
       historyTimeUse_ids: user.historyTimeUse_ids
     };
 

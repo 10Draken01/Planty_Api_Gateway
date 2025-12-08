@@ -21,19 +21,19 @@ export interface UserDocument extends Document {
   name: string;
   email: string;
   password: string;
-  is_verified: boolean; // Indica si el usuario ha verificado su cuenta con 2FA
+  is_verified: boolean;
   orchards_id: string[];
   count_orchards: number;
   experience_level: 1 | 2 | 3;
   profile_image: string;
-  tokenFCM?: string; // Token de Firebase Cloud Messaging
+  tokenFCM?: string;
   historyTimeUse_ids: Date[];
 
-  // 🆕 PREFERENCIAS DE USUARIO
-  preferred_plant_category?: 'aromatic' | 'medicinal' | 'vegetable' | 'ornamental';
-  favorite_plants?: number[]; // IDs de plantas favoritas
+  // PREFERENCIAS DE USUARIO
+  preferred_plant_category?: ('aromatic' | 'medicinal' | 'vegetable' | 'ornamental')[];
+  favorite_plants?: number[];
 
-  // 🆕 NUEVOS CAMPOS PARA CHATBOT
+  // NUEVOS CAMPOS PARA CHATBOT
   chatPreferences?: ChatPreferences;
   chatMetrics?: ChatMetrics;
 
@@ -67,12 +67,20 @@ const UserSchema = new Schema<UserDocument>({
     required: true,
     default: false
   },
+  orchards_id: { // 🔧 Campo faltante en el schema
+    type: [String],
+    default: []
+  },
+  count_orchards: { // 🔧 Campo faltante en el schema
+    type: Number,
+    default: 0
+  },
   experience_level: {
     type: Number,
     required: true,
     default: 1,
     min: 1,
-    max: 4
+    max: 3
   },
   profile_image: {
     type: String,
@@ -88,9 +96,9 @@ const UserSchema = new Schema<UserDocument>({
     default: []
   },
 
-  // 🆕 PREFERENCIAS DE USUARIO
+  // PREFERENCIAS DE USUARIO
   preferred_plant_category: {
-    type: String,
+    type: [String],
     enum: ['aromatic', 'medicinal', 'vegetable', 'ornamental'],
     required: false
   },
@@ -100,64 +108,47 @@ const UserSchema = new Schema<UserDocument>({
     required: false
   },
 
-  // 🆕 NUEVOS CAMPOS PARA CHATBOT
+  // NUEVOS CAMPOS PARA CHATBOT
   chatPreferences: {
-    type: {
-      favoritePlants: {
-        type: [String],
-        default: []
-      },
-      interests: {
-        type: [String],
-        default: []
-      },
-      responseStyle: {
-        type: String,
-        enum: ['concise', 'detailed'],
-        default: 'detailed'
-      },
-      language: {
-        type: String,
-        enum: ['es', 'en'],
-        default: 'es'
-      }
+    favoritePlants: {
+      type: [String],
+      default: []
     },
-    required: false,
-    default: {
-      favoritePlants: [],
-      interests: [],
-      responseStyle: 'detailed',
-      language: 'es'
+    interests: {
+      type: [String],
+      default: []
+    },
+    responseStyle: {
+      type: String,
+      enum: ['concise', 'detailed'],
+      default: 'detailed'
+    },
+    language: {
+      type: String,
+      enum: ['es', 'en'],
+      default: 'es'
     }
   },
   chatMetrics: {
-    type: {
-      totalMessages: {
-        type: Number,
-        default: 0
-      },
-      totalSessions: {
-        type: Number,
-        default: 0
-      },
-      averageSessionDuration: {
-        type: Number,
-        default: 0
-      },
-      lastActiveAt: {
-        type: Date
-      },
-      satisfactionScore: {
-        type: Number,
-        min: 1,
-        max: 5
-      }
+    totalMessages: {
+      type: Number,
+      default: 0
     },
-    required: false,
-    default: {
-      totalMessages: 0,
-      totalSessions: 0,
-      averageSessionDuration: 0
+    totalSessions: {
+      type: Number,
+      default: 0
+    },
+    averageSessionDuration: {
+      type: Number,
+      default: 0
+    },
+    lastActiveAt: {
+      type: Date
+    },
+    satisfactionScore: {
+      type: Number,
+      min: 1,
+      max: 5
     }
   }
 }, {
@@ -168,6 +159,5 @@ const UserSchema = new Schema<UserDocument>({
 // Índices adicionales para chatbot
 UserSchema.index({ 'chatMetrics.lastActiveAt': 1 });
 UserSchema.index({ 'chatPreferences.interests': 1 });
-
 
 export const UserModel = mongoose.model<UserDocument>('User', UserSchema);
