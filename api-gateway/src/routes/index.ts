@@ -30,8 +30,7 @@ router.use('/algorithm-gen', validateTokenWithAuthService, algorithmGenServicePr
 // router.use('/algorithm-gen', validateTokenWithAuthService, algorithmGenServiceProxy); // Con autenticación
 
 // Ruta para el servicio de Plants (Catálogo de plantas)
-// Sin autenticación - endpoint público para consultar plantas
+// Con autenticación para acceder al catálogo de plantas
 router.use('/plants', validateTokenWithAuthService, plantServiceProxy);
-// router.use('/plants', validateTokenWithAuthService, plantServiceProxy); // Con autenticación
 
 export default router;

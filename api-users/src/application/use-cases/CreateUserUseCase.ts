@@ -24,7 +24,6 @@ export class CreateUserUseCase {
     if (existingUser) {
       throw new Error('El usuario ya existe');
     }
-      console.log(request);
 
     // Validar nivel de experiencia si se proporciona
     if (request.experience_level && (request.experience_level < 1 || request.experience_level > 4)) {
@@ -59,7 +58,7 @@ export class CreateUserUseCase {
       historyTimeUse_ids: request.historyTimeUse_ids || []
     });
 
-
+    console.log('Usuario creado con experience_level:', user.experience_level);
     return await this.userRepository.save(user);
   }
 }

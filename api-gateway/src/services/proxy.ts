@@ -4,6 +4,9 @@ export const userServiceProxy = createProxyMiddleware({
   target: 'http://localhost:3001',
   changeOrigin: true,
   pathRewrite: { '^/users': '/api' },
+  timeout: 30000, // 30 segundos
+  proxyTimeout: 30000,
+  logLevel: 'debug',
 });
 
 export const authServiceProxy = createProxyMiddleware({

@@ -6,6 +6,7 @@ import { UpdateUserByIdUseCase } from '../../application/use-cases/UpdateUserByI
 import { DeleteUserByIdUseCase } from '../../application/use-cases/DeleteUserByIdUseCase';
 import { UpdateTokenFCMUseCase } from '../../application/use-cases/UpdateTokenFCMUseCase';
 import { VerifyUserUseCase } from '../../application/use-cases/VerifyUserUseCase';
+import { UpdateExperienceLevelUseCase } from '../../application/use-cases/UpdateExperienceLevelUseCase';
 
 
 export class UserController {
@@ -16,7 +17,8 @@ export class UserController {
     private updateUserByIdUseCase: UpdateUserByIdUseCase,
     private deleteUserByIdUseCase: DeleteUserByIdUseCase,
     private updateTokenFCMUseCase: UpdateTokenFCMUseCase,
-    private verifyUserUseCase: VerifyUserUseCase
+    private verifyUserUseCase: VerifyUserUseCase,
+    private updateExperienceLevelUseCase: UpdateExperienceLevelUseCase
   ) {}
 
   async createUser(req: Request, res: Response): Promise<void> {
@@ -414,6 +416,77 @@ export class UserController {
         res.status(404).json({
           message: error.message,
           status: 404
+        });
+        return;
+      }
+
+      res.status(500).json({
+        message: 'Error en el servidor',
+        error: error.message,
+        status: 500
+      });
+    }
+  }
+
+  /**
+   * Actualiza el nivel de experiencia de un usuario
+   * Endpoint usado por el cliente móvil desde la pantalla de preferencias
+   */
+  async updateExperienceLevel(req: Request, res: Response): Promise<void> {
+    try {
+      console.log('🎯 updateExperienceLevel - Request recibido');
+      console.log('📋 Params:', req.params);
+      console.log('📋 Body:', req.body);
+
+      const { id } = req.params;
+      const { experience_level } = req.body;
+
+      if (!experience_level) {
+        console.log('❌ experience_level no proporcionado');
+        res.status(400).json({
+          message: 'El nivel de experiencia es requerido',
+          status: 400
+        });
+        return;
+      }
+
+      console.log(`🔄 Actualizando usuario ${id} a nivel ${experience_level}`);
+
+      const user = await this.updateExperienceLevelUseCase.execute({
+        userId: id,
+        experience_level
+      });
+
+      console.log('✅ Usuario actualizado exitosamente:', user.experience_level);
+
+      res.status(200).json({
+        message: 'Nivel de experiencia actualizado exitosamente',
+        status: 200,
+        data: user.toJSON()
+      });
+
+    } catch (error: any) {
+      if (error.message === 'Usuario no encontrado') {
+        res.status(404).json({
+          message: error.message,
+          status: 404
+        });
+        return;
+      }
+
+      if (error.message === 'El ID del usuario es requerido') {
+        res.status(400).json({
+          message: error.message,
+          status: 400
+        });
+        return;
+      }
+
+      if (error.message === 'El nivel de experiencia debe estar entre 1 y 3' ||
+          error.message === 'El nivel de experiencia es requerido') {
+        res.status(400).json({
+          message: error.message,
+          status: 400
         });
         return;
       }

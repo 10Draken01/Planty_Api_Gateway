@@ -21,6 +21,9 @@ export class UserRoutes {
     // Endpoint para actualizar token FCM (usado por Notifications Service)
     this.router.patch('/:id/fcm-token', (req, res) => this.userController.updateTokenFCM(req, res));
 
+    // Endpoint para actualizar nivel de experiencia (usado por Mobile Client - Preferencias)
+    this.router.patch('/:id/experience-level', (req, res) => this.userController.updateExperienceLevel(req, res));
+
     // Endpoint para verificar usuario (usado por Auth Service después de validar OTP 2FA)
     this.router.post('/verify', (req, res) => this.userController.verifyUser(req, res));
   }

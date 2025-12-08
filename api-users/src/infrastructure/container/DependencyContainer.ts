@@ -11,6 +11,7 @@ import { UpdateUserByIdUseCase } from '../../application/use-cases/UpdateUserByI
 import { DeleteUserByIdUseCase } from '../../application/use-cases/DeleteUserByIdUseCase';
 import { UpdateTokenFCMUseCase } from '../../application/use-cases/UpdateTokenFCMUseCase';
 import { VerifyUserUseCase } from '../../application/use-cases/VerifyUserUseCase';
+import { UpdateExperienceLevelUseCase } from '../../application/use-cases/UpdateExperienceLevelUseCase';
 
 // Services
 import { MemoryService } from '../../application/services/MemoryService';
@@ -38,6 +39,7 @@ export class DependencyContainer {
   private deleteUserByIdUseCase: DeleteUserByIdUseCase
   private updateTokenFCMUseCase: UpdateTokenFCMUseCase
   private verifyUserUseCase: VerifyUserUseCase
+  private updateExperienceLevelUseCase: UpdateExperienceLevelUseCase
 
   // Services
   private memoryService: MemoryService;
@@ -95,6 +97,10 @@ export class DependencyContainer {
       this.userRepository
     );
 
+    this.updateExperienceLevelUseCase = new UpdateExperienceLevelUseCase(
+      this.userRepository
+    );
+
   }
   private async initDatabaseConnection(
     mongoRootUser: string,
@@ -114,7 +120,8 @@ export class DependencyContainer {
       this.updateUserByIdUseCase,
       this.deleteUserByIdUseCase,
       this.updateTokenFCMUseCase,
-      this.verifyUserUseCase
+      this.verifyUserUseCase,
+      this.updateExperienceLevelUseCase
     );
 
     // Routes
