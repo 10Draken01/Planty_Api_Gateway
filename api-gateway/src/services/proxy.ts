@@ -95,7 +95,7 @@ export const orchardServiceProxy = createProxyMiddleware({
 export const algorithmGenServiceProxy = createProxyMiddleware({
   target: process.env.ALGORITHM_GEN_SERVICE_URL || 'http://localhost:3005',
   changeOrigin: true,
-  pathRewrite: { '^/api/algorithm-gen': '/algorithm_gen' },
+  pathRewrite: { '^/api/algorithm-gen': '' },
   logLevel: 'debug',
 
   onProxyReq: (proxyReq, req) => {

@@ -12,11 +12,11 @@ export class CategoryDistribution {
   public readonly aromatic: number;
 
   constructor(data: CategoryDistributionData = {}) {
-    // Valores por defecto: 25% cada categoría
-    this.vegetable = data.vegetable ?? 25;
-    this.medicinal = data.medicinal ?? 25;
-    this.ornamental = data.ornamental ?? 25;
-    this.aromatic = data.aromatic ?? 25;
+    // Valores por defecto: 0% para categorías no especificadas
+    this.vegetable = data.vegetable ?? 0;
+    this.medicinal = data.medicinal ?? 0;
+    this.ornamental = data.ornamental ?? 0;
+    this.aromatic = data.aromatic ?? 0;
 
     // Validar que sumen 100
     const total = this.vegetable + this.medicinal + this.ornamental + this.aromatic;

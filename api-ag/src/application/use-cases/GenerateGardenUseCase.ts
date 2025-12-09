@@ -98,11 +98,11 @@ export class GenerateGardenUseCase {
 
       // 7. Transformar a DTOs (Top 3 soluciones)
       const solutions: SolutionDto[] = result.topSolutions.slice(0, 3).map((individual, index) => {
-        const calendar = calendarGenerator.generateCalendar(individual, {
+        const rawCalendar = calendarGenerator.generateCalendar(individual, {
           latitude: normalizedRequest.location.lat,
           longitude: normalizedRequest.location.lon,
         });
-        return this.transformToSolutionDto(individual, index + 1, calendar, compatibilityMatrix);
+        return this.transformToSolutionDto(individual, index + 1, rawCalendar, compatibilityMatrix);
       });
 
       // 8. Construir respuesta
@@ -169,7 +169,7 @@ export class GenerateGardenUseCase {
   private transformToSolutionDto(
     individual: Individual,
     rank: number,
-    calendar: any,
+    rawCalendar: any,
     compatibilityMatrix: Map<string, Map<string, number>>
   ): SolutionDto {
     // Calcular estimaciones
@@ -201,11 +201,34 @@ export class GenerateGardenUseCase {
       });
     }
 
+    // Transformar calendario al formato del DTO
+    const calendar = {
+      currentSeason: rawCalendar.season,
+      hemisphere: rawCalendar.hemisphere,
+      plantingSchedule: rawCalendar.plantingSchedule.map((item: any) => ({
+        id: item.plantId,
+        plant: item.plant,
+        plantingWeek: item.plantingWeek,
+        harvestWeek: item.harvestWeek,
+        daysToHarvest: item.daysToHarvest,
+        notes: item.notes,
+      })),
+      monthlyTasks: rawCalendar.monthlyTasks,
+    };
+
     return {
       rank,
       layout: {
         dimensions: individual.dimensions.toJSON(),
-        plants: individual.plants.map(p => p.toJSON() as any),
+        plants: individual.plants.map(p => ({
+          id: p.plant.id,
+          name: p.plant.species,
+          scientificName: p.plant.scientificName,
+          quantity: 1,
+          position: p.position.toJSON(),
+          area: p.totalArea,
+          type: p.plant.type,
+        })),
         totalPlants: individual.totalPlants,
         usedArea: individual.usedArea,
         availableArea: individual.availableArea,

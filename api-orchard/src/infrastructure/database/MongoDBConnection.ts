@@ -28,7 +28,19 @@ export class MongoDBConnection {
       }
 
       console.log('🔌 Conectando a MongoDB...');
-      const uri = `mongodb://${config.mongodb.rootUser}:${config.mongodb.rootPassword}@localhost:27017/${config.mongodb.dbName}?authSource=admin`;
+
+      // Si hay credenciales configuradas, usar autenticación
+      // Si no, conectar sin autenticación (desarrollo local)
+      let uri: string;
+      if (config.mongodb.rootUser && config.mongodb.rootPassword &&
+          config.mongodb.rootUser !== 'admin') {
+        uri = `mongodb://${config.mongodb.rootUser}:${config.mongodb.rootPassword}@localhost:27017/${config.mongodb.dbName}?authSource=admin`;
+        console.log('  → Conectando con autenticación...');
+      } else {
+        uri = `mongodb://localhost:27017/${config.mongodb.dbName}`;
+        console.log('  → Conectando sin autenticación (desarrollo local)...');
+      }
+
       this.client = new MongoClient(uri);
       await this.client.connect();
 
