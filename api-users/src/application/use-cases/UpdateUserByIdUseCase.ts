@@ -6,7 +6,7 @@ export interface UpdateUserByIdRequest {
   name?: string;
   email?: string;
   password?: string;
-  experience_level?: number;
+  experience_level?: 1 | 2 | 3;
   profile_image?: string;
   preferred_plant_category?: ('aromatic' | 'medicinal' | 'vegetable' | 'ornamental')[];
   favorite_plants?: number[];

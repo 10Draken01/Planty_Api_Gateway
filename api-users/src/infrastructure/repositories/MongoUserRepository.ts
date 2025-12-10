@@ -74,7 +74,7 @@ export class MongoUserRepository implements UserRepository {
     return result.deletedCount > 0;
   }
 
-  async findByExperienceLevel(level: number): Promise<User[]> {
+  async findByExperienceLevel(level: 1 | 2 | 3): Promise<User[]> {
     const userDocuments = await UserModel.find({ experience_level: level });
     return userDocuments.map(doc => this.toDomainEntity(doc));
   }

@@ -5,7 +5,7 @@ export interface UserProps {
   password: string;
   is_verified?: boolean; // Indica si el usuario ha verificado su cuenta con 2FA
   count_orchards?: number;
-  experience_level?: 1 | 2 | 3 | 4;
+  experience_level?: 1 | 2 | 3;
   profile_image?: string;
   tokenFCM?: string; // Token de Firebase Cloud Messaging para notificaciones push
   createdAt?: Date;
@@ -22,7 +22,7 @@ export class User {
   private _password: string;
   private _is_verified: boolean;
   private _count_orchards: number;
-  private _experience_level: 1 | 2 | 3 | 4;
+  private _experience_level: 1 | 2 | 3;
   private _profile_image: string;
   private _tokenFCM: string | undefined;
   private _createdAt: Date;

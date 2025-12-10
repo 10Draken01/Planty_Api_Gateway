@@ -25,7 +25,7 @@ const OBJECTIVE_WEIGHTS: Record<
   ornamental: { CEE: 0.15, PSRNT: 0.30, EH: 0.10, UE: 0.20, CS: 0.10, BSN: 0.15 },
 };
 
-export interface ImprovedFitnessConfig {
+export interface FitnessConfig {
   compatibilityMatrix: Map<string, Map<string, number>>;
   objective: Objective;
   desiredCategoryDistribution?: CategoryDistribution;
@@ -33,8 +33,8 @@ export interface ImprovedFitnessConfig {
   season?: 'spring' | 'summer' | 'autumn' | 'winter';
 }
 
-export class ImprovedFitnessCalculator {
-  constructor(private config: ImprovedFitnessConfig) {}
+export class FitnessCalculator {
+  constructor(private config: FitnessConfig) {}
 
   /**
    * Calcula el fitness completo de un individuo.

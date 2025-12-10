@@ -1,5 +1,5 @@
 import { Plant } from '../entities/Plant';
-import { Objective } from './ImprovedFitnessCalculator';
+import { Objective } from './FitnessCalculator';
 
 export interface PlantSelectionConfig {
   desiredPlantIds?: number[]; // MEJORADO: IDs de plantas deseadas por el usuario

@@ -21,7 +21,9 @@ import { ToggleOrchardStateUseCase } from '@application/use-cases/ToggleOrchardS
 import { AddPlantToOrchardLayoutUseCase } from '@application/use-cases/AddPlantToOrchardLayoutUseCase';
 import { MovePlantInLayoutUseCase } from '@application/use-cases/MovePlantInLayoutUseCase';
 import { RemovePlantFromLayoutUseCase } from '@application/use-cases/RemovePlantFromLayoutUseCase';
+import { SeedOrchardsUseCase } from '@application/use-cases/SeedOrchardsUseCase';
 import { OrchardController } from '@presentation/controllers/OrchardController';
+import { SeedController } from '@presentation/controllers/SeedController';
 import { OrchardRoutes } from '@presentation/routes/OrchardRoutes';
 
 export class DependencyContainer {
@@ -42,9 +44,11 @@ export class DependencyContainer {
   private addPlantToLayoutUseCase!: AddPlantToOrchardLayoutUseCase;
   private movePlantInLayoutUseCase!: MovePlantInLayoutUseCase;
   private removePlantFromLayoutUseCase!: RemovePlantFromLayoutUseCase;
+  private seedOrchardsUseCase!: SeedOrchardsUseCase;
 
   // Controllers
   private orchardController!: OrchardController;
+  private seedController!: SeedController;
 
   constructor() {
     this.dbConnection = MongoDBConnection.getInstance();
@@ -78,6 +82,9 @@ export class DependencyContainer {
       this.movePlantInLayoutUseCase = new MovePlantInLayoutUseCase(this.orchardRepository);
       this.removePlantFromLayoutUseCase = new RemovePlantFromLayoutUseCase(this.orchardRepository);
 
+      // ✅ CASO DE USO PARA SEED
+      this.seedOrchardsUseCase = new SeedOrchardsUseCase(this.orchardRepository);
+
       console.log('✓ Casos de uso inicializados');
 
       // 4. Inicializar controladores
@@ -93,6 +100,9 @@ export class DependencyContainer {
         this.movePlantInLayoutUseCase,     // ✅ NUEVO
         this.removePlantFromLayoutUseCase  // ✅ NUEVO
       );
+
+      this.seedController = new SeedController(this.seedOrchardsUseCase);
+
       console.log('✓ Controladores inicializados');
 
       console.log('✓ Dependencias inicializadas correctamente\n');
@@ -109,7 +119,7 @@ export class DependencyContainer {
     if (!this.orchardController) {
       throw new Error('El contenedor no ha sido inicializado');
     }
-    return OrchardRoutes.create(this.orchardController);
+    return OrchardRoutes.create(this.orchardController, this.seedController);
   }
 
   /**

@@ -7,6 +7,7 @@ import { DeleteUserByIdUseCase } from '../../application/use-cases/DeleteUserByI
 import { UpdateTokenFCMUseCase } from '../../application/use-cases/UpdateTokenFCMUseCase';
 import { VerifyUserUseCase } from '../../application/use-cases/VerifyUserUseCase';
 import { UpdateExperienceLevelUseCase } from '../../application/use-cases/UpdateExperienceLevelUseCase';
+import { ListUsersUseCase } from '../../application/use-cases/ListUsersUseCase';
 
 
 export class UserController {
@@ -18,7 +19,8 @@ export class UserController {
     private deleteUserByIdUseCase: DeleteUserByIdUseCase,
     private updateTokenFCMUseCase: UpdateTokenFCMUseCase,
     private verifyUserUseCase: VerifyUserUseCase,
-    private updateExperienceLevelUseCase: UpdateExperienceLevelUseCase
+    private updateExperienceLevelUseCase: UpdateExperienceLevelUseCase,
+    private listUsersUseCase: ListUsersUseCase
   ) {}
 
   async createUser(req: Request, res: Response): Promise<void> {
@@ -491,6 +493,37 @@ export class UserController {
         return;
       }
 
+      res.status(500).json({
+        message: 'Error en el servidor',
+        error: error.message,
+        status: 500
+      });
+    }
+  }
+
+  /**
+   * Lista usuarios con paginación
+   * Endpoint usado por otros servicios para obtener usuarios en lotes
+   */
+  async listUsers(req: Request, res: Response): Promise<void> {
+    try {
+      const limit = parseInt(req.query.limit as string) || 100;
+      const offset = parseInt(req.query.offset as string) || 0;
+
+      const users = await this.listUsersUseCase.execute({ limit, offset });
+
+      res.status(200).json({
+        message: 'Usuarios obtenidos exitosamente',
+        status: 200,
+        data: users,
+        pagination: {
+          limit,
+          offset,
+          total: users.length
+        }
+      });
+
+    } catch (error: any) {
       res.status(500).json({
         message: 'Error en el servidor',
         error: error.message,

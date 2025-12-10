@@ -3,12 +3,12 @@ import { Plant } from '../entities/Plant';
 import { PlantInstance } from '../entities/PlantInstance';
 import { Dimensions } from '../value-objects/Dimensions';
 import { Position } from '../value-objects/Position';
-import { ImprovedFitnessCalculator, Objective } from './ImprovedFitnessCalculator';
+import { FitnessCalculator, Objective } from './FitnessCalculato';
 import { PlantSelectorService } from './PlantSelectorService';
 import { CategoryDistribution } from '../value-objects/CategoryDistribution';
 import { logger } from '../../config/logger';
 
-export interface ImprovedGAConfig {
+export interface GAConfig {
   populationSize: number;
   maxGenerations: number;
   crossoverProbability: number;
@@ -24,7 +24,7 @@ export interface ImprovedGAConfig {
   maxSpecies: number; // NUEVO: máximo de especies simultáneas (3 o 5)
 }
 
-export interface ImprovedGAConstraints {
+export interface GAConstraints {
   maxArea: number;
   maxWaterWeekly: number;
   maxBudget?: number;
@@ -32,7 +32,7 @@ export interface ImprovedGAConstraints {
   desiredPlantIds?: number[]; // MEJORADO: IDs de plantas deseadas por usuario
 }
 
-export interface ImprovedGAResult {
+export interface GAResult {
   topSolutions: Individual[];
   generations: number;
   convergenceGeneration: number;
@@ -58,18 +58,18 @@ export interface ImprovedGAResult {
  * 4. Diversidad genética controlada
  * 5. Límite de especies simultáneas
  */
-export class ImprovedGeneticAlgorithm {
-  private config: ImprovedGAConfig;
+export class GeneticAlgorithm {
+  private config: GAConfig;
   private allPlants: Plant[];
   private selectedPlants: Plant[]; // Pool restringido de plantas
-  private fitnessCalculator: ImprovedFitnessCalculator;
+  private fitnessCalculator: FitnessCalculator;
   private rng: () => number;
-  private generationStats: ImprovedGAResult['generationStats'] = [];
+  private generationStats: GAResult['generationStats'] = [];
 
   constructor(
     allPlants: Plant[],
-    fitnessCalculator: ImprovedFitnessCalculator,
-    config: ImprovedGAConfig
+    fitnessCalculator: FitnessCalculator,
+    config: GAConfig
   ) {
     this.allPlants = allPlants;
     this.fitnessCalculator = fitnessCalculator;
@@ -85,11 +85,11 @@ export class ImprovedGeneticAlgorithm {
    * Ejecuta el algoritmo genético completo.
    */
   async run(
-    constraints: ImprovedGAConstraints,
+    constraints: GAConstraints,
     objective: Objective
-  ): Promise<ImprovedGAResult> {
+  ): Promise<GAResult> {
     const startTime = Date.now();
-    let stoppingReason: ImprovedGAResult['stoppingReason'] = 'max_generations';
+    let stoppingReason: GAResult['stoppingReason'] = 'max_generations';
 
     logger.info('Iniciando Algoritmo Genético MEJORADO', {
       population: this.config.populationSize,
@@ -250,7 +250,7 @@ export class ImprovedGeneticAlgorithm {
    * FASE 0: Selección inteligente de plantas.
    */
   private selectPlantsIntelligently(
-    constraints: ImprovedGAConstraints,
+    constraints: GAConstraints,
     objective: Objective
   ): Plant[] {
     const selector = new PlantSelectorService({
@@ -271,7 +271,7 @@ export class ImprovedGeneticAlgorithm {
    * - Distribuye plantas considerando compatibilidad
    * - Genera individuos con diversidad controlada
    */
-  private initializePopulationHeuristic(constraints: ImprovedGAConstraints): Individual[] {
+  private initializePopulationHeuristic(constraints: GAConstraints): Individual[] {
     const population: Individual[] = [];
 
     for (let i = 0; i < this.config.populationSize; i++) {
@@ -291,7 +291,7 @@ export class ImprovedGeneticAlgorithm {
    * - Usa espaciamiento basado en compatibilidad
    * - Evita colisiones y valida límites
    */
-  private createSmartIndividual(constraints: ImprovedGAConstraints, _seed: number): Individual {
+  private createSmartIndividual(constraints: GAConstraints, _seed: number): Individual {
     const area = constraints.maxArea;
     const aspectRatio = 0.6 + this.rng() * 0.8; // Ratio 0.6 a 1.4
     const width = Math.sqrt(area * aspectRatio);
@@ -489,7 +489,7 @@ export class ImprovedGeneticAlgorithm {
    *
    * Inserta una nueva planta del pool con validación de espaciamiento.
    */
-  private insertMutation(individual: Individual, constraints: ImprovedGAConstraints): void {
+  private insertMutation(individual: Individual, constraints: GAConstraints): void {
     // Límite: no exceder maxSpecies * 3 plantas totales (permitir duplicados)
     if (individual.plants.length >= this.config.maxSpecies * 3) return;
 

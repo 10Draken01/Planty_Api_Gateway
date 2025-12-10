@@ -1,16 +1,23 @@
 import { Router } from 'express';
 import { UserController } from '../controllers/UserController.js';
+import { SeedController } from '../controllers/SeedController.js';
 
 export class UserRoutes {
   private router: Router;
 
-  constructor(private userController: UserController) {
+  constructor(
+    private userController: UserController,
+    private seedController?: SeedController
+  ) {
     this.router = Router();
     this.setupRoutes();
   }
 
   private setupRoutes(): void {
-    
+
+    // List users (debe ir ANTES de otras rutas GET)
+    this.router.get('/', (req, res) => this.userController.listUsers(req, res));
+
     this.router.post('/create', (req, res) => this.userController.createUser(req, res));
     this.router.get('/email/:email', (req, res) => this.userController.getUserByEmail(req, res));
 
@@ -26,6 +33,11 @@ export class UserRoutes {
 
     // Endpoint para verificar usuario (usado por Auth Service después de validar OTP 2FA)
     this.router.post('/verify', (req, res) => this.userController.verifyUser(req, res));
+
+    // Endpoint para seed de usuarios (generación de datos de prueba)
+    if (this.seedController) {
+      this.router.post('/seed', (req, res) => this.seedController!.seedUsers(req, res));
+    }
   }
 
   getRouter(): Router {

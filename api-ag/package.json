@@ -20,7 +20,7 @@
     "optimization",
     "multi-objective"
   ],
-  "author": "PlantGen Team",
+  "author": "Vega Script",
   "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",

@@ -10,9 +10,10 @@
 
 import { Router } from 'express';
 import { OrchardController } from '../controllers/OrchardController';
+import { SeedController } from '../controllers/SeedController';
 
 export class OrchardRoutes {
-  static create(orchardController: OrchardController): Router {
+  static create(orchardController: OrchardController, seedController?: SeedController): Router {
     const router = Router();
 
     // ==================== HEALTH CHECK ====================
@@ -112,6 +113,11 @@ export class OrchardRoutes {
       '/:id/plants/layout/:plantInstanceId',
       (req, res) => orchardController.removePlantFromLayout(req, res)
     );
+
+    // ==================== SEED (GENERACIÓN DE DATOS) ====================
+    if (seedController) {
+      router.post('/seed', (req, res) => seedController.seedOrchards(req, res));
+    }
 
     return router;
   }

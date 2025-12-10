@@ -19,7 +19,7 @@
     "push-notifications",
     "microservices"
   ],
-  "author": "Tu Nombre",
+  "author": "Vega Script",
   "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",

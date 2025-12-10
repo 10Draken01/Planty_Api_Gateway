@@ -12,6 +12,8 @@ import { DeleteUserByIdUseCase } from '../../application/use-cases/DeleteUserByI
 import { UpdateTokenFCMUseCase } from '../../application/use-cases/UpdateTokenFCMUseCase';
 import { VerifyUserUseCase } from '../../application/use-cases/VerifyUserUseCase';
 import { UpdateExperienceLevelUseCase } from '../../application/use-cases/UpdateExperienceLevelUseCase';
+import { SeedUsersUseCase } from '../../application/use-cases/SeedUsersUseCase';
+import { ListUsersUseCase } from '../../application/use-cases/ListUsersUseCase';
 
 // Services
 import { MemoryService } from '../../application/services/MemoryService';
@@ -19,6 +21,7 @@ import { MemoryService } from '../../application/services/MemoryService';
 // Controllers
 import { UserController } from '../../presentation/controllers/UserController';
 import { MemoryController } from '../../presentation/controllers/MemoryController';
+import { SeedController } from '../../presentation/controllers/SeedController';
 
 // Routes
 import { UserRoutes } from '../../presentation/routes/UserRoutes';
@@ -40,6 +43,8 @@ export class DependencyContainer {
   private updateTokenFCMUseCase: UpdateTokenFCMUseCase
   private verifyUserUseCase: VerifyUserUseCase
   private updateExperienceLevelUseCase: UpdateExperienceLevelUseCase
+  private seedUsersUseCase: SeedUsersUseCase
+  private listUsersUseCase: ListUsersUseCase
 
   // Services
   private memoryService: MemoryService;
@@ -101,6 +106,14 @@ export class DependencyContainer {
       this.userRepository
     );
 
+    this.seedUsersUseCase = new SeedUsersUseCase(
+      this.userRepository
+    );
+
+    this.listUsersUseCase = new ListUsersUseCase(
+      this.userRepository
+    );
+
   }
   private async initDatabaseConnection(
     mongoRootUser: string,
@@ -121,11 +134,15 @@ export class DependencyContainer {
       this.deleteUserByIdUseCase,
       this.updateTokenFCMUseCase,
       this.verifyUserUseCase,
-      this.updateExperienceLevelUseCase
+      this.updateExperienceLevelUseCase,
+      this.listUsersUseCase
     );
 
+    // Seed controller
+    const seedController = new SeedController(this.seedUsersUseCase);
+
     // Routes
-    return new UserRoutes(userController);
+    return new UserRoutes(userController, seedController);
   }
 
   createMemoryRoutes(): Router {

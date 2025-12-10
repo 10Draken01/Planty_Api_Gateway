@@ -1,8 +1,8 @@
 import { Individual } from '../../domain/entities/Individual';
 import { PlantRepository } from '../../domain/repositories/PlantRepository';
 import { CompatibilityMatrixRepository } from '../../domain/repositories/CompatibilityMatrixRepository';
-import { ImprovedGeneticAlgorithm, ImprovedGAConfig, ImprovedGAConstraints } from '../../domain/services/ImprovedGeneticAlgorithm';
-import { ImprovedFitnessCalculator } from '../../domain/services/ImprovedFitnessCalculator';
+import { GeneticAlgorithm, GAConfig, GAConstraints } from '../../domain/services/GeneticAlgorithm';
+import { FitnessCalculator } from '../../domain/services/FitnessCalculator';
 import { CalendarGeneratorService } from '../../domain/services/CalendarGeneratorService';
 import { CategoryDistribution } from '../../domain/value-objects/CategoryDistribution';
 import { GenerateGardenRequestDto } from '../dtos/GenerateGardenRequestDto';
@@ -56,7 +56,7 @@ export class GenerateGardenUseCase {
       const compatibilityMatrix = await this.compatibilityMatrixRepository.getAllCompatibilities();
 
       // 3. Configurar calculador de fitness MEJORADO
-      const fitnessCalculator = new ImprovedFitnessCalculator({
+      const fitnessCalculator = new FitnessCalculator({
         compatibilityMatrix,
         objective: normalizedRequest.objective,
         desiredCategoryDistribution: normalizedRequest.categoryDistribution,
@@ -65,7 +65,7 @@ export class GenerateGardenUseCase {
       });
 
       // 4. Configurar AG MEJORADO
-      const agConfig: ImprovedGAConfig = {
+      const agConfig: GAConfig = {
         populationSize: env.ag.populationSize,
         maxGenerations: env.ag.maxGenerations,
         crossoverProbability: env.ag.crossoverProbability,
@@ -80,10 +80,10 @@ export class GenerateGardenUseCase {
         maxSpecies: normalizedRequest.maxPlantSpecies, // NUEVO: límite de especies
       };
 
-      const ga = new ImprovedGeneticAlgorithm(plants, fitnessCalculator, agConfig);
+      const ga = new GeneticAlgorithm(plants, fitnessCalculator, agConfig);
 
       // 5. Ejecutar AG MEJORADO
-      const constraints: ImprovedGAConstraints = {
+      const constraints: GAConstraints = {
         maxArea: normalizedRequest.dimensions.width * normalizedRequest.dimensions.height,
         maxWaterWeekly: normalizedRequest.waterLimit,
         maxBudget: normalizedRequest.budget,
