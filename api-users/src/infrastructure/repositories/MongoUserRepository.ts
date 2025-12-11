@@ -117,6 +117,17 @@ export class MongoUserRepository implements UserRepository {
     return this.toDomainEntity(updatedDocument);
   }
 
+  async findByDateRange(startDate: Date, endDate: Date): Promise<User[]> {
+    const userDocuments = await UserModel.find({
+      createdAt: {
+        $gte: startDate,
+        $lte: endDate
+      }
+    }).sort({ createdAt: -1 });
+
+    return userDocuments.map(doc => this.toDomainEntity(doc));
+  }
+
   private toDomainEntity(userDocument: UserDocument): User {
     return new User({
       id: userDocument._id,

@@ -72,4 +72,10 @@ export interface OrchardRepository {
    * Cuenta los huertos activos
    */
   countActive(): Promise<number>;
+
+  /**
+   * Obtiene todos los huertos de una lista de IDs de usuarios
+   * Usado por el servicio de recomendaciones para ML training
+   */
+  findByUserIds(userIds: string[]): Promise<Orchard[]>;
 }

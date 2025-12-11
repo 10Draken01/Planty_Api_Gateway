@@ -14,6 +14,7 @@ import { VerifyUserUseCase } from '../../application/use-cases/VerifyUserUseCase
 import { UpdateExperienceLevelUseCase } from '../../application/use-cases/UpdateExperienceLevelUseCase';
 import { SeedUsersUseCase } from '../../application/use-cases/SeedUsersUseCase';
 import { ListUsersUseCase } from '../../application/use-cases/ListUsersUseCase';
+import { GetUsersByDateRangeUseCase } from '../../application/use-cases/GetUsersByDateRangeUseCase';
 
 // Services
 import { MemoryService } from '../../application/services/MemoryService';
@@ -45,6 +46,7 @@ export class DependencyContainer {
   private updateExperienceLevelUseCase: UpdateExperienceLevelUseCase
   private seedUsersUseCase: SeedUsersUseCase
   private listUsersUseCase: ListUsersUseCase
+  private getUsersByDateRangeUseCase: GetUsersByDateRangeUseCase
 
   // Services
   private memoryService: MemoryService;
@@ -114,6 +116,10 @@ export class DependencyContainer {
       this.userRepository
     );
 
+    this.getUsersByDateRangeUseCase = new GetUsersByDateRangeUseCase(
+      this.userRepository
+    );
+
   }
   private async initDatabaseConnection(
     mongoRootUser: string,
@@ -135,7 +141,8 @@ export class DependencyContainer {
       this.updateTokenFCMUseCase,
       this.verifyUserUseCase,
       this.updateExperienceLevelUseCase,
-      this.listUsersUseCase
+      this.listUsersUseCase,
+      this.getUsersByDateRangeUseCase
     );
 
     // Seed controller

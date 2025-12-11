@@ -8,6 +8,7 @@ import { UpdateTokenFCMUseCase } from '../../application/use-cases/UpdateTokenFC
 import { VerifyUserUseCase } from '../../application/use-cases/VerifyUserUseCase';
 import { UpdateExperienceLevelUseCase } from '../../application/use-cases/UpdateExperienceLevelUseCase';
 import { ListUsersUseCase } from '../../application/use-cases/ListUsersUseCase';
+import { GetUsersByDateRangeUseCase } from '../../application/use-cases/GetUsersByDateRangeUseCase';
 
 
 export class UserController {
@@ -20,7 +21,8 @@ export class UserController {
     private updateTokenFCMUseCase: UpdateTokenFCMUseCase,
     private verifyUserUseCase: VerifyUserUseCase,
     private updateExperienceLevelUseCase: UpdateExperienceLevelUseCase,
-    private listUsersUseCase: ListUsersUseCase
+    private listUsersUseCase: ListUsersUseCase,
+    private getUsersByDateRangeUseCase: GetUsersByDateRangeUseCase
   ) {}
 
   async createUser(req: Request, res: Response): Promise<void> {
@@ -524,6 +526,81 @@ export class UserController {
       });
 
     } catch (error: any) {
+      res.status(500).json({
+        message: 'Error en el servidor',
+        error: error.message,
+        status: 500
+      });
+    }
+  }
+
+  /**
+   * Obtiene usuarios registrados en un rango de fechas
+   * Endpoint usado por el servicio de recomendaciones para ML training
+   */
+  async getUsersByDateRange(req: Request, res: Response): Promise<void> {
+    try {
+      const { startDate, endDate } = req.query;
+
+      if (!startDate || !endDate) {
+        res.status(400).json({
+          message: 'Los parámetros startDate y endDate son requeridos',
+          status: 400
+        });
+        return;
+      }
+
+      const start = new Date(startDate as string);
+      const end = new Date(endDate as string);
+
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        res.status(400).json({
+          message: 'Formato de fecha inválido. Use formato ISO 8601',
+          status: 400
+        });
+        return;
+      }
+
+      const users = await this.getUsersByDateRangeUseCase.execute({
+        startDate: start,
+        endDate: end
+      });
+
+      // Remover datos sensibles (password, email) para ML
+      const sanitizedUsers = users.map(user => ({
+        id: user.id,
+        name: user.name,
+        is_verified: user.is_verified,
+        count_orchards: user.count_orchards,
+        experience_level: user.experience_level,
+        profile_image: user.profile_image,
+        createdAt: user.createdAt,
+        preferred_plant_category: user.preferred_plant_category,
+        favorite_plants: user.favorite_plants,
+        tokenFCM: user.tokenFCM
+      }));
+
+      res.status(200).json({
+        message: 'Usuarios obtenidos exitosamente',
+        status: 200,
+        data: sanitizedUsers,
+        dateRange: {
+          startDate: start,
+          endDate: end
+        },
+        total: sanitizedUsers.length
+      });
+
+    } catch (error: any) {
+      if (error.message === 'La fecha de inicio debe ser anterior a la fecha de fin' ||
+          error.message === 'Las fechas no pueden ser futuras') {
+        res.status(400).json({
+          message: error.message,
+          status: 400
+        });
+        return;
+      }
+
       res.status(500).json({
         message: 'Error en el servidor',
         error: error.message,

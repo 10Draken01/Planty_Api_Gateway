@@ -14,6 +14,7 @@ import { ChromaVectorRepository } from '../database/ChromaVectorRepository';
 import { PDFService } from '../services/PDFService';
 import { TextSplitterService } from '../services/TextSplitterService';
 import { OllamaChatService } from '../services/OllamaChatService';
+import { OllamaService } from '../services/OllamaService';
 
 // 🆕 NUEVOS SERVICIOS CON MEMORIA
 import { CachedOllamaEmbeddingService } from '../services/CachedOllamaEmbeddingService';
@@ -28,6 +29,7 @@ import { GetChatHistoryUseCase } from '@application/use-cases/GetChatHistoryUseC
 
 // 🆕 NUEVO USE CASE CON MEMORIA
 import { SendMessageWithMemoryUseCase } from '@application/use-cases/SendMessageWithMemoryUseCase';
+import { GenerateRecommendationMessageUseCase } from '@application/use-cases/GenerateRecommendationMessageUseCase';
 
 // Controllers
 import { DocumentController } from '@presentation/controllers/DocumentController';
@@ -48,6 +50,7 @@ export class DependencyContainer {
   private textSplitterService: TextSplitterService;
   private embeddingService: CachedOllamaEmbeddingService; // 🆕 Con cache
   private chatService: OllamaChatService;
+  private ollamaService: OllamaService; // Servicio Ollama general
   private usersServiceClient: UsersServiceClient; // 🆕 Cliente para api-users
 
   // Use Cases - Documents
@@ -59,6 +62,7 @@ export class DependencyContainer {
   // Use Cases - Chat
   private sendMessageUseCase: SendMessageWithMemoryUseCase; // 🆕 Con memoria
   private getChatHistoryUseCase: GetChatHistoryUseCase;
+  private generateRecommendationMessageUseCase: GenerateRecommendationMessageUseCase;
 
   // Controllers
   private documentController: DocumentController;
@@ -81,6 +85,9 @@ export class DependencyContainer {
     console.log('  ✓ Embedding service con cache inicializado');
 
     this.chatService = new OllamaChatService();
+
+    // Servicio Ollama general
+    this.ollamaService = new OllamaService();
 
     // 🆕 Cliente para comunicación con api-users
     this.usersServiceClient = new UsersServiceClient();
@@ -116,6 +123,10 @@ export class DependencyContainer {
 
     this.getChatHistoryUseCase = new GetChatHistoryUseCase(this.chatRepository);
 
+    this.generateRecommendationMessageUseCase = new GenerateRecommendationMessageUseCase(
+      this.ollamaService
+    );
+
     // 5. Inicializar Controllers
     this.documentController = new DocumentController(
       this.uploadDocumentUseCase,
@@ -126,7 +137,8 @@ export class DependencyContainer {
 
     this.chatController = new ChatController(
       this.sendMessageUseCase,
-      this.getChatHistoryUseCase
+      this.getChatHistoryUseCase,
+      this.generateRecommendationMessageUseCase
     );
 
     console.log('✅ DependencyContainer CON MEMORIA listo\n');

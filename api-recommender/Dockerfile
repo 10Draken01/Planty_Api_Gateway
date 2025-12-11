@@ -32,11 +32,11 @@ COPY .env.example .env
 RUN mkdir -p models
 
 # Exponer puerto
-EXPOSE 8000
+EXPOSE 3008
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/')" || exit 1
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:3008/')" || exit 1
 
 # Comando de inicio
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "3008"]

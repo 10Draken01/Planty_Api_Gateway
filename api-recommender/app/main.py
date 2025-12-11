@@ -6,8 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from app.core.config import settings
-from app.api import routes
-from app.services.scheduler import start_scheduler
+from app.api import routes_v2
+from app.services.scheduler_v2 import start_scheduler
 
 # Configurar logging
 logging.basicConfig(
@@ -48,9 +48,9 @@ async def lifespan(app: FastAPI):
 
 # Crear app
 app = FastAPI(
-    title="PlantGen Recommender Service",
-    description="Microservicio de recomendaciones con clustering no supervisado",
-    version="1.0.0",
+    title="PlantGen Recommender Service v2",
+    description="Microservicio de recomendaciones con ML multi-algoritmo (K-Prototypes, DBSCAN, GMM)",
+    version="2.0.0",
     lifespan=lifespan
 )
 
@@ -63,8 +63,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Incluir rutas
-app.include_router(routes.router)
+# Incluir rutas v2
+app.include_router(routes_v2.router)
 
 
 @app.get("/")

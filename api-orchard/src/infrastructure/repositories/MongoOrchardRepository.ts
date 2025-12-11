@@ -320,4 +320,18 @@ export class MongoOrchardRepository implements OrchardRepository {
       throw new Error('No se pudo contar los huertos activos');
     }
   }
+
+  async findByUserIds(userIds: string[]): Promise<Orchard[]> {
+    try {
+      const docs = await this.collection
+        .find({ userId: { $in: userIds } })
+        .sort({ createAt: -1 })
+        .toArray();
+
+      return docs.map(doc => this.toDomain(doc));
+    } catch (error) {
+      console.error('Error al buscar huertos por lista de userIds:', error);
+      throw new Error('No se pudieron obtener los huertos de los usuarios');
+    }
+  }
 }

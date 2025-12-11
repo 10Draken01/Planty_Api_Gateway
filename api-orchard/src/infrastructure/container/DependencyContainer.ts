@@ -21,6 +21,7 @@ import { ToggleOrchardStateUseCase } from '@application/use-cases/ToggleOrchardS
 import { AddPlantToOrchardLayoutUseCase } from '@application/use-cases/AddPlantToOrchardLayoutUseCase';
 import { MovePlantInLayoutUseCase } from '@application/use-cases/MovePlantInLayoutUseCase';
 import { RemovePlantFromLayoutUseCase } from '@application/use-cases/RemovePlantFromLayoutUseCase';
+import { GetOrchardsByUserIdsUseCase } from '@application/use-cases/GetOrchardsByUserIdsUseCase';
 import { SeedOrchardsUseCase } from '@application/use-cases/SeedOrchardsUseCase';
 import { OrchardController } from '@presentation/controllers/OrchardController';
 import { SeedController } from '@presentation/controllers/SeedController';
@@ -44,6 +45,7 @@ export class DependencyContainer {
   private addPlantToLayoutUseCase!: AddPlantToOrchardLayoutUseCase;
   private movePlantInLayoutUseCase!: MovePlantInLayoutUseCase;
   private removePlantFromLayoutUseCase!: RemovePlantFromLayoutUseCase;
+  private getOrchardsByUserIdsUseCase!: GetOrchardsByUserIdsUseCase;
   private seedOrchardsUseCase!: SeedOrchardsUseCase;
 
   // Controllers
@@ -82,6 +84,9 @@ export class DependencyContainer {
       this.movePlantInLayoutUseCase = new MovePlantInLayoutUseCase(this.orchardRepository);
       this.removePlantFromLayoutUseCase = new RemovePlantFromLayoutUseCase(this.orchardRepository);
 
+      // ✅ CASO DE USO PARA ML TRAINING
+      this.getOrchardsByUserIdsUseCase = new GetOrchardsByUserIdsUseCase(this.orchardRepository);
+
       // ✅ CASO DE USO PARA SEED
       this.seedOrchardsUseCase = new SeedOrchardsUseCase(this.orchardRepository);
 
@@ -98,7 +103,8 @@ export class DependencyContainer {
         this.toggleOrchardStateUseCase,
         this.addPlantToLayoutUseCase,      // ✅ NUEVO
         this.movePlantInLayoutUseCase,     // ✅ NUEVO
-        this.removePlantFromLayoutUseCase  // ✅ NUEVO
+        this.removePlantFromLayoutUseCase, // ✅ NUEVO
+        this.getOrchardsByUserIdsUseCase   // ✅ NUEVO (ML Training)
       );
 
       this.seedController = new SeedController(this.seedOrchardsUseCase);

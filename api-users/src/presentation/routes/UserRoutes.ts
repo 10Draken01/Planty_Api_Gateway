@@ -18,6 +18,9 @@ export class UserRoutes {
     // List users (debe ir ANTES de otras rutas GET)
     this.router.get('/', (req, res) => this.userController.listUsers(req, res));
 
+    // Get users by date range (para ML training) - debe ir ANTES de /:id
+    this.router.get('/by-registration-date', (req, res) => this.userController.getUsersByDateRange(req, res));
+
     this.router.post('/create', (req, res) => this.userController.createUser(req, res));
     this.router.get('/email/:email', (req, res) => this.userController.getUserByEmail(req, res));
 

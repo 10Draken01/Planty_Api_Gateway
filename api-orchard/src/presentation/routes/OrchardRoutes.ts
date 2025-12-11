@@ -22,6 +22,10 @@ export class OrchardRoutes {
     // ==================== CRUD BÁSICO ====================
     router.post('/', (req, res) => orchardController.create(req, res));
     router.get('/', (req, res) => orchardController.list(req, res));
+
+    // ML Training endpoint - debe ir ANTES de las rutas con :id
+    router.post('/by-users', (req, res) => orchardController.getByUserIds(req, res));
+
     router.get('/user/:userId', (req, res) => orchardController.getByUserId(req, res));
     router.get('/:id', (req, res) => orchardController.getById(req, res));
     router.put('/:id', (req, res) => orchardController.update(req, res));

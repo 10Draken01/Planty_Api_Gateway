@@ -19,6 +19,7 @@ import { ToggleOrchardStateUseCase } from '@application/use-cases/ToggleOrchardS
 import { AddPlantToOrchardLayoutUseCase } from '@application/use-cases/AddPlantToOrchardLayoutUseCase';
 import { MovePlantInLayoutUseCase } from '@application/use-cases/MovePlantInLayoutUseCase';
 import { RemovePlantFromLayoutUseCase } from '@application/use-cases/RemovePlantFromLayoutUseCase';
+import { GetOrchardsByUserIdsUseCase } from '@application/use-cases/GetOrchardsByUserIdsUseCase';
 
 export class OrchardController {
   constructor(
@@ -31,7 +32,8 @@ export class OrchardController {
     private toggleOrchardStateUseCase: ToggleOrchardStateUseCase,
     private addPlantToLayoutUseCase: AddPlantToOrchardLayoutUseCase,
     private movePlantInLayoutUseCase: MovePlantInLayoutUseCase,
-    private removePlantFromLayoutUseCase: RemovePlantFromLayoutUseCase
+    private removePlantFromLayoutUseCase: RemovePlantFromLayoutUseCase,
+    private getOrchardsByUserIdsUseCase: GetOrchardsByUserIdsUseCase
   ) {}
 
   /**
@@ -399,6 +401,48 @@ export class OrchardController {
       res.status(statusCode).json({
         success: false,
         error: error instanceof Error ? error.message : 'Error al remover planta del layout'
+      });
+    }
+  }
+
+  // ==================== ML TRAINING ENDPOINTS ====================
+
+  /**
+   * POST /orchards/by-users
+   * Obtiene huertos de una lista de IDs de usuarios (para ML training)
+   *
+   * Body: {
+   *   userIds: string[]
+   * }
+   */
+  async getByUserIds(req: Request, res: Response): Promise<void> {
+    try {
+      const { userIds } = req.body;
+
+      if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: 'El campo userIds es requerido y debe ser un array no vacío'
+        });
+        return;
+      }
+
+      const orchards = await this.getOrchardsByUserIdsUseCase.execute({ userIds });
+
+      res.status(200).json({
+        success: true,
+        message: `${orchards.length} huertos encontrados`,
+        data: orchards.map(o => o.toJSON()),
+        total: orchards.length
+      });
+
+    } catch (error: any) {
+      const statusCode = error.message.includes('no pueden estar vacía') ||
+                         error.message.includes('no son válidos') ? 400 : 500;
+
+      res.status(statusCode).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Error al obtener huertos por userIds'
       });
     }
   }

@@ -18,4 +18,7 @@ export interface UserRepository {
 
   // Método para verificar usuario (2FA)
   verifyUser(email: string): Promise<User | null>;
+
+  // Método para obtener usuarios por rango de fechas (para ML)
+  findByDateRange(startDate: Date, endDate: Date): Promise<User[]>;
 }

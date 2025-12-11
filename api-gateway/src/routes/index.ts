@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { userServiceProxy, authServiceProxy, protectedChatbotProxy, orchardServiceProxy, algorithmGenServiceProxy, plantServiceProxy } from '../services/proxy';
+import { userServiceProxy, authServiceProxy, protectedChatbotProxy, orchardServiceProxy, algorithmGenServiceProxy, plantServiceProxy, recommenderServiceProxy } from '../services/proxy';
 import { validateTokenWithAuthService } from '../middleware/validateTokenWithAuthService';
 
 const router = Router();
@@ -32,5 +32,9 @@ router.use('/algorithm-gen', validateTokenWithAuthService, algorithmGenServicePr
 // Ruta para el servicio de Plants (Catálogo de plantas)
 // Con autenticación para acceder al catálogo de plantas
 router.use('/plants', validateTokenWithAuthService, plantServiceProxy);
+
+// Ruta para el servicio de Recommender (ML)
+// Con autenticación para acceder a las recomendaciones
+router.use('/recommender', validateTokenWithAuthService, recommenderServiceProxy);
 
 export default router;

@@ -194,6 +194,45 @@ services:
       retries: 3
       start_period: 60s
 
+  # Recommender Service (ML)
+  api-recommender:
+    build:
+      context: ./api-recommender
+      dockerfile: Dockerfile
+    container_name: planty-api-recommender
+    restart: unless-stopped
+    ports:
+      - "3008:3008"
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=3008
+      - LOG_LEVEL=INFO
+      - MONGO_URI=mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-password123}@mongodb:27017/planty_recommender?authSource=admin
+      - MONGO_DB_NAME=planty_recommender
+      - USERS_SERVICE_URL=http://api-users:3001/api
+      - ORCHARD_SERVICE_URL=http://api-orchard:3004/orchards
+      - CHATBOT_SERVICE_URL=http://api-chatbot:3003/chat
+      - MODEL_STORAGE_PATH=/app/models
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      api-users:
+        condition: service_healthy
+      api-orchard:
+        condition: service_healthy
+      api-chatbot:
+        condition: service_healthy
+    networks:
+      - planty-network
+    volumes:
+      - recommender-models:/app/models
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:3008/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
   # API Gateway
   api-gateway:
     image: draken101/planty-api-gateway:latest
@@ -215,6 +254,7 @@ services:
       - CHATBOT_SERVICE_URL=http://api-chatbot:3003
       - ORCHARD_SERVICE_URL=http://api-orchard:3004
       - ALGORITHM_GEN_SERVICE_URL=http://api-algorithm-gen:3005
+      - RECOMMENDER_SERVICE_URL=http://api-recommender:3008
     depends_on:
       api-users:
         condition: service_healthy
@@ -225,6 +265,8 @@ services:
       api-orchard:
         condition: service_healthy
       api-algorithm-gen:
+        condition: service_healthy
+      api-recommender:
         condition: service_healthy
     networks:
       - planty-network
@@ -241,6 +283,8 @@ volumes:
   chromadb-data:
     driver: local
   chatbot-uploads:
+    driver: local
+  recommender-models:
     driver: local
 
 networks:

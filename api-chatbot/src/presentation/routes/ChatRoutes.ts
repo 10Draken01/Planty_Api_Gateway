@@ -12,6 +12,9 @@ export class ChatRoutes {
     // POST /chat/message - Enviar mensaje
     router.post('/message', (req, res) => chatController.sendMessage(req, res));
 
+    // POST /chat/generate-recommendation-message - Generar mensajes de recomendación con Planty
+    router.post('/generate-recommendation-message', (req, res) => chatController.generateRecommendationMessage(req, res));
+
     // GET /chat/history/:sessionId - Obtener historial
     router.get('/history/:sessionId', (req, res) => chatController.getHistory(req, res));
 

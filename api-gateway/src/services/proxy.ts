@@ -141,3 +141,32 @@ export const plantServiceProxy = createProxyMiddleware({
     }
   },
 });
+
+/**
+ * Proxy para el servicio de Recommender (ML)
+ * Redirige todas las peticiones a /recommender al microservicio api-recommender
+ */
+export const recommenderServiceProxy = createProxyMiddleware({
+  target: process.env.RECOMMENDER_SERVICE_URL || 'http://localhost:3008',
+  changeOrigin: true,
+  pathRewrite: { '^/api/recommender': '' },
+  logLevel: 'debug',
+  timeout: 60000, // 60 segundos para ML operations
+  proxyTimeout: 60000,
+
+  onProxyReq: (proxyReq, req) => {
+    // Pasar información del usuario autenticado al microservicio (si existe)
+    const user = (req as any).user;
+    if (user) {
+      proxyReq.setHeader('X-User-Id', user.userId);
+      proxyReq.setHeader('X-User-Email', user.email);
+    }
+
+    if (req.body && Object.keys(req.body).length) {
+      const bodyData = JSON.stringify(req.body);
+      proxyReq.setHeader('Content-Type', 'application/json');
+      proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+      proxyReq.write(bodyData);
+    }
+  },
+});

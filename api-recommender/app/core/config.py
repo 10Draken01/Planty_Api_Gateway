@@ -13,8 +13,9 @@ class Settings(BaseSettings):
     # External Services
     AG_SERVICE_URL: str = "http://localhost:3005/v1"
     NOTIFICATIONS_SERVICE_URL: str = "http://localhost:3003"
-    USERS_SERVICE_URL: str = "http://localhost:3001"
-    ORCHARDS_SERVICE_URL: str = "http://localhost:3002"
+    USERS_SERVICE_URL: str = "http://api-users:3001"
+    ORCHARDS_SERVICE_URL: str = "http://api-orchard:3004"
+    CHATBOT_SERVICE_URL: str = "http://api-chatbot:3003"
 
     # Clustering Config
     MIN_CLUSTERS: int = 3
@@ -38,8 +39,8 @@ class Settings(BaseSettings):
     JWT_EXPIRE_MINUTES: int = 30
 
     # API
-    API_PORT: int = 8000
-    API_HOST: str = "127.0.0.1"
+    API_PORT: int = 3008
+    API_HOST: str = "0.0.0.0"
     WORKERS: int = 4
 
     # Logging

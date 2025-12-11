@@ -5,11 +5,13 @@
 import { Request, Response } from 'express';
 import { SendMessageWithMemoryUseCase } from '@application/use-cases/SendMessageWithMemoryUseCase';
 import { GetChatHistoryUseCase } from '@application/use-cases/GetChatHistoryUseCase';
+import { GenerateRecommendationMessageUseCase } from '@application/use-cases/GenerateRecommendationMessageUseCase';
 
 export class ChatController {
   constructor(
     private sendMessageUseCase: SendMessageWithMemoryUseCase,
-    private getChatHistoryUseCase: GetChatHistoryUseCase
+    private getChatHistoryUseCase: GetChatHistoryUseCase,
+    private generateRecommendationMessageUseCase: GenerateRecommendationMessageUseCase
   ) {}
 
   /**
@@ -94,6 +96,51 @@ export class ChatController {
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Error al obtener historial'
+      });
+    }
+  }
+
+  /**
+   * POST /chat/generate-recommendation-message
+   * Genera mensajes personalizados de Planty para recomendaciones
+   */
+  async generateRecommendationMessage(req: Request, res: Response): Promise<void> {
+    try {
+      const { user, currentOrchards, recommendedOrchards } = req.body;
+
+      // Validaciones
+      if (!user || !user._id || !user.name) {
+        res.status(400).json({
+          success: false,
+          error: 'Datos de usuario inválidos. Se requiere: user._id y user.name'
+        });
+        return;
+      }
+
+      if (!recommendedOrchards || !Array.isArray(recommendedOrchards) || recommendedOrchards.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: 'Se requiere al menos un huerto recomendado'
+        });
+        return;
+      }
+
+      // Ejecutar use case
+      const messages = await this.generateRecommendationMessageUseCase.execute({
+        user,
+        currentOrchards: currentOrchards || [],
+        recommendedOrchards
+      });
+
+      res.status(200).json({
+        success: true,
+        ...messages
+      });
+    } catch (error) {
+      console.error('Error en generateRecommendationMessage:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Error al generar mensajes'
       });
     }
   }
