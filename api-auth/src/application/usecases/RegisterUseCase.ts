@@ -8,7 +8,7 @@ import { RegisterPending2FADTO } from '../dtos/AuthDTOs';
 import { AuthValidators } from '../validators/AuthValidators';
 import { OTP } from '../../domain/entities/OTP';
 
-export class RegisterUseCase {
+export class  RegisterUseCase {
   constructor(
     private hashService: IHashService,
     private tokenService: ITokenService,
