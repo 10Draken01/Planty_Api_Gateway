@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  notifications:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api-notifications
+    ports:
+      - "3005:3005"
+    environment:
+      - NODE_ENV=production
+      - PORT=3005
+      - USERS_SERVICE_URL=http://api-users:3001
+      - FIREBASE_SERVICE_ACCOUNT_PATH=/app/config/firebase-service-account.json
+      - LOG_LEVEL=info
+    volumes:
+      # Mount Firebase credentials (recommended for production)
+      - ./config/firebase-service-account.json:/app/config/firebase-service-account.json:ro
+      # Mount logs directory
+      - ./logs:/app/logs
+    networks:
+      - microservices-network
+    depends_on:
+      - users
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3005/notify/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Reference to Users Service (should be defined in main docker-compose)
+  users:
+    image: api-users:latest
+    container_name: api-users
+    ports:
+      - "3001:3001"
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
