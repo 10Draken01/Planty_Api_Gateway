@@ -1,0 +1,54 @@
+"""Configuración del microservicio recommender."""
+from pydantic_settings import BaseSettings
+from typing import Optional
+
+
+class Settings(BaseSettings):
+    """Configuración global del servicio."""
+
+    # MongoDB
+    MONGO_URI: str
+    MONGO_DB_NAME: str = "users_db"
+
+    # External Services
+    AG_SERVICE_URL: str = "http://localhost:3005/v1"
+    NOTIFICATIONS_SERVICE_URL: str = "http://localhost:3003"
+    USERS_SERVICE_URL: str = "http://api-users:3001"
+    ORCHARDS_SERVICE_URL: str = "http://api-orchard:3004"
+    CHATBOT_SERVICE_URL: str = "http://api-chatbot:3003"
+
+    # Clustering Config
+    MIN_CLUSTERS: int = 3
+    MAX_CLUSTERS: int = 15
+    OPTIMAL_CLUSTER_METHOD: str = "silhouette"
+    RETRAIN_THRESHOLD_PCT: float = 0.15
+
+    # Scheduler
+    MONTHLY_RETRAIN_DAY: int = 1
+    MONTHLY_RETRAIN_HOUR: int = 2
+    WEEKLY_RECOMMENDATIONS_DAY: int = 0  # 0 = Lunes
+    WEEKLY_RECOMMENDATIONS_HOUR: int = 9
+
+    # Model Storage
+    MODEL_STORAGE_PATH: str = "./models"
+    MODEL_VERSION: str = "v1"
+
+    # Security
+    JWT_SECRET_KEY: str
+    JWT_ALGORITHM: str = "HS256"
+    JWT_EXPIRE_MINUTES: int = 30
+
+    # API
+    API_PORT: int = 3008
+    API_HOST: str = "0.0.0.0"
+    WORKERS: int = 4
+
+    # Logging
+    LOG_LEVEL: str = "INFO"
+
+    class Config:
+        env_file = ".env"
+        case_sensitive = True
+
+
+settings = Settings()

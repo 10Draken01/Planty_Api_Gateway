@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  recommender:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: plantgen-recommender
+    ports:
+      - "8000:8000"
+    environment:
+      MONGO_URI: mongodb://admin:password123@mongodb:27017/plantgen?authSource=admin
+      MONGO_DB_NAME: plantgen
+      AG_SERVICE_URL: http://ag-service:3005/v1
+      NOTIFICATIONS_SERVICE_URL: http://notifications-service:3003
+      USERS_SERVICE_URL: http://users-service:3001
+      ORCHARDS_SERVICE_URL: http://orchards-service:3002
+      LOG_LEVEL: INFO
+    depends_on:
+      - mongodb
+    networks:
+      - plantgen-network
+    restart: unless-stopped
+    volumes:
+      - recommender-models:/app/models
+
+  mongodb:
+    image: mongo:7.0
+    container_name: plantgen-mongodb-recommender
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: plantgen
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - plantgen-network
+    restart: unless-stopped
+
+networks:
+  plantgen-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:
+  recommender-models:

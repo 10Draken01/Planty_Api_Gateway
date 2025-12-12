@@ -1,0 +1,150 @@
+### PlantGen Recommender Service - API Examples
+### Base URL: http://localhost:8000
+
+################################################################################
+# 1. HEALTH CHECK
+################################################################################
+
+### Root - Health check básico
+GET http://localhost:8000/
+Content-Type: application/json
+
+###
+
+################################################################################
+# 2. TRAINING
+################################################################################
+
+### Entrenar modelo de clustering
+POST http://localhost:8000/train
+Content-Type: application/json
+
+###
+
+### Obtener estado del entrenamiento
+GET http://localhost:8000/status
+Content-Type: application/json
+
+###
+
+################################################################################
+# 3. CLUSTERS
+################################################################################
+
+### Obtener información de todos los clusters
+GET http://localhost:8000/clusters
+Content-Type: application/json
+
+###
+
+################################################################################
+# 4. RECOMMENDATIONS
+################################################################################
+
+### Obtener recomendaciones para un usuario (top 10)
+GET http://localhost:8000/recommendations/user/USER_ID_HERE?limit=10
+Content-Type: application/json
+
+###
+
+### Obtener recomendaciones limitadas (top 5)
+GET http://localhost:8000/recommendations/user/USER_ID_HERE?limit=5
+Content-Type: application/json
+
+###
+
+################################################################################
+# 5. WEBHOOKS
+################################################################################
+
+### Webhook - Usuario recién registrado
+POST http://localhost:8000/webhook/user-registered
+Content-Type: application/json
+
+{
+  "userId": "user-new-123"
+}
+
+###
+
+################################################################################
+# 6. ADMIN ENDPOINTS (requieren JWT)
+################################################################################
+
+### Generar JWT token de admin (ejecutar en Python)
+# from jose import jwt
+# from datetime import datetime, timedelta
+# payload = {"sub": "admin", "exp": datetime.utcnow() + timedelta(hours=24)}
+# token = jwt.encode(payload, "your-secret-key", algorithm="HS256")
+# print(token)
+
+### Entrenar modelo (admin)
+POST http://localhost:8000/train
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+
+### Notificar a un cluster completo (admin)
+POST http://localhost:8000/notify/cluster/3
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+###
+
+################################################################################
+# EJEMPLOS DE RESPUESTAS ESPERADAS
+################################################################################
+
+### Response de POST /train:
+# {
+#   "success": true,
+#   "message": "Model trained successfully",
+#   "n_clusters": 8,
+#   "n_users_clustered": 1543,
+#   "silhouette_score": 0.42,
+#   "trained_at": "2024-01-15T10:30:00Z"
+# }
+
+### Response de GET /status:
+# {
+#   "model_exists": true,
+#   "trained_at": "2024-01-15T10:30:00Z",
+#   "n_clusters": 8,
+#   "metrics": {
+#     "silhouette_score": 0.42,
+#     "n_samples": 1543
+#   }
+# }
+
+### Response de GET /clusters:
+# {
+#   "n_clusters": 8,
+#   "clusters": [
+#     {
+#       "cluster_id": 0,
+#       "size": 245,
+#       "centroid_numeric": [...],
+#       "centroid_categorical": [...]
+#     }
+#   ],
+#   "total_users": 1543
+# }
+
+### Response de GET /recommendations/user/{id}:
+# {
+#   "userId": "user-123",
+#   "clusterIdAssigned": 3,
+#   "recommendations": [
+#     {
+#       "orchardId": "orchard-456",
+#       "name": "Huerto Medicinal Compacto",
+#       "shortDescription": "3 plantas medicinales, 1.5m², bajo mantenimiento",
+#       "estimatedWeeklyWater": 45.5,
+#       "maintenanceMinutes": 60,
+#       "fitness": 0.87,
+#       "score": 0.92
+#     }
+#   ],
+#   "generatedAt": "2024-01-15T10:35:00Z"
+# }
