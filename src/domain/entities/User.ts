@@ -1,0 +1,128 @@
+export interface UserProps {
+  id?: string;
+  name: string;
+  email: string;
+  password: string;
+  is_verified?: boolean; // Indica si el usuario ha verificado su cuenta con 2FA
+  count_orchards?: number;
+  experience_level?: 1 | 2 | 3;
+  profile_image?: string;
+  tokenFCM?: string; // Token de Firebase Cloud Messaging para notificaciones push
+  createdAt?: Date;
+  historyTimeUse_ids?: Date[];
+  // Preferencias del usuario puede elegir todas o ninguna
+  preferred_plant_category?: ('aromatic' | 'medicinal' | 'vegetable' | 'ornamental')[];
+  favorite_plants?: number[];
+}
+
+export class User {
+  private _id: string;
+  private _name: string;
+  private _email: string;
+  private _password: string;
+  private _is_verified: boolean;
+  private _count_orchards: number;
+  private _experience_level: 1 | 2 | 3;
+  private _profile_image: string;
+  private _tokenFCM: string | undefined;
+  private _createdAt: Date;
+  private _historyTimeUse_ids: Date[];
+  private _preferred_plant_category?: ('aromatic' | 'medicinal' | 'vegetable' | 'ornamental')[];
+  private _favorite_plants: number[];
+
+
+  constructor(props: UserProps) {
+    this._id = props.id || this.generateId();
+    this._name = props.name;
+    this._email = props.email;
+    this._password = props.password;
+    this._is_verified = props.is_verified !== undefined ? props.is_verified : false;
+    this._count_orchards = props.count_orchards || 0;
+    this._experience_level = props.experience_level || 1;
+    this._profile_image = props.profile_image || 'https://imgs.search.brave.com/4UEc9qL-ya5yCbrX6t3vwBJRKoFVHndy9k0d9DuWMJY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9oaXBz/LmhlYXJzdGFwcHMu/Y29tL2htZy1wcm9k/L2ltYWdlcy9zd2Vl/dC1wb3RhdG8tcGxh/bnQtcm95YWx0eS1m/cmVlLWltYWdlLTE3/NDI0MjMxMDIucGpw/ZWc_Y3JvcD0wLjY2/OHh3OjEuMDB4aDsw/LjAyMDR4dyww';
+    this._tokenFCM = props.tokenFCM;
+    this._createdAt = props.createdAt || new Date();
+    this._historyTimeUse_ids = props.historyTimeUse_ids || [];
+    this._preferred_plant_category = props.preferred_plant_category;
+    this._favorite_plants = props.favorite_plants || [];
+  }
+
+  get id(): string {
+    return this._id;
+  }
+
+  get name(): string {
+    return this._name;
+  }
+
+  get email(): string {
+    return this._email;
+  }
+
+  get password(): string {
+    return this._password;
+  }
+
+  get is_verified(): boolean {
+    return this._is_verified;
+  }
+
+  get count_orchards(): number | undefined {
+    return this._count_orchards;
+  }
+
+  get experience_level(): number {
+    return this._experience_level;
+  }
+
+  get profile_image(): string | undefined {
+    return this._profile_image;
+  }
+
+  get createdAt(): Date {
+    return this._createdAt;
+  }
+
+  get historyTimeUse_ids(): Date[] {
+    return [...this._historyTimeUse_ids];
+  }
+
+  get tokenFCM(): string | undefined {
+    return this._tokenFCM;
+  }
+
+  set tokenFCM(token: string | undefined) {
+    this._tokenFCM = token;
+  }
+
+  
+  get preferred_plant_category(): ('aromatic' | 'medicinal' | 'vegetable' | 'ornamental')[] | undefined {
+    return this._preferred_plant_category;
+  }
+
+  get favorite_plants(): number[] {
+    return [...this._favorite_plants];
+  }
+
+  private generateId(): string {
+    return Date.now().toString() + Math.random().toString(36).substr(2, 9);
+  }
+
+  toJSON() {
+    return {
+      id: this._id,
+      name: this._name,
+      email: this._email,
+      password: this._password,
+      is_verified: this._is_verified,
+      count_orchards: this._count_orchards,
+      experience_level: this._experience_level,
+      profile_image: this._profile_image,
+      tokenFCM: this._tokenFCM,
+      createdAt: this._createdAt,
+      historyTimeUse_ids: this._historyTimeUse_ids,
+      preferred_plant_category: this._preferred_plant_category,
+      favorite_plants: this._favorite_plants
+    };
+  }
+}
