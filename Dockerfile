@@ -1,12 +1,12 @@
-# Imagen oficial de MongoDB
 FROM mongo:6.0
 
-# Variables de entorno para inicializar el usuario root y la DB
-ENV MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USER}
-ENV MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+# Railway inyectará estas variables desde el panel
+ENV MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME
+ENV MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
+ENV MONGO_INITDB_DATABASE=$MONGO_INITDB_DATABASE
 
-# Exponer el puerto interno
+# Puerto interno de Mongo
 EXPOSE 27017
 
-# MongoDB escuchando en todas las interfaces dentro de Railway
+# Iniciar MongoDB con autenticación y accesible dentro de la red interna
 CMD ["mongod", "--bind_ip_all"]
