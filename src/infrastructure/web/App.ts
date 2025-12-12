@@ -1,0 +1,66 @@
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { DependencyContainer } from '../container/DependencyContainer';
+
+dotenv.config();
+
+export class App {
+  private app: express.Application;
+  private port: number;
+  private dependencyContainer: DependencyContainer;
+
+  constructor() {
+    this.app = express();
+    this.port = parseInt(process.env.PORT || '3001', 10);
+    const mongoRootUser = process.env.MONGO_ROOT_USER || 'admin';
+    const mongoRootPassword = process.env.MONGO_ROOT_PASSWORD || 'password123';
+    const mongoDbName = process.env.MONGO_DB_NAME || 'users_db';
+    this.dependencyContainer = new DependencyContainer(
+      mongoRootUser,
+      mongoRootPassword,
+      mongoDbName
+    );
+
+    this.initializeMiddlewares();
+    this.initializeRoutes();
+  }
+
+  private initializeMiddlewares(): void {
+    this.app.use(cors());
+    this.app.use(express.json());
+  }
+
+  private initializeRoutes(): void {
+    // Health check
+    this.app.get('/', (req, res) => {
+      res.json({ message: 'Users Microservice funcionando' });
+    });
+
+    this.app.get('/health', (req, res) => {
+      res.json({ status: 'ok', service: 'users' });
+    });
+
+    // User routes
+    const userRoutes = this.dependencyContainer.createUserRoutes();
+    this.app.use('/api', userRoutes.getRouter());
+
+    // Memory routes (for chatbot integration)
+    const memoryRoutes = this.dependencyContainer.createMemoryRoutes();
+    this.app.use('/api/memory', memoryRoutes);
+  }
+
+  async start(): Promise<void> {
+    try {
+      // Conectar a la base de datos
+
+      // Iniciar servidor
+      this.app.listen(this.port, () => {
+        console.log(`🚀 Servidor corriendo en puerto ${this.port}`);
+      });
+    } catch (error) {
+      console.error('Error iniciando la aplicación:', error);
+      process.exit(1);
+    }
+  }
+}

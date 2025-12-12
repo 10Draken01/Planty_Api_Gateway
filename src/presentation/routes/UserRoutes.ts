@@ -1,0 +1,49 @@
+import { Router } from 'express';
+import { UserController } from '../controllers/UserController.js';
+import { SeedController } from '../controllers/SeedController.js';
+
+export class UserRoutes {
+  private router: Router;
+
+  constructor(
+    private userController: UserController,
+    private seedController?: SeedController
+  ) {
+    this.router = Router();
+    this.setupRoutes();
+  }
+
+  private setupRoutes(): void {
+
+    // List users (debe ir ANTES de otras rutas GET)
+    this.router.get('/', (req, res) => this.userController.listUsers(req, res));
+
+    // Get users by date range (para ML training) - debe ir ANTES de /:id
+    this.router.get('/by-registration-date', (req, res) => this.userController.getUsersByDateRange(req, res));
+
+    this.router.post('/create', (req, res) => this.userController.createUser(req, res));
+    this.router.get('/email/:email', (req, res) => this.userController.getUserByEmail(req, res));
+
+    this.router.get('/:id', (req, res) => this.userController.getUserById(req, res));
+    this.router.put('/:id', (req, res) => this.userController.updateUserById(req, res));
+    this.router.delete('/:id', (req, res) => this.userController.deleteUserById(req, res));
+
+    // Endpoint para actualizar token FCM (usado por Notifications Service)
+    this.router.patch('/:id/fcm-token', (req, res) => this.userController.updateTokenFCM(req, res));
+
+    // Endpoint para actualizar nivel de experiencia (usado por Mobile Client - Preferencias)
+    this.router.patch('/:id/experience-level', (req, res) => this.userController.updateExperienceLevel(req, res));
+
+    // Endpoint para verificar usuario (usado por Auth Service después de validar OTP 2FA)
+    this.router.post('/verify', (req, res) => this.userController.verifyUser(req, res));
+
+    // Endpoint para seed de usuarios (generación de datos de prueba)
+    if (this.seedController) {
+      this.router.post('/seed', (req, res) => this.seedController!.seedUsers(req, res));
+    }
+  }
+
+  getRouter(): Router {
+    return this.router;
+  }
+}
