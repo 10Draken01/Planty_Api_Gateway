@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  ag-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: plantgen-ag-service
+    ports:
+      - "3005:3005"
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${PORT:-3005}
+      API_VERSION: ${API_VERSION:-v1}
+
+      # MongoDB
+      MONGO_HOST: ${MONGO_HOST:-mongodb}
+      MONGO_PORT: ${MONGO_PORT:-27017}
+      MONGO_ROOT_USER: ${MONGO_ROOT_USER:-admin}
+      MONGO_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_DATABASE: ${MONGO_DATABASE:-plantgen_ag}
+
+      # External Services
+      USERS_SERVICE_URL: ${USERS_SERVICE_URL:-http://api-users:3001}
+      NOTIFICATIONS_SERVICE_URL: ${NOTIFICATIONS_SERVICE_URL:-http://api-notifications:3003}
+
+      # AG Parameters
+      AG_POPULATION_SIZE: ${AG_POPULATION_SIZE:-40}
+      AG_MAX_GENERATIONS: ${AG_MAX_GENERATIONS:-150}
+      AG_CROSSOVER_PROBABILITY: ${AG_CROSSOVER_PROBABILITY:-0.85}
+      AG_MUTATION_RATE: ${AG_MUTATION_RATE:-0.08}
+      AG_TOURNAMENT_K: ${AG_TOURNAMENT_K:-3}
+      AG_ELITE_COUNT: ${AG_ELITE_COUNT:-3}
+      AG_PATIENCE: ${AG_PATIENCE:-20}
+      AG_CONVERGENCE_THRESHOLD: ${AG_CONVERGENCE_THRESHOLD:-0.001}
+
+      # Timeouts
+      AG_EXECUTION_TIMEOUT_MS: ${AG_EXECUTION_TIMEOUT_MS:-30000}
+      EXTERNAL_SERVICE_TIMEOUT_MS: ${EXTERNAL_SERVICE_TIMEOUT_MS:-5000}
+
+      # Logging
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+
+      # Location
+      DEFAULT_LATITUDE: ${DEFAULT_LATITUDE:-16.75}
+      DEFAULT_LONGITUDE: ${DEFAULT_LONGITUDE:-93.11}
+
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+    networks:
+      - plantgen-network
+
+    restart: unless-stopped
+
+    volumes:
+      - ag-logs:/app/logs
+
+  mongodb:
+    image: mongo:7.0
+    container_name: plantgen-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-plantgen_ag}
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - plantgen-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  plantgen-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:
+  ag-logs:
