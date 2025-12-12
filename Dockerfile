@@ -52,4 +52,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 
 # Iniciar aplicación
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "dist/app.js"]
+CMD ["node", "dist/main.js"]
