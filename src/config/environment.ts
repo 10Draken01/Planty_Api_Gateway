@@ -74,26 +74,66 @@ class Environment {
 
   private getRequiredEnv(key: string): string {
     const value = process.env[key];
-    if (!value) {
+    if (!value || value.trim() === '') {
+      console.error(`\n❌ ERROR: Missing required environment variable: ${key}`);
+      console.error(`Please set ${key} in your environment or .env file\n`);
       throw new Error(`Missing required environment variable: ${key}`);
     }
-    return value;
+    return value.trim();
+  }
+
+  private isValidUrl(urlString: string): boolean {
+    try {
+      const url = new URL(urlString);
+      return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch {
+      return false;
+    }
   }
 
   private validate(): void {
+    // Validar URLs de servicios
+    const serviceUrls = Object.entries(this.config.services);
+    const invalidUrls: string[] = [];
+
+    for (const [serviceName, url] of serviceUrls) {
+      if (!this.isValidUrl(url)) {
+        invalidUrls.push(`${serviceName}: ${url}`);
+      }
+    }
+
+    if (invalidUrls.length > 0) {
+      console.error('\n❌ ERROR: Invalid service URLs detected:');
+      invalidUrls.forEach(invalid => console.error(`  - ${invalid}`));
+      console.error('\nURLs must start with http:// or https://\n');
+      throw new Error('Invalid service URLs configuration');
+    }
+
+    // Validaciones de producción
     if (this.config.nodeEnv === 'production') {
       if (this.config.jwt.secret === 'default-secret-change-in-production') {
         throw new Error('JWT_SECRET must be set in production environment');
       }
 
       if (this.config.cors.origin === '*') {
-        console.warn('WARNING: CORS is set to allow all origins in production. This is not recommended for security.');
+        console.warn('⚠️  WARNING: CORS is set to allow all origins in production. This is not recommended for security.');
       }
     }
 
+    // Validar puerto
     if (this.config.port < 1 || this.config.port > 65535) {
       throw new Error(`Invalid PORT: ${this.config.port}. Must be between 1 and 65535.`);
     }
+
+    // Log de configuración exitosa
+    console.log('\n✅ Environment configuration loaded successfully');
+    console.log(`📍 Environment: ${this.config.nodeEnv}`);
+    console.log(`🚪 Port: ${this.config.port}`);
+    console.log('\n📡 Configured microservices:');
+    for (const [name, url] of serviceUrls) {
+      console.log(`  - ${name.padEnd(15)} → ${url}`);
+    }
+    console.log('');
   }
 
   public get(): EnvironmentConfig {
