@@ -5,11 +5,11 @@ ENV MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
 ENV MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
 ENV MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
 
-# Crear script de inicialización
-RUN mkdir -p /docker-entrypoint-initdb.d
+# Copiar script de inicialización
+COPY init-mongo.sh /docker-entrypoint-initdb.d/
 
-# Script para crear usuario admin
-RUN echo 'db.createUser({user: process.env.MONGO_INITDB_ROOT_USERNAME, pwd: process.env.MONGO_INITDB_ROOT_PASSWORD, roles: [{role: "root", db: "admin"}]});' > /docker-entrypoint-initdb.d/init.js
+# Dar permisos de ejecución
+RUN chmod +x /docker-entrypoint-initdb.d/init-mongo.sh
 
 EXPOSE 27017
 
