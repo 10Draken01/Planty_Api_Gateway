@@ -30,6 +30,7 @@ WORKDIR /app
 COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nodejs:nodejs /app/package*.json ./
+COPY --from=builder --chown=nodejs:nodejs /app/tsconfig.json ./
 
 USER nodejs
 
@@ -40,4 +41,4 @@ ENV PORT=3000
 ENV NODE_OPTIONS=--max-old-space-size=8192
 
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "dist/app.js"]
+CMD ["node", "-r", "tsconfig-paths/register", "dist/app.js"]
