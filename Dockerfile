@@ -26,11 +26,12 @@ RUN apk add --no-cache dumb-init \
 
 WORKDIR /app
 
-# Copiar solo lo necesario
-COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+# Copiar solo dependencias de producción
 COPY --from=builder --chown=nodejs:nodejs /app/package*.json ./
-COPY --from=builder --chown=nodejs:nodejs /app/tsconfig.json ./
+RUN npm ci --only=production && npm cache clean --force
+
+# Copiar código compilado
+COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 
 USER nodejs
 
@@ -41,4 +42,4 @@ ENV PORT=3000
 ENV NODE_OPTIONS=--max-old-space-size=8192
 
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "-r", "tsconfig-paths/register", "dist/app.js"]
+CMD ["node", "dist/app.js"]
