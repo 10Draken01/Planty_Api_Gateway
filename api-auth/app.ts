@@ -10,11 +10,11 @@ const PORT = process.env.PORT || 3002;
 app.use(cors());
 app.use(express.json());
 
-app.get('/auth/health', (req, res) => {
+app.get('/health', (req, res) => {
   res.json({ status: 'OK', service: 'Authentication Service' });
 });
 
-app.use('/auth', authRoutes);
+app.use('/', authRoutes);
 
 app.listen(PORT, () => {
   console.log(`Authentication Service running on port ${PORT}`);

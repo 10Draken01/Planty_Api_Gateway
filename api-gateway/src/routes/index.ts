@@ -1,16 +1,12 @@
 import { Router } from 'express';
 import { userServiceProxy, authServiceProxy, protectedChatbotProxy, orchardServiceProxy, algorithmGenServiceProxy, plantServiceProxy, recommenderServiceProxy } from '../services/proxy';
 import { validateTokenWithAuthService } from '../middleware/validateTokenWithAuthService';
+import { HealthController } from '../controllers/HealthController';
 
 const router = Router();
 
-router.get('/health', (req, res) => {
-  res.json({
-    status: 'OK',
-    service: 'API Gateway',
-    timestamp: new Date().toISOString()
-  });
-});
+router.get('/health', HealthController.check);
+router.get('/health/detailed', HealthController.detailed);
 
 router.use('/auth', authServiceProxy);
 router.use('/users', validateTokenWithAuthService, userServiceProxy);

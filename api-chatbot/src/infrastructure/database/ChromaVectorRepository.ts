@@ -5,6 +5,7 @@
 import { VectorRepository, SearchResult } from '@domain/repositories/VectorRepository';
 import { TextChunk } from '@domain/entities/TextChunk';
 import { ChromaClient, Collection } from 'chromadb';
+import { config } from '@config/environment';
 
 export class ChromaVectorRepository implements VectorRepository {
   private client: ChromaClient;
@@ -12,13 +13,38 @@ export class ChromaVectorRepository implements VectorRepository {
   private collectionName: string;
 
   constructor(host?: string, port?: number, collectionName?: string) {
-    const chromaHost = host || process.env.CHROMA_HOST || 'localhost';
-    const chromaPort = port || parseInt(process.env.CHROMA_PORT || '8000');
-    this.collectionName = collectionName || process.env.CHROMA_COLLECTION_NAME || 'plantas_suchiapa';
+    const chromaHost = host || config.chroma.host;
+    const chromaPort = port || config.chroma.port;
+    this.collectionName = collectionName || config.chroma.collectionName;
 
-    this.client = new ChromaClient({
-      path: `http://${chromaHost}:${chromaPort}`
-    });
+    // Construir la URL de ChromaDB
+    let chromaUrl: string;
+
+    // Si chromaHost ya incluye http:// o https://, usarlo directamente
+    if (chromaHost.startsWith('http://') || chromaHost.startsWith('https://')) {
+      chromaUrl = chromaHost;
+    } else {
+      // Si no, construir la URL con host:port
+      chromaUrl = `http://${chromaHost}:${chromaPort}`;
+    }
+
+    // Configuración del cliente con autenticación opcional
+    const clientConfig: any = {
+      path: chromaUrl
+    };
+
+    // Si hay API Key configurado, agregar autenticación
+    if (config.chroma.apiKey) {
+      clientConfig.auth = {
+        provider: config.chroma.authProvider,
+        credentials: config.chroma.apiKey
+      };
+      console.log(`ChromaDB: Autenticación habilitada - Conectando a ${chromaUrl}`);
+    } else {
+      console.log(`ChromaDB: Sin autenticación - Conectando a ${chromaUrl}`);
+    }
+
+    this.client = new ChromaClient(clientConfig);
   }
 
   async initialize(): Promise<void> {

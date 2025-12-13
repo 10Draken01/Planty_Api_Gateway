@@ -1,55 +1,57 @@
-# Authentication Service Dockerfile
+# Etapa de construcción
 FROM node:20-alpine AS builder
 
-# Establecer directorio de trabajo
 WORKDIR /app
 
 # Copiar archivos de dependencias
 COPY package*.json ./
 
-# Instalar dependencias
-RUN npm ci --only=production
+# Instalar todas las dependencias (incluye devDependencies para compilar)
+RUN npm ci
 
-# Copiar código fuente
+# Copiar configuración de TypeScript
+COPY tsconfig.json ./
+
+# Copiar todo el código fuente
 COPY . .
 
-# Build de TypeScript (si es necesario)
-RUN npm run build || true
+# Compilar TypeScript
+RUN npm run build
+
+# Verificar que dist/app.js existe
+RUN ls -la dist/
 
 # Etapa de producción
 FROM node:20-alpine
 
-# Instalar dumb-init para manejo correcto de señales
+# Instalar dumb-init
 RUN apk add --no-cache dumb-init
 
-# Crear usuario no-root
-RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
-
-# Establecer directorio de trabajo
 WORKDIR /app
 
-# Copiar node_modules y archivos compilados
-COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
-COPY --from=builder --chown=nodejs:nodejs /app/package*.json ./
+# Copiar package files
+COPY package*.json ./
 
-# Si no hay carpeta dist, copiar src
-COPY --chown=nodejs:nodejs ./src ./src
+# Instalar solo dependencias de producción
+RUN npm ci --only=production
 
-# Cambiar a usuario no-root
+# Copiar archivos compilados desde builder
+COPY --from=builder /app/dist ./dist
+
+# Crear usuario no-root
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001 && \
+    chown -R nodejs:nodejs /app
+
 USER nodejs
 
-# Exponer puerto
+# Exponer puerto (Railway asigna dinámicamente)
 EXPOSE 3002
 
-# Variables de entorno por defecto
-ENV NODE_ENV=production
-ENV PORT=3002
+# Health check (opcional pero recomendado)
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3002/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
-
-# Iniciar aplicación
+# Comando de inicio
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["node", "dist/app.js"]

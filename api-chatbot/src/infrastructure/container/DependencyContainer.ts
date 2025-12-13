@@ -14,11 +14,15 @@ import { ChromaVectorRepository } from '../database/ChromaVectorRepository';
 import { PDFService } from '../services/PDFService';
 import { TextSplitterService } from '../services/TextSplitterService';
 import { OllamaChatService } from '../services/OllamaChatService';
+import { GroqChatService } from '../services/GroqChatService';
 import { OllamaService } from '../services/OllamaService';
 
 // 🆕 NUEVOS SERVICIOS CON MEMORIA
 import { CachedOllamaEmbeddingService } from '../services/CachedOllamaEmbeddingService';
 import { UsersServiceClient } from '../external/UsersServiceClient';
+
+// Config
+import { config } from '@config/environment';
 
 // Use Cases
 import { UploadDocumentUseCase } from '@application/use-cases/UploadDocumentUseCase';
@@ -49,7 +53,7 @@ export class DependencyContainer {
   private pdfService: PDFService;
   private textSplitterService: TextSplitterService;
   private embeddingService: CachedOllamaEmbeddingService; // 🆕 Con cache
-  private chatService: OllamaChatService;
+  private chatService: OllamaChatService | GroqChatService; // 🆕 Soporta Ollama o Groq
   private ollamaService: OllamaService; // Servicio Ollama general
   private usersServiceClient: UsersServiceClient; // 🆕 Cliente para api-users
 
@@ -84,7 +88,14 @@ export class DependencyContainer {
     this.embeddingService = new CachedOllamaEmbeddingService();
     console.log('  ✓ Embedding service con cache inicializado');
 
-    this.chatService = new OllamaChatService();
+    // 🆕 Inicializar servicio de chat según configuración
+    if (config.llmProvider === 'groq') {
+      this.chatService = new GroqChatService();
+      console.log('  ✓ Groq Chat service inicializado');
+    } else {
+      this.chatService = new OllamaChatService();
+      console.log('  ✓ Ollama Chat service inicializado');
+    }
 
     // Servicio Ollama general
     this.ollamaService = new OllamaService();
@@ -160,21 +171,42 @@ export class DependencyContainer {
       throw error;
     }
 
-    // 2. Verificar Ollama
-    console.log('🤖 Verificando Ollama...');
-    const embeddingAvailable = await this.embeddingService.checkModelAvailability();
-    const chatAvailable = await this.chatService.checkModelAvailability();
+    // 2. Verificar LLM (Ollama o Groq)
+    if (config.llmProvider === 'groq') {
+      console.log('🤖 Verificando Groq API...');
+      const chatAvailable = await this.chatService.checkModelAvailability();
 
-    if (!embeddingAvailable) {
-      console.warn('  ⚠️  Modelo de embeddings no disponible');
-    } else {
-      console.log('  ✅ Modelo de embeddings disponible');
-    }
+      if (!chatAvailable) {
+        console.warn('  ⚠️  Groq API no disponible o API Key inválido');
+      } else {
+        console.log('  ✅ Groq API conectado y funcionando');
+      }
 
-    if (!chatAvailable) {
-      console.warn('  ⚠️  Modelo de chat no disponible');
+      // Para embeddings seguimos usando Ollama
+      console.log('🧬 Verificando Ollama (embeddings)...');
+      const embeddingAvailable = await this.embeddingService.checkModelAvailability();
+
+      if (!embeddingAvailable) {
+        console.warn('  ⚠️  Modelo de embeddings no disponible');
+      } else {
+        console.log('  ✅ Modelo de embeddings disponible');
+      }
     } else {
-      console.log('  ✅ Modelo de chat disponible');
+      console.log('🤖 Verificando Ollama...');
+      const embeddingAvailable = await this.embeddingService.checkModelAvailability();
+      const chatAvailable = await this.chatService.checkModelAvailability();
+
+      if (!embeddingAvailable) {
+        console.warn('  ⚠️  Modelo de embeddings no disponible');
+      } else {
+        console.log('  ✅ Modelo de embeddings disponible');
+      }
+
+      if (!chatAvailable) {
+        console.warn('  ⚠️  Modelo de chat no disponible');
+      } else {
+        console.log('  ✅ Modelo de chat disponible');
+      }
     }
 
     console.log();

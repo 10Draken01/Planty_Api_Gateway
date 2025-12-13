@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Request, Response, NextFunction } from 'express';
+import { env } from '../config/environment';
 
 /**
  * Middleware para validar tokens JWT usando el microservicio de autenticación
@@ -34,8 +35,8 @@ export const validateTokenWithAuthService = async (
 
     const token = authHeader.replace('Bearer ', '');
 
-    // Obtener la URL del servicio de autenticación desde variables de entorno
-    const authServiceUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:3002';
+    // Obtener la URL del servicio de autenticación desde configuración centralizada
+    const authServiceUrl = env.getServiceUrl('auth');
 
     // Llamar al endpoint de validación del microservicio de autenticación
     const response = await axios.post(
