@@ -14,7 +14,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', service: 'Authentication Service' });
 });
 
-app.use('/', authRoutes);
+app.use('/auth', authRoutes);
 
 app.listen(PORT, () => {
   console.log(`Authentication Service running on port ${PORT}`);
