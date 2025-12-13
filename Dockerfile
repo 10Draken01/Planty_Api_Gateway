@@ -41,7 +41,7 @@ USER nodejs
 EXPOSE 3003
 
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=3003
 ENV NODE_OPTIONS=--max-old-space-size=8192
 
 ENTRYPOINT ["dumb-init", "--"]
