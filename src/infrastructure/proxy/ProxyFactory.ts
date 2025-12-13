@@ -36,7 +36,7 @@ export class ProxyFactory {
     },
     [ProxyService.AUTH]: {
       serviceName: 'auth',
-      pathRewrite: { '^/api/auth': '' },
+      pathRewrite: { '^/api/auth': '/auth' },
       timeout: ProxyFactory.DEFAULT_TIMEOUT,
       withAuth: false,
     },
