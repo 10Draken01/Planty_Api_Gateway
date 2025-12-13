@@ -33,6 +33,9 @@ RUN npm ci --only=production && npm cache clean --force
 # Copiar código compilado
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 
+# Crear directorio uploads con permisos correctos ANTES de cambiar de usuario
+RUN mkdir -p /app/uploads && chown -R nodejs:nodejs /app/uploads
+
 USER nodejs
 
 EXPOSE 3003

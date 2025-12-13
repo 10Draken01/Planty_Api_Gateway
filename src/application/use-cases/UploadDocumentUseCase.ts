@@ -13,9 +13,13 @@ export class UploadDocumentUseCase {
     private documentRepository: DocumentRepository,
     private uploadsDir: string = path.join(process.cwd(), 'uploads')
   ) {
-    // Asegurar que el directorio de uploads existe
+    // Asegurar que el directorio de uploads existe (con manejo de errores)
     if (!fs.existsSync(this.uploadsDir)) {
-      fs.mkdirSync(this.uploadsDir, { recursive: true });
+      try {
+        fs.mkdirSync(this.uploadsDir, { recursive: true });
+      } catch (error) {
+        console.warn(`Warning: No se pudo crear el directorio uploads. Puede que ya exista o no haya permisos.`, error);
+      }
     }
   }
 
