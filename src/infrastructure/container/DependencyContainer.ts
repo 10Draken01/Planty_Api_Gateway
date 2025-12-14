@@ -2,6 +2,7 @@
 import { MongoUserRepository } from '../../infrastructure/repositories/MongoUserRepository';
 import { MongoConversationRepository } from '../../infrastructure/repositories/MongoConversationRepository';
 import { MongoUserMemoryRepository } from '../../infrastructure/repositories/MongoUserMemoryRepository';
+import { MongoPlantyContextRepository } from '../../infrastructure/repositories/MongoPlantyContextRepository';
 
 // Use Cases
 import { CreateUserUseCase } from '../../application/use-cases/CreateUserUseCase';
@@ -34,6 +35,7 @@ export class DependencyContainer {
   private userRepository: MongoUserRepository;
   private conversationRepository: MongoConversationRepository;
   private userMemoryRepository: MongoUserMemoryRepository;
+  private plantyContextRepository: MongoPlantyContextRepository;
 
   // Use Cases
   private createUserUseCase: CreateUserUseCase
@@ -69,6 +71,7 @@ export class DependencyContainer {
     this.userRepository = new MongoUserRepository();
     this.conversationRepository = new MongoConversationRepository();
     this.userMemoryRepository = new MongoUserMemoryRepository();
+    this.plantyContextRepository = new MongoPlantyContextRepository();
 
     // Services
     this.memoryService = new MemoryService(
@@ -156,8 +159,11 @@ export class DependencyContainer {
   }
 
   createMemoryRoutes(): Router {
-    // Controller con el servicio de memoria
-    const memoryController = new MemoryController(this.memoryService);
+    // Controller con el servicio de memoria y planty context
+    const memoryController = new MemoryController(
+      this.memoryService,
+      this.plantyContextRepository
+    );
 
     // Routes
     return MemoryRoutes.create(memoryController);

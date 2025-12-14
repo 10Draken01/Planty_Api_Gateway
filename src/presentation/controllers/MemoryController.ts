@@ -5,9 +5,13 @@
 
 import { Request, Response } from 'express';
 import { MemoryService } from '../../application/services/MemoryService';
+import { PlantyContextRepository } from '../../domain/repositories/PlantyContextRepository';
 
 export class MemoryController {
-  constructor(private memoryService: MemoryService) {}
+  constructor(
+    private memoryService: MemoryService,
+    private plantyContextRepo: PlantyContextRepository
+  ) {}
 
   /**
    * GET /api/memory/user/:userId/context
@@ -238,6 +242,46 @@ export class MemoryController {
       res.json(history);
     } catch (error: any) {
       console.error('Error getting user history:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  // 🌿 PLANTY CONTEXT ENDPOINTS
+  async getPlantyContext(req: Request, res: Response): Promise<void> {
+    try {
+      const { userId } = req.params;
+      const context = await this.plantyContextRepo.getByUserId(userId);
+
+      if (!context) {
+        res.status(404).json({ error: 'PlantyContext not found' });
+        return;
+      }
+
+      res.json(context);
+    } catch (error: any) {
+      console.error('Error getting PlantyContext:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async savePlantyContext(req: Request, res: Response): Promise<void> {
+    try {
+      const contextData = req.body;
+      await this.plantyContextRepo.save(contextData);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('Error saving PlantyContext:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async deletePlantyContext(req: Request, res: Response): Promise<void> {
+    try {
+      const { userId } = req.params;
+      await this.plantyContextRepo.delete(userId);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('Error deleting PlantyContext:', error);
       res.status(500).json({ error: error.message });
     }
   }
