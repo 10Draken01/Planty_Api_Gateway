@@ -6,9 +6,6 @@ import { PlantInLayout } from '@domain/entities/PlantInLayout';
 import { Dimensions } from '@domain/value-objects/Dimensions';
 import { Position } from '@domain/value-objects/Position';
 
-// Configurar faker con el locale español
-faker.setLocale('es');
-
 interface UserDTO {
   id: string;
   name: string;
