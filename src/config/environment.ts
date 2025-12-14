@@ -18,7 +18,10 @@ export const config = {
     mongoRootUser: process.env.MONGO_ROOT_USER || 'admin',
     mongoRootPassword: process.env.MONGO_ROOT_PASSWORD || 'password123',
     mongoIp: process.env.MONGO_IP || 'localhost',
-    dbName: process.env.DB_NAME || 'planty_plants'
+    dbName: process.env.DB_NAME || 'planty_plants',
+    get uri(): string {
+      return process.env.MONGO_URI || `mongodb://${this.mongoRootUser}:${this.mongoRootPassword}@${this.mongoIp}:27017/${this.dbName}?authSource=admin`;
+    }
   },
 
   // Rate Limiting
