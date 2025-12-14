@@ -33,7 +33,7 @@ export class MongoDBConnection {
       // Si no, conectar sin autenticación (desarrollo local)
       let uri: string;
       if (config.mongodb.rootUser && config.mongodb.rootPassword) {
-        uri = `mongodb://${config.mongodb.rootUser}:${config.mongodb.rootPassword}@localhost:27017/admin?authSource=admin`;
+        uri = `mongodb://${config.mongodb.rootUser}:${config.mongodb.rootPassword}@${config.mongodb.mongoIp}:27017/admin?authSource=admin`;
         console.log('  → Conectando con autenticación...');
       } else {
         uri = `mongodb://localhost:27017/${config.mongodb.dbName}`;
