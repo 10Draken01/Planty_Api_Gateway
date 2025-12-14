@@ -3,7 +3,7 @@ import { Plant } from '../entities/Plant';
 import { PlantInstance } from '../entities/PlantInstance';
 import { Dimensions } from '../value-objects/Dimensions';
 import { Position } from '../value-objects/Position';
-import { FitnessCalculator, Objective } from './FitnessCalculato';
+import { FitnessCalculator, Objective } from './FitnessCalculator';
 import { PlantSelectorService } from './PlantSelectorService';
 import { CategoryDistribution } from '../value-objects/CategoryDistribution';
 import { logger } from '../../config/logger';
