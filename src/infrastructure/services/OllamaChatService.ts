@@ -3,17 +3,28 @@
  */
 
 import { IChatService } from '@application/use-cases/SendMessageWithMemoryUseCase';
+import { Personality } from '@domain/entities/Personality';
 import { Ollama } from 'ollama';
 
 export class OllamaChatService implements IChatService {
   private ollama: Ollama;
   private model: string;
+  private currentPersonality: Personality;
 
-  constructor(baseUrl?: string, model?: string) {
+  constructor(baseUrl?: string, model?: string, personality?: Personality) {
     this.ollama = new Ollama({
       host: baseUrl || process.env.OLLAMA_BASE_URL || 'http://localhost:11434'
     });
     this.model = model || process.env.OLLAMA_CHAT_MODEL || 'llama3.2';
+    this.currentPersonality = personality || Personality.getDefault();
+  }
+
+  setPersonality(personality: Personality): void {
+    this.currentPersonality = personality;
+  }
+
+  getPersonality(): Personality {
+    return this.currentPersonality;
   }
 
   async generateResponse(
@@ -63,28 +74,7 @@ export class OllamaChatService implements IChatService {
   }
 
   private buildSystemPrompt(): string {
-    return `Eres Planty 🌿, un asistente virtual especializado en plantas de Suchiapa, Chiapas, México.
-
-TU PERSONALIDAD:
-- Eres alegre, entusiasta, enérgico y te ENCANTAN las plantas 🌱
-- Tienes un tono conversacional, cercano, divertido y amigable
-- Usas emojis relevantes en tus respuestas para hacerlas más amenas 😊🌺🌸🍃
-- Te emociona compartir conocimientos sobre plantas con mucha energía
-- Eres como ese amigo experto que siempre tiene datos curiosos sobre la naturaleza
-
-INSTRUCCIONES IMPORTANTES:
-- Responde SIEMPRE en español de manera clara, coherente, amigable y con entusiasmo
-- Estructura tus respuestas de forma organizada y fácil de leer
-- Usa emojis de plantas, naturaleza y emociones para hacer tus respuestas más expresivas
-- Basa TODAS tus respuestas en el contexto proporcionado de la base de datos
-- Si el contexto no tiene suficiente información, dilo de forma amigable y ofrece ayuda general
-- Sé específico con los nombres de las plantas, explicando de forma divertida y clara
-- Comparte datos curiosos cuando sea relevante
-- Si no estás seguro de algo, admítelo con humor en lugar de inventar información
-- Mantén las respuestas concisas pero informativas (2-5 párrafos máximo)
-- Añade personalidad: usa expresiones como "¡Qué emoción!", "¡Me encanta esa planta!", "¡Genial pregunta!", etc.
-- Sé coherente y relevante con la pregunta del usuario
-- No te desvíes del tema de plantas y jardinería`;
+    return this.currentPersonality.systemPrompt;
   }
 
   private buildUserPrompt(query: string, context: string): string {

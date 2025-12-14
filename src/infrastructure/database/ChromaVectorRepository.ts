@@ -30,7 +30,10 @@ export class ChromaVectorRepository implements VectorRepository {
 
     // Configuración del cliente con autenticación opcional
     const clientConfig: any = {
-      path: chromaUrl
+      path: chromaUrl,
+      fetchOptions: {
+        timeout: 30000 // 30 segundos para Railway
+      }
     };
 
     // Si hay API Key configurado, agregar autenticación

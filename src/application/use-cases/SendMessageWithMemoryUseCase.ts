@@ -11,9 +11,18 @@
 import { VectorRepository } from '@domain/repositories/VectorRepository';
 import { SendMessageDTO, ChatResponseDTO } from '../dtos/ChatDTOs';
 import { UsersServiceClient } from '@infrastructure/external/UsersServiceClient';
+import { IntentionDetectorService } from '@application/services/IntentionDetectorService';
+import { PersonalityService } from '@application/services/PersonalityService';
+import { GodStorytellerService } from '@application/services/GodStorytellerService';
+import { PlantyPromptBuilder } from '@application/services/PlantyPromptBuilder';
+import { IPlantyContextRepository } from '@domain/repositories/PlantyContextRepository';
+import { Personality } from '@domain/entities/Personality';
+import { PlantyContext } from '@domain/entities/PlantyContext';
+import { IntentionType } from '@domain/entities/IntentionType';
 
 export interface IChatService {
   generateResponse(query: string, context: string): Promise<string>;
+  setPersonality(personality: Personality): void;
 }
 
 export interface IEmbeddingService {
@@ -25,7 +34,12 @@ export class SendMessageWithMemoryUseCase {
     private vectorRepository: VectorRepository,
     private chatService: IChatService,
     private embeddingService: IEmbeddingService,
-    private usersServiceClient: UsersServiceClient
+    private usersServiceClient: UsersServiceClient,
+    private intentionDetector: IntentionDetectorService,
+    private personalityService: PersonalityService,
+    private plantyContextRepo: IPlantyContextRepository,
+    private plantyPromptBuilder: PlantyPromptBuilder,
+    private godStorytellerService: GodStorytellerService
   ) {}
 
   async execute(dto: SendMessageDTO): Promise<ChatResponseDTO> {
@@ -53,6 +67,34 @@ export class SendMessageWithMemoryUseCase {
 
     try {
       // ============================================
+      // [0] PLANTY SYSTEM: Detectar intenciones y cargar contexto
+      // ============================================
+      console.log('🌿 Detectando intenciones con Planty System...');
+      const detectedIntentions = this.intentionDetector.detect(message);
+      console.log(`  ✓ Intenciones detectadas: ${detectedIntentions.map(i => i.type).join(', ') || 'ninguna'}`);
+
+      // Cargar o crear PlantyContext
+      let plantyContext = await this.plantyContextRepo.getByUserId(userId);
+      const isFirstInteraction = !plantyContext;
+
+      if (!plantyContext) {
+        console.log('  🆕 Primera interacción - creando contexto de Planty...');
+        plantyContext = PlantyContext.createNew(userId);
+      }
+
+      // Obtener personalidad actual
+      const currentPersonalityId = plantyContext.currentPersonality;
+      let currentPersonality = this.personalityService.getPersonalityById(currentPersonalityId);
+
+      if (!currentPersonality) {
+        currentPersonality = Personality.getDefault();
+      }
+
+      // Aplicar personalidad al servicio de chat
+      this.chatService.setPersonality(currentPersonality);
+      console.log(`  ✓ Personalidad activa: ${currentPersonality.config.name}`);
+
+      // ============================================
       // [1] INICIAR O RECUPERAR SESIÓN
       // ============================================
       let sessionId = providedSessionId;
@@ -76,6 +118,54 @@ export class SendMessageWithMemoryUseCase {
         console.log(`  ✓ Nivel: ${userContext.experienceLevel}`);
         console.log(`  ✓ Plantas activas: ${userContext.activePlants.length}`);
         console.log(`  ✓ Problemas comunes: ${userContext.commonProblems.length}`);
+      }
+
+      // ============================================
+      // [2.5] PLANTY SYSTEM: Manejar primera interacción y cambios de personalidad
+      // ============================================
+      let personalityChanged = false;
+      let personalityChangeMessage = '';
+
+      // Detectar si el usuario quiere cambiar de personalidad
+      const personalityChangeIntention = detectedIntentions.find(
+        i => i.type === IntentionType.CHANGE_PERSONALITY
+      );
+
+      if (personalityChangeIntention && personalityChangeIntention.extractedData?.personalityRequested) {
+        const newPersonality = this.personalityService.getPersonalityByType(
+          personalityChangeIntention.extractedData.personalityRequested as any
+        );
+
+        if (newPersonality && newPersonality.id !== currentPersonality.id) {
+          console.log(`  🔄 Cambiando personalidad: ${currentPersonality.config.name} → ${newPersonality.config.name}`);
+
+          // Generar mensaje de transición
+          personalityChangeMessage = this.plantyPromptBuilder.buildPersonalityChangeResponse(
+            currentPersonality,
+            newPersonality,
+            userContext?.name
+          );
+
+          // Actualizar contexto y personalidad
+          plantyContext = plantyContext.changePersonality(personalityChangeIntention.extractedData.personalityRequested as any);
+          currentPersonality = newPersonality;
+          this.chatService.setPersonality(currentPersonality);
+          personalityChanged = true;
+        }
+      }
+
+      // Detectar referencias a dioses
+      const godReferenceIntentions = detectedIntentions.filter(
+        i => i.type === IntentionType.REFERENCE_GOD
+      );
+
+      if (godReferenceIntentions.length > 0) {
+        console.log(`  ⚡ Referencias a dioses detectadas: ${godReferenceIntentions.length}`);
+        godReferenceIntentions.forEach(intention => {
+          if (intention.extractedData?.godMentioned) {
+            plantyContext = plantyContext!.incrementGodReference(intention.extractedData.godMentioned);
+          }
+        });
       }
 
       // ============================================
@@ -215,16 +305,30 @@ export class SendMessageWithMemoryUseCase {
       }
 
       // ============================================
-      // [11] CONSTRUIR RESPUESTA
+      // [11] PLANTY SYSTEM: Guardar contexto actualizado
+      // ============================================
+      console.log('🌿 Guardando contexto de Planty...');
+      plantyContext = plantyContext!.addConversationMemory(message);
+      await this.plantyContextRepo.save(plantyContext);
+      console.log('  ✓ Contexto de Planty guardado');
+
+      // ============================================
+      // [12] CONSTRUIR RESPUESTA
       // ============================================
       const totalLatency = Date.now() - startTime;
 
       console.log(`✅ Mensaje procesado en ${totalLatency}ms\n`);
 
+      // Si hubo cambio de personalidad, agregar mensaje al inicio de la respuesta
+      let finalResponse = response;
+      if (personalityChanged && personalityChangeMessage) {
+        finalResponse = `${personalityChangeMessage}\n\n${response}`;
+      }
+
       const chatResponse: ChatResponseDTO = {
         sessionId,
         message,
-        response,
+        response: finalResponse,
         sources: retrievedChunks.map(chunk => ({
           content: chunk.chunkId,
           score: chunk.relevanceScore,
@@ -239,6 +343,11 @@ export class SendMessageWithMemoryUseCase {
           messageCount: conversationContext.messageCount + 1, // +1 por el nuevo mensaje
           tags: conversationContext.tags
         } : undefined,
+        // 🌿 PLANTY SYSTEM: Nuevos campos
+        currentPersonality: currentPersonality.config.name,
+        availablePersonalities: this.personalityService.getAvailablePersonalities().map(p => p.config.name),
+        personalityChanged,
+        needsUserProfile: isFirstInteraction && !userContext,
         cached: embeddingCached,
         latencyMs: totalLatency,
         timestamp: new Date()
@@ -301,9 +410,9 @@ export class SendMessageWithMemoryUseCase {
       context += `=== FIN DEL HISTORIAL COMPLETO - NO INVENTES MÁS MENSAJES ===\n\n`;
     }
 
-    // 3. Contexto RAG (base de conocimiento)
+    // 3. Contexto RAG (conocimiento sobre plantas)
     if (ragContext && ragContext.length > 0) {
-      context += `📚 INFORMACIÓN RELEVANTE DE LA BASE DE DATOS:\n`;
+      context += `🌿 LO QUE SÉ SOBRE ESTE TEMA:\n`;
       context += ragContext;
       context += '\n\n';
     }
@@ -325,15 +434,22 @@ export class SendMessageWithMemoryUseCase {
 5. NO saludes de nuevo si ya saludaste en mensajes anteriores del historial
 6. PROHIBIDO inventar temas o conversaciones - solo usa lo que está explícitamente en el historial
 7. Si no estás 100% seguro de que algo se mencionó, NO lo menciones
+8. NUNCA menciones "base de datos", "documentos" o "información almacenada"
+9. Si sabes algo (de la sección "LO QUE SÉ"), responde como si fuera TU conocimiento propio
+10. Si NO sabes algo, simplemente di "No sé eso" o "No tengo información sobre eso"
 
 EJEMPLO DE LO QUE NO DEBES HACER:
 ❌ "Recuerdo que hablamos sobre pH del suelo" (si no está en el historial)
 ❌ "Como mencionaste antes sobre tus tomates" (si el usuario solo dijo "tomates" sin contexto)
 ❌ "¡Hola! Me alegra verte de nuevo" (si ya saludaste en el historial)
+❌ "Según la base de datos..." o "En los documentos..."
+❌ "No encuentro eso en mi base de datos"
 
 EJEMPLO DE LO QUE SÍ DEBES HACER:
 ✅ Responder directamente a la pregunta actual
 ✅ Usar SOLO la información que aparece literalmente en el historial
+✅ "Los tomates necesitan..." (como si fuera tu conocimiento)
+✅ "No sé eso" o "No tengo información sobre eso" (si no está en "LO QUE SÉ")
 ✅ Ser conciso y directo sin inventar contexto`;
     } else {
       context += `⚠️ INSTRUCCIONES CRÍTICAS - PRIMERA INTERACCIÓN:
@@ -344,15 +460,21 @@ EJEMPLO DE LO QUE SÍ DEBES HACER:
 4. Responde DIRECTAMENTE a la pregunta sin saludos innecesarios
 5. Si el usuario dice "hola", saluda brevemente y pregunta cómo ayudar
 6. Si el usuario pregunta algo específico (ej: "tomates"), responde DIRECTAMENTE sin saludar de nuevo
+7. NUNCA menciones "base de datos", "documentos" o "información almacenada"
+8. Si sabes algo (de la sección "LO QUE SÉ"), responde como si fuera TU conocimiento propio
+9. Si NO sabes algo, simplemente di "No sé eso" o "No tengo información sobre eso"
 
 PROHIBIDO:
 ❌ "¡Hola! Me alegra verte aquí por primera vez"
 ❌ "Recuerdo que..."
 ❌ "Anteriormente hablamos..."
+❌ "Según la base de datos..." o "En los documentos..."
+❌ "No encuentro eso en mi base de datos"
 
 CORRECTO:
 ✅ Respuesta directa sin saludos innecesarios
-✅ "Los tomates necesitan..." (respuesta directa)
+✅ "Los tomates necesitan..." (como si fuera tu conocimiento)
+✅ "No sé eso" o "No tengo información sobre eso" (si no está en "LO QUE SÉ")
 ✅ Si pregunta "hola" → "¡Hola! ¿En qué puedo ayudarte?"`;
     }
 
