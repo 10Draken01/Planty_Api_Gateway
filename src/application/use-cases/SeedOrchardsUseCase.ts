@@ -6,8 +6,8 @@ import { PlantInLayout } from '@domain/entities/PlantInLayout';
 import { Dimensions } from '@domain/value-objects/Dimensions';
 import { Position } from '@domain/value-objects/Position';
 
-// Configurar faker
-faker.locale = 'es';
+// Configurar faker con el locale español
+faker.setLocale('es');
 
 interface UserDTO {
   id: string;
@@ -355,10 +355,10 @@ export class SeedOrchardsUseCase {
       maxArea = 20; // 6-20 m²
     }
 
-    const area = faker.number.float({ min: minArea, max: maxArea, precision: 0.5 });
+    const area = faker.number.float({ min: minArea, max: maxArea, fractionDigits: 1 });
 
     // Generar width y height que cumplan el área
-    const aspectRatio = faker.number.float({ min: 0.5, max: 2.0, precision: 0.1 });
+    const aspectRatio = faker.number.float({ min: 0.5, max: 2.0, fractionDigits: 1 });
     const width = Math.sqrt(area * aspectRatio);
     const height = area / width;
 
@@ -502,8 +502,8 @@ export class SeedOrchardsUseCase {
         const index = Math.floor(Math.random() * modified.length);
         const plant = modified[index];
 
-        const newX = faker.number.float({ min: 0, max: Math.max(0.5, dimensions.width - plant.width), precision: 0.1 });
-        const newY = faker.number.float({ min: 0, max: Math.max(0.5, dimensions.height - plant.height), precision: 0.1 });
+        const newX = faker.number.float({ min: 0, max: Math.max(0.5, dimensions.width - plant.width), fractionDigits: 1 });
+        const newY = faker.number.float({ min: 0, max: Math.max(0.5, dimensions.height - plant.height), fractionDigits: 1 });
 
         modified[index] = PlantInLayout.create({
           plantId: plant.plantId,
@@ -520,10 +520,10 @@ export class SeedOrchardsUseCase {
       } else if (action < 0.90) {
         // 20%: Agregar planta aleatoria (puede no respetar compatibilidad)
         const plantId = faker.number.int({ min: 1, max: 50 });
-        const size = faker.number.float({ min: 0.3, max: 1.5, precision: 0.1 });
+        const size = faker.number.float({ min: 0.3, max: 1.5, fractionDigits: 1 });
 
-        const x = faker.number.float({ min: 0, max: Math.max(0, dimensions.width - size), precision: 0.1 });
-        const y = faker.number.float({ min: 0, max: Math.max(0, dimensions.height - size), precision: 0.1 });
+        const x = faker.number.float({ min: 0, max: Math.max(0, dimensions.width - size), fractionDigits: 1 });
+        const y = faker.number.float({ min: 0, max: Math.max(0, dimensions.height - size), fractionDigits: 1 });
 
         modified.push(PlantInLayout.create({
           plantId,
@@ -567,11 +567,11 @@ export class SeedOrchardsUseCase {
 
     for (let i = 0; i < targetPlants; i++) {
       const plantId = availablePlants[Math.floor(Math.random() * availablePlants.length)];
-      const size = faker.number.float({ min: 0.4, max: 1.8, precision: 0.1 });
+      const size = faker.number.float({ min: 0.4, max: 1.8, fractionDigits: 1 });
 
       // Posición aleatoria (puede haber superposiciones si experiencia baja)
-      const x = faker.number.float({ min: 0, max: Math.max(0, dimensions.width - size), precision: 0.1 });
-      const y = faker.number.float({ min: 0, max: Math.max(0, dimensions.height - size), precision: 0.1 });
+      const x = faker.number.float({ min: 0, max: Math.max(0, dimensions.width - size), fractionDigits: 1 });
+      const y = faker.number.float({ min: 0, max: Math.max(0, dimensions.height - size), fractionDigits: 1 });
 
       plants.push(PlantInLayout.create({
         plantId,
