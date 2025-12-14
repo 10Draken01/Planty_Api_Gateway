@@ -21,12 +21,20 @@
   ],
   "author": "Vega Script",
   "license": "MIT",
+  "_moduleAliases": {
+    "@domain": "dist/domain",
+    "@application": "dist/application",
+    "@infrastructure": "dist/infrastructure",
+    "@presentation": "dist/presentation",
+    "@config": "dist/config"
+  },
   "dependencies": {
-    "express": "^4.18.2",
     "cors": "^2.8.5",
-    "helmet": "^8.0.0",
-    "express-rate-limit": "^7.1.5",
     "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^8.0.0",
+    "module-alias": "^2.2.3",
     "mongodb": "^6.3.0"
   },
   "devDependencies": {
