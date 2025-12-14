@@ -1,4 +1,4 @@
-import { IOrchardRepository } from '@domain/repositories/IOrchardRepository';
+import { OrchardRepository } from '@domain/repositories/OrchardRepository';
 import { Orchard } from '@domain/entities/Orchard';
 
 export interface GetOrchardsByUserIdsDTO {
@@ -6,7 +6,7 @@ export interface GetOrchardsByUserIdsDTO {
 }
 
 export class GetOrchardsByUserIdsUseCase {
-  constructor(private orchardRepository: IOrchardRepository) {}
+  constructor(private orchardRepository: OrchardRepository) {}
 
   async execute(dto: GetOrchardsByUserIdsDTO): Promise<Orchard[]> {
     const { userIds } = dto;

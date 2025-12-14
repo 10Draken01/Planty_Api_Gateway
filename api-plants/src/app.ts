@@ -3,6 +3,9 @@
  * Puerto: 3005
  */
 
+// Configurar module-alias PRIMERO antes de cualquier otro import
+import 'module-alias/register';
+
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';

@@ -29,7 +29,7 @@ export class MongoDBConnection {
 
       console.log('🔌 Conectando a MongoDB...');
       
-      const mongoUri = `mongodb://${config.mongodb.mongoRootUser}:${config.mongodb.mongoRootPassword}@localhost:27017/${config.mongodb.dbName}?authSource=admin`;
+      const mongoUri = `mongodb://${config.mongodb.mongoRootUser}:${config.mongodb.mongoRootPassword}@${config.mongodb.mongoIp}:27017/${config.mongodb.dbName}?authSource=admin`;
       this.client = new MongoClient(mongoUri);
       await this.client.connect();
 

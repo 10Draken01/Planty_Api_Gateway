@@ -46,7 +46,7 @@ export class MongoPlantRepository implements PlantRepository {
    */
   async findById(id: number): Promise<Plant | null> {
     try {
-      const plant = await this.collection.findOne({ _id: id });
+      const plant = await this.collection.findOne({ _id: id } as any);
       return plant ? Plant.fromPersistence(plant) : null;
     } catch (error) {
       console.error('Error al buscar planta por ID:', error);

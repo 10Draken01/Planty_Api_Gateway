@@ -21,7 +21,7 @@ export class ListPlantsUseCase {
 
   private toDTO(plant: Plant): PlantInfoDTO {
     return {
-      id: plant.id,
+      _id: plant.id,
       species: plant.species,
       scientificName: plant.scientificName,
       type: plant.type,

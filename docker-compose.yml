@@ -164,35 +164,70 @@ services:
       retries: 3
       start_period: 40s
 
-  # Algorithm Genetic Service (PlantGen)
-  api-algorithm-gen:
+  # Plants Service
+  api-plants:
     build:
-      context: ./Proyecto_AG_C2
+      context: ./api-plants
       dockerfile: Dockerfile
-    container_name: planty-api-algorithm-gen
+    container_name: planty-api-plants
     restart: unless-stopped
     ports:
-      - "3005:3005"
+      - "3007:3007"
     environment:
-      - MONGO_ROOT_USER=${MONGO_ROOT_USER:-admin}
-      - MONGO_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-password123}
-      - MONGO_HOST=mongodb
-      - MONGO_PORT=27017
-      - MONGO_DATABASE=Data_plants
-      - PORT=3005
-      - ENVIRONMENT=production
-      - LOG_LEVEL=INFO
+      - NODE_ENV=production
+      - PORT=3007
+      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+      - MONGO_URI=mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-password123}@mongodb:27017/plantgen_ag?authSource=admin
+      - MONGO_DB_NAME=plantgen_ag
+      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-900000}
+      - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS:-100}
     depends_on:
       mongodb:
         condition: service_healthy
     networks:
       - planty-network
     healthcheck:
-      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:3005/algorithm_gen/health')"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3007/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
+      start_period: 40s
+
+  # Algorithm Genetic Service (PlantGen)
+  api-algorithm-gen:
+    build:
+      context: ./api-ag
+      dockerfile: Dockerfile
+    container_name: planty-api-algorithm-gen
+    restart: unless-stopped
+    ports:
+      - "3005:3005"
+    environment:
+      - NODE_ENV=production
+      - PORT=3005
+      - API_VERSION=v1
+      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
+      - MONGO_ROOT_USER=${MONGO_ROOT_USER:-admin}
+      - MONGO_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-password123}
+      - MONGO_DATABASE=plantgen_ag
+      - LOG_LEVEL=INFO
+      - AG_POPULATION_SIZE=40
+      - AG_MAX_GENERATIONS=150
+      - USERS_SERVICE_URL=http://api-users:3001
+      - NOTIFICATIONS_SERVICE_URL=http://api-notifications:3006
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - planty-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3005/v1/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # Recommender Service (ML)
   api-recommender:
@@ -254,6 +289,7 @@ services:
       - CHATBOT_SERVICE_URL=http://api-chatbot:3003
       - ORCHARD_SERVICE_URL=http://api-orchard:3004
       - ALGORITHM_GEN_SERVICE_URL=http://api-algorithm-gen:3005
+      - PLANTS_SERVICE_URL=http://api-plants:3007
       - RECOMMENDER_SERVICE_URL=http://api-recommender:3008
     depends_on:
       api-users:
@@ -263,6 +299,8 @@ services:
       api-chatbot:
         condition: service_healthy
       api-orchard:
+        condition: service_healthy
+      api-plants:
         condition: service_healthy
       api-algorithm-gen:
         condition: service_healthy

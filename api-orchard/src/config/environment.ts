@@ -17,6 +17,7 @@ export const config = {
   mongodb: {
     rootUser: process.env.MONGO_ROOT_USER || 'admin',
     rootPassword: process.env.MONGO_ROOT_PASSWORD || 'TuPassword123!',
+    mongoIp: process.env.MONGO_IP || 'localhost',
     dbName: process.env.MONGO_DB_NAME || 'planty_orchards'
   },
 

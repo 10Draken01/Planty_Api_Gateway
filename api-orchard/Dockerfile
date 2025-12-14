@@ -6,11 +6,11 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copiar archivos de dependencias
-COPY package*.json ./
+COPY package.json package-lock.json* ./
 COPY tsconfig.json ./
 
-# Instalar dependencias
-RUN npm ci
+# Instalar dependencias (incluyendo devDependencies para compilar)
+RUN npm ci || npm install
 
 # Copiar código fuente
 COPY src ./src
@@ -21,16 +21,26 @@ RUN npm run build
 # Stage 2: Production
 FROM node:20-alpine
 
+# Instalar dumb-init para manejo correcto de señales
+RUN apk add --no-cache dumb-init
+
+# Crear usuario no-root para seguridad
+RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
+
 WORKDIR /app
 
 # Copiar package files
-COPY package*.json ./
+COPY --chown=nodejs:nodejs package.json package-lock.json* ./
+COPY --chown=nodejs:nodejs tsconfig.json ./
 
 # Instalar solo dependencias de producción
-RUN npm ci --only=production
+RUN (npm ci --only=production || npm install --only=production) && npm cache clean --force
 
 # Copiar código compilado desde builder
-COPY --from=builder /app/dist ./dist
+COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+
+# Cambiar a usuario no-root
+USER nodejs
 
 # Variables de entorno por defecto
 ENV PORT=3004
@@ -40,8 +50,9 @@ ENV NODE_ENV=production
 EXPOSE 3004
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3004/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1); })"
 
-# Comando de inicio
+# Comando de inicio con dumb-init
+ENTRYPOINT ["dumb-init", "--"]
 CMD ["node", "dist/app.js"]
