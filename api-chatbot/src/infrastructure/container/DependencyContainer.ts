@@ -21,10 +21,20 @@ import { OllamaService } from '../services/OllamaService';
 import { CachedOllamaEmbeddingService } from '../services/CachedOllamaEmbeddingService';
 import { OpenAIEmbeddingService } from '../services/OpenAIEmbeddingService';
 import { JinaEmbeddingService } from '../services/JinaEmbeddingService';
+import { HuggingFaceEmbeddingService } from '../services/HuggingFaceEmbeddingService';
 import { IEmbeddingService } from '@application/use-cases/ProcessDocumentUseCase';
 
 // External Services
 import { UsersServiceClient } from '../external/UsersServiceClient';
+
+// 🌿 PLANTY SYSTEM - Application Services
+import { IntentionDetectorService } from '@application/services/IntentionDetectorService';
+import { PersonalityService } from '@application/services/PersonalityService';
+import { GodStorytellerService } from '@application/services/GodStorytellerService';
+import { PlantyPromptBuilder } from '@application/services/PlantyPromptBuilder';
+import { IPlantyContextRepository } from '@domain/repositories/PlantyContextRepository';
+import { UsersServicePlantyContextRepository } from '../repositories/UsersServicePlantyContextRepository';
+import { Personality } from '@domain/entities/Personality';
 
 // Config
 import { config } from '@config/environment';
@@ -62,6 +72,13 @@ export class DependencyContainer {
   private ollamaService: OllamaService; // Servicio Ollama general
   private usersServiceClient: UsersServiceClient; // 🆕 Cliente para api-users
 
+  // 🌿 PLANTY SYSTEM - Services
+  private intentionDetector: IntentionDetectorService;
+  private personalityService: PersonalityService;
+  private godStorytellerService: GodStorytellerService;
+  private plantyPromptBuilder: PlantyPromptBuilder;
+  private plantyContextRepo: IPlantyContextRepository;
+
   // Use Cases - Documents
   private uploadDocumentUseCase: UploadDocumentUseCase;
   private processDocumentUseCase: ProcessDocumentUseCase;
@@ -97,19 +114,23 @@ export class DependencyContainer {
     } else if (embeddingProvider === 'jina') {
       this.embeddingService = new JinaEmbeddingService();
       console.log('  ✓ Jina AI Embedding service inicializado (GRATIS - 8000 req/día)');
+    } else if (embeddingProvider === 'huggingface') {
+      this.embeddingService = new HuggingFaceEmbeddingService();
+      console.log('  ✓ Hugging Face Embedding service inicializado (GRATIS - 1000 req/hora)');
     } else {
       // Default: Ollama con cache
       this.embeddingService = new CachedOllamaEmbeddingService();
       console.log('  ✓ Ollama Embedding service con cache inicializado');
     }
 
-    // 🆕 Inicializar servicio de chat según configuración
+    // 🆕 Inicializar servicio de chat según configuración (con personalidad por defecto)
+    const defaultPersonality = Personality.getDefault();
     if (config.llmProvider === 'groq') {
-      this.chatService = new GroqChatService();
-      console.log('  ✓ Groq Chat service inicializado');
+      this.chatService = new GroqChatService(undefined, undefined, defaultPersonality);
+      console.log('  ✓ Groq Chat service inicializado con personalidad Amigable');
     } else {
-      this.chatService = new OllamaChatService();
-      console.log('  ✓ Ollama Chat service inicializado');
+      this.chatService = new OllamaChatService(undefined, undefined, defaultPersonality);
+      console.log('  ✓ Ollama Chat service inicializado con personalidad Amigable');
     }
 
     // Servicio Ollama general
@@ -118,6 +139,16 @@ export class DependencyContainer {
     // 🆕 Cliente para comunicación con api-users
     this.usersServiceClient = new UsersServiceClient();
     console.log('  ✓ Users service client inicializado');
+
+    // 🌿 PLANTY SYSTEM - Inicializar servicios
+    this.intentionDetector = new IntentionDetectorService();
+    this.personalityService = new PersonalityService();
+    this.godStorytellerService = new GodStorytellerService();
+    this.plantyPromptBuilder = new PlantyPromptBuilder();
+
+    this.plantyContextRepo = new UsersServicePlantyContextRepository();
+
+    console.log('  ✓ Planty System servicios inicializados');
 
     // 3. Inicializar Use Cases - Documents
     this.uploadDocumentUseCase = new UploadDocumentUseCase(this.documentRepository);
@@ -138,14 +169,19 @@ export class DependencyContainer {
     );
 
     // 4. Inicializar Use Cases - Chat
-    // 🆕 Usar el nuevo use case con memoria
+    // 🆕 Usar el nuevo use case con memoria Y PLANTY SYSTEM
     this.sendMessageUseCase = new SendMessageWithMemoryUseCase(
       this.vectorRepository,
       this.chatService,
       this.embeddingService,
-      this.usersServiceClient
+      this.usersServiceClient,
+      this.intentionDetector,
+      this.personalityService,
+      this.plantyContextRepo,
+      this.plantyPromptBuilder,
+      this.godStorytellerService
     );
-    console.log('  ✓ SendMessageWithMemoryUseCase inicializado');
+    console.log('  ✓ SendMessageWithMemoryUseCase con Planty System inicializado');
 
     this.getChatHistoryUseCase = new GetChatHistoryUseCase(this.chatRepository);
 

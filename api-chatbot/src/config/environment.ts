@@ -18,7 +18,7 @@ export const config = {
   // LLM Provider (ollama o groq)
   llmProvider: process.env.LLM_PROVIDER || 'ollama',
 
-  // Embedding Provider (ollama, openai, voyageai)
+  // Embedding Provider (ollama, openai, voyageai, jina, huggingface)
   embeddingProvider: process.env.EMBEDDING_PROVIDER || process.env.LLM_PROVIDER || 'ollama',
 
   // Ollama
@@ -54,6 +54,12 @@ export const config = {
     embeddingModel: process.env.JINA_EMBEDDING_MODEL || 'jina-embeddings-v2-base-en'
   },
 
+  // Hugging Face Inference API (GRATUITO - 1000 requests/hora)
+  huggingface: {
+    apiKey: process.env.HUGGINGFACE_API_KEY || '',
+    embeddingModel: process.env.HUGGINGFACE_EMBEDDING_MODEL || 'sentence-transformers/all-MiniLM-L6-v2'
+  },
+
   // ChromaDB
   chroma: {
     host: process.env.CHROMA_HOST || 'localhost',
@@ -80,7 +86,10 @@ export const config = {
   // JWT (para futura integración)
   jwt: {
     secret: process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production'
-  }
+  },
+
+  // Users Service
+  usersServiceUrl: process.env.USERS_SERVICE_URL || 'http://localhost:3001'
 };
 
 /**

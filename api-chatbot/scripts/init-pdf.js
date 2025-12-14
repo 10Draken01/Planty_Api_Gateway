@@ -114,9 +114,10 @@ async function processPdf(documentId) {
   console.log('   Por favor, espera...\n');
 
   try {
+    // Configuración optimizada para PDFs grandes con límites de API
     const response = await axios.post(`${API_BASE_URL}/documents/${documentId}/process`, {
-      chunkSize: 1000,
-      chunkOverlap: 200
+      chunkSize: 1200,     // Más grande = menos chunks = menos requests a Jina
+      chunkOverlap: 150    // Balance entre contexto y eficiencia
     });
 
     if (response.data.success) {

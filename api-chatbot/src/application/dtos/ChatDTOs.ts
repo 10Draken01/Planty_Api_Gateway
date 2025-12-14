@@ -26,6 +26,13 @@ export interface ChatResponseDTO {
     messageCount: number;
     tags: string[];
   };
+
+  // 🌿 PLANTY SYSTEM
+  currentPersonality?: string;
+  availablePersonalities?: string[];
+  personalityChanged?: boolean;
+  needsUserProfile?: boolean;
+
   cached?: boolean; // Indica si el embedding vino del cache
   latencyMs?: number;
 

@@ -61,6 +61,22 @@ export class MemoryRoutes {
       (req, res) => memoryController.updateTags(req, res)
     );
 
+    // 🌿 PLANTY CONTEXT ENDPOINTS
+    router.get(
+      '/planty/context/:userId',
+      (req, res) => memoryController.getPlantyContext(req, res)
+    );
+
+    router.post(
+      '/planty/context',
+      (req, res) => memoryController.savePlantyContext(req, res)
+    );
+
+    router.delete(
+      '/planty/context/:userId',
+      (req, res) => memoryController.deletePlantyContext(req, res)
+    );
+
     return router;
   }
 }
