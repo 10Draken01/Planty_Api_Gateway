@@ -14,7 +14,6 @@ RUN npm ci
 
 # Copiar código fuente
 COPY src ./src
-COPY data ./data
 
 # Compilar TypeScript
 RUN npm run build
@@ -39,7 +38,6 @@ RUN npm ci --only=production && npm cache clean --force
 
 # Copiar build artifacts
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
-COPY --from=builder --chown=nodejs:nodejs /app/data ./data
 
 # Crear directorio para logs con permisos correctos
 RUN mkdir -p logs && chown -R nodejs:nodejs logs
