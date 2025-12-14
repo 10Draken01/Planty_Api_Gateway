@@ -46,7 +46,7 @@ export class ChatController {
       }
 
       // Ejecutar use case con memoria - ahora incluye userId y sessionId
-      const response = await this.sendMessageUseCase.execute({
+      const chatResponse = await this.sendMessageUseCase.execute({
         userId: userId.trim(),
         sessionId: sessionId?.trim(), // Opcional
         message: message.trim(),
@@ -54,11 +54,13 @@ export class ChatController {
         maxContextChunks
       });
 
-      // Retornar respuesta con sessionId para continuar conversación
+      // Retornar respuesta simplificada (solo lo esencial)
       res.status(200).json({
         success: true,
-        response: response.response,
-        sessionId: response.sessionId
+        sessionId: chatResponse.sessionId,
+        response: chatResponse.response,
+        currentPersonality: chatResponse.currentPersonality,
+        needsUserProfile: chatResponse.needsUserProfile
       });
     } catch (error) {
       console.error('Error en sendMessage:', error);

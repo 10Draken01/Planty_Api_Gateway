@@ -102,34 +102,30 @@ export class GroqChatService implements IChatService {
 
   private buildUserPrompt(query: string, context: string): string {
     if (context && context.trim().length > 0) {
-      return `De lo siguiente responde coherentemente, con energía, de manera clara, divertida y amigable.
-
-📚 INFORMACIÓN DISPONIBLE EN LA BASE DE DATOS:
-${context}
-
-💬 PREGUNTA DEL USUARIO:
-"${query}"
+      return `${context}
 
 INSTRUCCIONES PARA TU RESPUESTA:
 - Lee cuidadosamente la pregunta del usuario y el contexto proporcionado
 - Genera una respuesta coherente, directa y relevante a la pregunta específica
-- Usa ÚNICAMENTE la información de la base de datos proporcionada arriba
+- Usa ÚNICAMENTE la información proporcionada arriba
 - Estructura tu respuesta de forma clara y organizada
 - Sé específico y menciona detalles relevantes del contexto
-- Mantén un tono entusiasta, amigable y divertido
+- Mantén un tono entusiasta, amigable y divertido según tu personalidad
 - Usa emojis relevantes para hacer la respuesta más amena
-- Si la información en el contexto es limitada para responder completamente, menciónalo de forma simpática y ofrece lo que sí sabes
+- Si la información es limitada, menciónalo de forma simpática y ofrece lo que sí sabes
+- NUNCA menciones "base de datos", "documentos" o "información almacenada"
+- Responde como si el conocimiento proporcionado fuera TU conocimiento propio
 - No inventes información que no esté en el contexto proporcionado`;
     } else {
-      return `De lo siguiente responde coherentemente, con energía, de manera clara, divertida y amigable.
-
-💬 PREGUNTA DEL USUARIO:
+      return `💬 PREGUNTA DEL USUARIO:
 "${query}"
 
-⚠️ SITUACIÓN: No encontré información específica en mi base de datos sobre esta pregunta.
+⚠️ SITUACIÓN: No tienes información específica sobre esta pregunta.
 
 INSTRUCCIONES PARA TU RESPUESTA:
-- Genera una respuesta amigable y honesta indicando que NO tienes información específica sobre esa consulta en tu base de datos de plantas de Suchiapa
+- Di honestamente que no sabes sobre eso
+- Usa frases como "No sé eso" o "No tengo información sobre eso"
+- NUNCA digas "no está en mi base de datos" o "no encuentro documentos"
 - Mantén un tono positivo, alegre y entusiasta
 - Ofrece ayuda de forma general si es apropiado
 - Sugiere al usuario que reformule su pregunta o pregunte sobre otras plantas
