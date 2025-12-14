@@ -46,6 +46,12 @@ class ChatbotApp {
    * Configura los middlewares de Express
    */
   private setupMiddlewares(): void {
+    // Trust proxy - CRÍTICO para Railway/producción
+    // Railway usa proxies reversos, necesitamos confiar en X-Forwarded-* headers
+    if (config.nodeEnv === 'production') {
+      this.app.set('trust proxy', 1);
+    }
+
     // CORS
     this.app.use(
       cors({

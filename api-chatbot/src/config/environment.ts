@@ -18,6 +18,9 @@ export const config = {
   // LLM Provider (ollama o groq)
   llmProvider: process.env.LLM_PROVIDER || 'ollama',
 
+  // Embedding Provider (ollama, openai, voyageai)
+  embeddingProvider: process.env.EMBEDDING_PROVIDER || process.env.LLM_PROVIDER || 'ollama',
+
   // Ollama
   ollama: {
     baseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
@@ -30,6 +33,25 @@ export const config = {
     apiKey: process.env.GROQ_API_KEY || '',
     chatModel: process.env.GROQ_CHAT_MODEL || 'llama-3.2-90b-text-preview',
     embeddingModel: process.env.GROQ_EMBEDDING_MODEL || 'nomic-embed-text'
+  },
+
+  // OpenAI (para embeddings de alta calidad)
+  openai: {
+    apiKey: process.env.OPENAI_API_KEY || '',
+    embeddingModel: process.env.OPENAI_EMBEDDING_MODEL || 'text-embedding-3-small',
+    chatModel: process.env.OPENAI_CHAT_MODEL || 'gpt-4o-mini'
+  },
+
+  // Voyage AI (alternativa especializada en embeddings)
+  voyageai: {
+    apiKey: process.env.VOYAGEAI_API_KEY || '',
+    embeddingModel: process.env.VOYAGEAI_EMBEDDING_MODEL || 'voyage-2'
+  },
+
+  // Jina AI (alternativa GRATUITA para embeddings - 8000 requests/día)
+  jina: {
+    apiKey: process.env.JINA_API_KEY || '',
+    embeddingModel: process.env.JINA_EMBEDDING_MODEL || 'jina-embeddings-v2-base-en'
   },
 
   // ChromaDB

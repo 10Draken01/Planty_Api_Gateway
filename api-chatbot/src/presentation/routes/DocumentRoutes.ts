@@ -11,9 +11,13 @@ import * as fs from 'fs';
 // Configurar multer para subida de archivos
 const uploadsDir = path.join(process.cwd(), 'uploads');
 
-// Asegurar que el directorio existe
+// Asegurar que el directorio existe (con manejo de errores)
 if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+  try {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  } catch (error) {
+    console.warn(`Warning: No se pudo crear el directorio uploads. Puede que ya exista o no haya permisos.`, error);
+  }
 }
 
 const storage = multer.diskStorage({
