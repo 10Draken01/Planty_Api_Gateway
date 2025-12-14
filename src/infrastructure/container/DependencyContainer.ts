@@ -17,8 +17,13 @@ import { OllamaChatService } from '../services/OllamaChatService';
 import { GroqChatService } from '../services/GroqChatService';
 import { OllamaService } from '../services/OllamaService';
 
-// 🆕 NUEVOS SERVICIOS CON MEMORIA
+// Embedding Services
 import { CachedOllamaEmbeddingService } from '../services/CachedOllamaEmbeddingService';
+import { OpenAIEmbeddingService } from '../services/OpenAIEmbeddingService';
+import { JinaEmbeddingService } from '../services/JinaEmbeddingService';
+import { IEmbeddingService } from '@application/use-cases/ProcessDocumentUseCase';
+
+// External Services
 import { UsersServiceClient } from '../external/UsersServiceClient';
 
 // Config
@@ -52,7 +57,7 @@ export class DependencyContainer {
   // Services
   private pdfService: PDFService;
   private textSplitterService: TextSplitterService;
-  private embeddingService: CachedOllamaEmbeddingService; // 🆕 Con cache
+  private embeddingService: IEmbeddingService; // Soporta múltiples providers
   private chatService: OllamaChatService | GroqChatService; // 🆕 Soporta Ollama o Groq
   private ollamaService: OllamaService; // Servicio Ollama general
   private usersServiceClient: UsersServiceClient; // 🆕 Cliente para api-users
@@ -84,9 +89,19 @@ export class DependencyContainer {
     this.pdfService = new PDFService();
     this.textSplitterService = new TextSplitterService();
 
-    // 🆕 Embedding service con cache
-    this.embeddingService = new CachedOllamaEmbeddingService();
-    console.log('  ✓ Embedding service con cache inicializado');
+    // Inicializar embedding service según configuración
+    const embeddingProvider = config.embeddingProvider || 'ollama';
+    if (embeddingProvider === 'openai') {
+      this.embeddingService = new OpenAIEmbeddingService();
+      console.log('  ✓ OpenAI Embedding service inicializado');
+    } else if (embeddingProvider === 'jina') {
+      this.embeddingService = new JinaEmbeddingService();
+      console.log('  ✓ Jina AI Embedding service inicializado (GRATIS - 8000 req/día)');
+    } else {
+      // Default: Ollama con cache
+      this.embeddingService = new CachedOllamaEmbeddingService();
+      console.log('  ✓ Ollama Embedding service con cache inicializado');
+    }
 
     // 🆕 Inicializar servicio de chat según configuración
     if (config.llmProvider === 'groq') {
@@ -182,9 +197,10 @@ export class DependencyContainer {
         console.log('  ✅ Groq API conectado y funcionando');
       }
 
-      // Para embeddings seguimos usando Ollama
-      console.log('🧬 Verificando Ollama (embeddings)...');
-      const embeddingAvailable = await this.embeddingService.checkModelAvailability();
+      // Para embeddings (puede ser OpenAI u Ollama)
+      console.log(`🧬 Verificando ${config.embeddingProvider} (embeddings)...`);
+      const embeddingAvailable = (this.embeddingService as any).checkModelAvailability ?
+        await (this.embeddingService as any).checkModelAvailability() : true;
 
       if (!embeddingAvailable) {
         console.warn('  ⚠️  Modelo de embeddings no disponible');
@@ -193,7 +209,8 @@ export class DependencyContainer {
       }
     } else {
       console.log('🤖 Verificando Ollama...');
-      const embeddingAvailable = await this.embeddingService.checkModelAvailability();
+      const embeddingAvailable = (this.embeddingService as any).checkModelAvailability ?
+        await (this.embeddingService as any).checkModelAvailability() : true;
       const chatAvailable = await this.chatService.checkModelAvailability();
 
       if (!embeddingAvailable) {
@@ -247,17 +264,22 @@ export class DependencyContainer {
   }
 
   /**
-   * Obtiene estadísticas del cache de embeddings
+   * Obtiene estadísticas del cache de embeddings (solo Ollama)
    */
   async getCacheStats() {
-    return await this.embeddingService.getCacheStats();
+    if ((this.embeddingService as any).getCacheStats) {
+      return await (this.embeddingService as any).getCacheStats();
+    }
+    return { totalCached: 0, cacheHits: 0, cacheMisses: 0, hitRate: 0 };
   }
 
   /**
-   * Limpiar cache de embeddings
+   * Limpiar cache de embeddings (solo Ollama)
    */
   async clearEmbeddingCache() {
-    await this.embeddingService.clearCache();
+    if ((this.embeddingService as any).clearCache) {
+      await (this.embeddingService as any).clearCache();
+    }
   }
 
   /**
@@ -265,9 +287,12 @@ export class DependencyContainer {
    */
   async getSystemInfo() {
     const cacheStats = await this.getCacheStats();
+    const embeddingInfo = (this.embeddingService as any).getInfo ?
+      (this.embeddingService as any).getInfo() :
+      { provider: config.embeddingProvider };
 
     return {
-      embeddingModel: this.embeddingService.getInfo(),
+      embeddingModel: embeddingInfo,
       chatModel: this.chatService.getModelInfo(),
       documentsCount: this.documentRepository.size(),
       chatMessagesCount: this.chatRepository.size(),
@@ -302,9 +327,10 @@ export class DependencyContainer {
     }
 
     try {
-      results.ollamaEmbedding = await this.embeddingService.checkModelAvailability();
+      results.ollamaEmbedding = (this.embeddingService as any).checkModelAvailability ?
+        await (this.embeddingService as any).checkModelAvailability() : true;
     } catch (error) {
-      console.error('Ollama Embedding no disponible:', error);
+      console.error('Embedding service no disponible:', error);
     }
 
     try {
