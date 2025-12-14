@@ -39,6 +39,9 @@ RUN (npm ci --only=production || npm install --only=production) && npm cache cle
 # Copiar build artifacts
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 
+# Copiar archivos de datos (plantas y compatibilidades)
+COPY --chown=nodejs:nodejs data ./data
+
 # Crear directorio para logs con permisos correctos
 RUN mkdir -p logs && chown -R nodejs:nodejs logs
 

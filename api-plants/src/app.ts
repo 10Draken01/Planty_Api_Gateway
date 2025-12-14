@@ -3,8 +3,11 @@
  * Puerto: 3005
  */
 
-// Configurar module-alias PRIMERO antes de cualquier otro import
-import 'module-alias/register';
+// Configurar module-alias solo en producción (cuando se ejecuta código compilado en .js)
+// En desarrollo con .ts, tsconfig-paths/register maneja los path aliases
+if (!__filename.endsWith('.ts')) {
+  require('module-alias/register');
+}
 
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
