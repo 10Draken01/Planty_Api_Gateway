@@ -21,7 +21,7 @@ export interface OrchardProps {
   name: string;
   description: string;
   dimensions: Dimensions;
-  plants: PlantInLayout[];  // ✅ NUEVO: Array de plantas con posiciones
+  plants: PlantInLayout[];
   state: boolean;
   createAt: Date;
   updateAt: Date;
